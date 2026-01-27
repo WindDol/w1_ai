@@ -1,0 +1,1 @@
+docker stop w1_ai
