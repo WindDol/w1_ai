@@ -79,7 +79,7 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
         }
         List<SymbolDefinition> finalSymbols = new ArrayList<>(globalSymbolMap.values());
 
-        List<ReferenceItem> finalReferences = new ArrayList<>();
+
         SectionEntity refSection = allSections.stream()
                 .filter(s -> s.getHeader().toUpperCase().contains("REFERENCE"))
                 .findFirst()

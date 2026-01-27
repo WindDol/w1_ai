@@ -97,6 +97,10 @@ public class PaperRepository implements IPaperRepository {
         // 1. 先查询出当前的 PO 对象
         // 注意：这里引用的是 infrastructure 层的 PO
         Paper po = paperMapper.selectById(paperId);
+        if (po == null) {
+            log.error("Paper not found with id: {}", paperId);
+            return;
+        }
         Map<String, Object> metadata = po.getMetadata();
         if (metadata == null) {
             metadata = new HashMap<>();
