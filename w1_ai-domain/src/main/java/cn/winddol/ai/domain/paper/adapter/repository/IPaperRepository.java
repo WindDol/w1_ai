@@ -14,6 +14,6 @@ public interface IPaperRepository {
 
     PaperEntity getPaperById(Long id);
 
-    void updatePaperMetadata(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection);
+    void saveEnrichmentData(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection);
 
 }

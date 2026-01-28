@@ -5,7 +5,6 @@ import cn.winddol.ai.domain.paper.adapter.repository.IPaperRepository;
 import cn.winddol.ai.domain.paper.model.entity.OutlineNode;
 import cn.winddol.ai.domain.paper.model.entity.PaperEntity;
 import cn.winddol.ai.domain.paper.model.entity.SectionEntity;
-import cn.winddol.ai.domain.paper.model.valobj.ReferenceItem;
 import cn.winddol.ai.domain.paper.model.valobj.SymbolDefinition;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
         int count = allUuids.size() >> 1 ;
 
         List<SectionEntity> allSections = repository.getSectionByUuid(allUuids);
-
         // key: parentId, value: 子章节列表
         Map<String, List<SectionEntity>> hierarchyMap = allSections.stream()
                 .filter(s -> s.getParentId() != null) // 只处理子节点
@@ -87,7 +85,7 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
 
         // 6. 存回数据库 (Metadata 字段)
         if (!finalSymbols.isEmpty() || refSection != null) {
-            repository.updatePaperMetadata(paperId, finalSymbols,refSection);
+            repository.saveEnrichmentData(paperId, finalSymbols,refSection);
             log.info("Paper [{}] enriched with {} symbols.", paperId, finalSymbols.size());
         }
     }

@@ -20,13 +20,17 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
 # MyBatis 配置【如需使用记得打开】
-#mybatis:
-#  mapper-locations: classpath:/mybatis/mapper/*.xml
-#  config-location:  classpath:/mybatis/config/mybatis-config.xml
+mybatis-plus:
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  # config-location: classpath:/mybatis/config/mybatis-config.xml
+  configuration:
+    map-underscore-to-camel-case: true # 开启驼峰命名转换
 ai:
   llm:
     api-key: sk-1e2d1a2adcae42e482f57ebcbca2e497
-# 日志
+  embedding:
+    api-key: sk-924a8ed2e50b43a188b7660aa2c1f93d
+    base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
 logging:
   level:
     root: info

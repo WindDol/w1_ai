@@ -62,7 +62,7 @@ public class TestAdapter {
     }
     @Test
     public void testEnrichment() throws Exception {
-        enrichmentService.symbolExtractionAndStorage(5l);
+        enrichmentService.symbolExtractionAndStorage(7l);
     }
 
 

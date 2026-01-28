@@ -20,7 +20,8 @@ public class TreeBuilderUtil {
 
         // 1. 先把所有 PO 转成 Node
         for (SectionPO po : flatSections) {
-            OutlineNode node = new OutlineNode(po.uuid, po.header, po.level);
+            OutlineNode node = OutlineNode.builder().id(po.uuid).title(po.header).level(po.level)
+                    .build();
             nodeMap.put(po.uuid, node);
         }
 

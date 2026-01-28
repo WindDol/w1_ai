@@ -8,11 +8,19 @@ import cn.winddol.ai.domain.paper.model.entity.SectionPO;
 import cn.winddol.ai.domain.paper.model.valobj.ReferenceItem;
 import cn.winddol.ai.domain.paper.model.valobj.SymbolDefinition;
 import cn.winddol.ai.infrastructure.dao.PaperMapper;
+import cn.winddol.ai.infrastructure.dao.ReferenceMapper;
 import cn.winddol.ai.infrastructure.dao.SectionMapper;
+import cn.winddol.ai.infrastructure.dao.SymbolMapper;
+import cn.winddol.ai.infrastructure.dao.impl.ReferenceSeriveceImpl;
+import cn.winddol.ai.infrastructure.dao.impl.SymbolService;
+import cn.winddol.ai.infrastructure.dao.impl.SymbolServiceImpl;
 import cn.winddol.ai.infrastructure.dao.po.Paper;
+import cn.winddol.ai.infrastructure.dao.po.Reference;
 import cn.winddol.ai.infrastructure.dao.po.Section;
+import cn.winddol.ai.infrastructure.dao.po.Symbol;
 import cn.winddol.ai.infrastructure.parser.ReferenceParser;
 import cn.winddol.ai.infrastructure.utils.TreeBuilderUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -32,6 +40,13 @@ public class PaperRepository implements IPaperRepository {
 
     @Resource
     private ReferenceParser referenceParser;
+
+    @Resource
+    private SymbolServiceImpl symbolService;
+
+    @Resource
+    private ReferenceSeriveceImpl referenceSerivece;
+
 
     @Override
     @Transactional
@@ -63,7 +78,11 @@ public class PaperRepository implements IPaperRepository {
         if (uuids == null || uuids.isEmpty()) {
             return List.of();
         }
-        List<Section> sections = sectionMapper.selectBatchIds(uuids);
+        List<Section> sections = sectionMapper.selectList(
+                new LambdaQueryWrapper<Section>()
+                        .in(Section::getId, uuids)
+                        .orderByAsc(Section::getIdx)
+        );
 
         return sections.stream().map(po -> {
             SectionEntity entity = new SectionEntity();
@@ -91,34 +110,29 @@ public class PaperRepository implements IPaperRepository {
                 .title(paper.getTitle())
                 .build();
     }
-
+    @Transactional
     @Override
-    public void updatePaperMetadata(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection) {
-        // 1. 先查询出当前的 PO 对象
-        // 注意：这里引用的是 infrastructure 层的 PO
-        Paper po = paperMapper.selectById(paperId);
-        if (po == null) {
-            log.error("Paper not found with id: {}", paperId);
-            return;
-        }
-        Map<String, Object> metadata = po.getMetadata();
-        if (metadata == null) {
-            metadata = new HashMap<>();
-        }
-        metadata.put("symbols", finalSymbols);
+    public void saveEnrichmentData(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection) {
+        List<Symbol> symbols = finalSymbols.stream().map(s -> Symbol.builder()
+                .paperId(paperId)
+                .symbol(s.getSymbol())
+                .latex(s.getLatex())
+                .description(s.getDescription())
+                .definitionFormula(s.getDefinitionFormula())
+                .sourceIds(s.getScopes().toArray(new String[0]))
+                .isGlobal(s.isGlobal()).build()).toList();
+
+        symbolService.saveBatch(symbols);
+
         if(refSection != null){
             List<ReferenceItem> references = referenceParser.parse(refSection.getContent());
             if (references != null && !references.isEmpty()) {
-                metadata.put("references", references);
+                List<Reference> referenceList = references.stream().map(r -> Reference.builder()
+                        .paperId(paperId).refIndex(r.getRefId()).rawText(r.getRawText()).title(r.getTitle()).build()).toList();
+                referenceSerivece.saveBatch(referenceList);
             }
             log.info("Extracted {} references.", references.size());
         }
-        // 4. 回填修改后的 metadata
-        po.setMetadata(metadata);
-
-        // 5. 执行数据库更新
-        paperMapper.updateById(po);
-
     }
 
 

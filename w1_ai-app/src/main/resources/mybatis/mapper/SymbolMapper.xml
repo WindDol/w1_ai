@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.winddol.ai.infrastructure.dao.SymbolMapper">
+
+    <resultMap id="SymbolMap" type="cn.winddol.ai.infrastructure.dao.po.Symbol">
+        <id column="id" property="id"/>
+        <result column="symbol" property="symbol"/>
+        <result column="description" property="description"/>
+    </resultMap>
+
+    <!-- 向量检索 SQL -->
+    <!-- order by embedding <=> [1,2,3] limit 5 -->
+    <select id="searchByVector" resultMap="SymbolMap">
+    <![CDATA[
+        SELECT id, symbol, description, 1 - (embedding <=> #{vectorStr}::vector) as score
+        FROM paper_symbols
+        WHERE paper_id = #{paperId}
+        ORDER BY embedding <=> #{vectorStr}::vector
+            LIMIT #{limit}
+        ]]>
+    </select>
+</mapper>

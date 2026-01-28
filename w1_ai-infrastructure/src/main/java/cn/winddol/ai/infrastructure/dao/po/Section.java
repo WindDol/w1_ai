@@ -1,9 +1,15 @@
 package cn.winddol.ai.infrastructure.dao.po;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @TableName("sections")
 public class Section {
     @TableId(type = IdType.INPUT) // 手动输入 UUID
@@ -17,7 +23,6 @@ public class Section {
 
     private Integer tokenCount;
 
-    @TableField(exist = false)
     private Object embedding;
 
     private Integer idx;

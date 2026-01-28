@@ -2,6 +2,13 @@
   <profile version="1.0">
     <option name="myName" value="Project Default" />
     <inspection_tool class="AliAccessStaticViaInstance" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AliArrayNamingShouldHaveBracket" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AliControlFlowStatementWithoutBraces" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AliDeprecation" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AliEqualsAvoidNull" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AliLongLiteralsEndingWithLowercaseL" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AliMissingOverrideAnnotation" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AliWrapperTypeEquality" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaAbstractClassShouldStartWithAbstractNaming" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaAvoidApacheBeanUtilsCopy" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -18,6 +25,7 @@
     <inspection_tool class="AlibabaAvoidReturnInFinally" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaAvoidStartWithDollarAndUnderLineNaming" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaAvoidUseTimer" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AlibabaBigDecimalAvoidDoubleConstructor" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaBooleanPropertyShouldNotStartWithIs" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaClassCastExceptionWithSubListToArrayList" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaClassCastExceptionWithToArray" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -26,10 +34,12 @@
     <inspection_tool class="AlibabaCollectionInitShouldAssignCapacity" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaCommentsMustBeJavadocFormat" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaConcurrentExceptionWithModifyOriginSubList" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AlibabaConstantFieldShouldBeUpperCase" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaCountDownShouldInFinally" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaDontModifyInForeachCircle" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaEnumConstantsMustHaveComment" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaExceptionClassShouldEndWithException" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AlibabaIbatisMethodQueryForList" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaLockShouldWithTryFinally" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaLowerCamelCaseVariableNaming" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaMethodReturnWrapperType" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -53,5 +63,6 @@
     <inspection_tool class="AlibabaUnsupportedExceptionWithModifyAsList" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaUseQuietReferenceNotation" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AlibabaUseRightCaseForDateFormat" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="MapOrSetKeyShouldOverrideHashCodeEquals" enabled="true" level="WARNING" enabled_by_default="true" />
   </profile>
 </component>
