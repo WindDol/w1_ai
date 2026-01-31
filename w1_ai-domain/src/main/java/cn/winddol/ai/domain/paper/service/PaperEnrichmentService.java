@@ -113,14 +113,11 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
         for (SymbolDefinition newSym : newSymbols) {
             String key = newSym.getSymbol().trim();
 
-            // 过滤掉常见无意义符号 (可选)
             if (key.length() > 10 || isCommonMathConstant(key)) continue;
             SymbolDefinition target;
 
             if (map.containsKey(key)) {
-                // 已存在，取出来更新
                 target = map.get(key);
-                // 择优更新描述（保留最长的那个）
                 if (isValidDescription(newSym.getDescription()) &&
                         newSym.getDescription().length() > target.getDescription().length() + 5) {
                     target.setDescription(newSym.getDescription());
@@ -128,7 +125,6 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
                     target.setDefinitionFormula(newSym.getDefinitionFormula());
                 }
             } else {
-                // 新符号
                 target = newSym;
                 map.put(key, target);
             }

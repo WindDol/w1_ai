@@ -10,7 +10,6 @@ import java.util.List;
 
 @Mapper
 public interface SymbolMapper extends BaseMapper<Symbol> {
-    List<Symbol> searchByVector(@Param("paperId") Long paperId,
-                                @Param("vectorStr") String vectorStr,
-                                @Param("limit") int limit );
+    List<Symbol> searchByVector(@Param("vectorStr") String vectorStr,
+                                @Param("topK") int topK );
 }

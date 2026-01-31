@@ -28,4 +28,7 @@ public class Section {
     private Integer idx;
 
     private String parentId;
+
+    @TableField(exist = false)
+    private Double score;
 }

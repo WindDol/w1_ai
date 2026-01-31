@@ -32,4 +32,22 @@ public class Symbol {
     @TableField(typeHandler = PgVectorHandler.class) // 应用刚才写的 Handler
     private float[] embedding;
 
+    @TableField(exist = false)
+    private Double score;
+
+    public String toEmbeddingText(){
+        StringBuilder textBuilder = new StringBuilder();
+
+        // 基础信息
+        textBuilder.append("Symbol: ").append(getSymbol());
+        textBuilder.append("; Meaning: ").append(getDescription());
+        textBuilder.append("; LaTeX Representation: ").append(getLatex());
+
+        if (getDefinitionFormula() != null) {
+            textBuilder.append("; Definition Formula: ").append(getDefinitionFormula());
+        }
+
+        return textBuilder.toString();
+    }
+
 }

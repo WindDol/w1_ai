@@ -43,6 +43,12 @@
             <groupId>cn.winddol.ai</groupId>
             <artifactId>w1_ai-types</artifactId>
         </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-core</artifactId>
+            <version>0.35.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

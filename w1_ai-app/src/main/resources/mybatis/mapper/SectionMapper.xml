@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.winddol.ai.infrastructure.dao.SectionMapper">
+
+    <resultMap id="SectionMap" type="cn.winddol.ai.infrastructure.dao.po.Section">
+        <id column="id" property="id"/>
+        <result column="header" property="header"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="idx" property="idx"/>
+        <result column="score" property="score"/>
+    </resultMap>
+    
+    <select id="searchByVector" resultMap="SectionMap">
+        <![CDATA[
+        SELECT id, paper_id, header, parent_id, idx,
+               1 - (embedding <=> cast(#{vectorStr} as vector)) as score
+        FROM sections
+        WHERE embedding IS NOT NULL
+        ORDER BY embedding <=> cast(#{vectorStr} as vector)
+            LIMIT #{topK}
+        ]]>
+    </select>
+</mapper>

@@ -32,21 +32,9 @@ public class EmbeddingProcessor {
 
         for (Symbol s : symbols) {
             // 2. 构造语义文本： 符号 + 描述 + LaTeX
-            StringBuilder textBuilder = new StringBuilder();
-
-            // 基础信息
-            textBuilder.append("Symbol: ").append(s.getSymbol());
-            textBuilder.append("; Meaning: ").append(s.getDescription());
-            textBuilder.append("; LaTeX Representation: ").append(s.getLatex());
-
-            if (s.getDefinitionFormula() != null) {
-                textBuilder.append("; Definition Formula: ").append(s.getDefinitionFormula());
-            }
-
-            String textToEmbed = textBuilder.toString();
+            String textToEmbed = s.toEmbeddingText();
             Response<Embedding> response = embeddingModel.embed(textToEmbed);
             float[] vector = response.content().vector(); // LangChain4j 返回的是 float[]
-
             // 4. 更新数据库
             s.setEmbedding(vector);
             symbolMapper.updateById(s);

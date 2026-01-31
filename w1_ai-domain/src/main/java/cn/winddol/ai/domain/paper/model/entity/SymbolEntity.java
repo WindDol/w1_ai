@@ -9,12 +9,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor  // 必须有这个
 @AllArgsConstructor // 建议配合使用
 @Builder
-public class SectionEntity {
-    private String id;
+public class SymbolEntity {
+    private Long id;
     private Long paperId;
-    private String header;
-    private String parentId;
-    private String content;
-    private Integer idx;
-    private Object embedding;
+    private String symbol;
+    private String latex;
+    private String description;
+    private String definitionFormula;
+    private Boolean isGlobal;
+    private String[] sourceIds;
+    private float[] embedding;
 }
