@@ -303,6 +303,7 @@ public class PaperRepository implements IPaperRepository {
         if(referenceList != null && !referenceList.isEmpty()){
             Reference reference = referenceList.get(0);
             return ReferenceItem.builder().rawText(reference.getRawText())
+                    .refId(reference.getRefIndex())
                     .title(reference.getTitle())
                     .paperAbstract(reference.getPaperAbstract())
                     .build();
