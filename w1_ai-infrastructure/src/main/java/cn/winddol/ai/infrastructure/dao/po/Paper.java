@@ -1,6 +1,6 @@
 package cn.winddol.ai.infrastructure.dao.po;
 
-import cn.winddol.ai.domain.paper.model.entity.OutlineNode;
+import cn.winddol.ai.domain.paperTools.model.entity.OutlineNode;
 import cn.winddol.ai.infrastructure.dao.handler.OutlineNodeTypeHandler;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;

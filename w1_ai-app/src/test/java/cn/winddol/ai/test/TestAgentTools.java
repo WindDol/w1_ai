@@ -1,12 +1,11 @@
 package cn.winddol.ai.test;
 
 
-import cn.winddol.ai.domain.paper.adapter.tools.ScientificResearchTools;
-import cn.winddol.ai.domain.paper.model.aggregate.SearchResultDTO;
-import cn.winddol.ai.domain.paper.service.AgentReaderService;
-import cn.winddol.ai.domain.paper.service.HybridRetrieverService;
+import cn.winddol.ai.domain.paperTools.adapter.tools.ScientificResearchTools;
+import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
+import cn.winddol.ai.domain.paperTools.service.AgentReaderService;
+import cn.winddol.ai.domain.paperTools.service.HybridRetrieverService;
 import com.alibaba.fastjson.JSON;
-import dev.langchain4j.internal.Json;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,14 +1,12 @@
 package cn.winddol.ai.test;
 
-import cn.winddol.ai.domain.paper.adapter.repository.IPaperRepository;
-import cn.winddol.ai.domain.paper.model.entity.SectionPO;
+import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
+import cn.winddol.ai.domain.paperTools.model.entity.SectionPO;
 import cn.winddol.ai.infrastructure.parser.MarkdownParser;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;

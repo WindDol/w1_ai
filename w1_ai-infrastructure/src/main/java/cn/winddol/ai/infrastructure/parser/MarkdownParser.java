@@ -1,5 +1,5 @@
 package cn.winddol.ai.infrastructure.parser;
-import cn.winddol.ai.domain.paper.model.entity.SectionPO;
+import cn.winddol.ai.domain.paperTools.model.entity.SectionPO;
 import com.alibaba.fastjson2.JSONObject;
 import java.io.BufferedReader;
 import java.io.StringReader;

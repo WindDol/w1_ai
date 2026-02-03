@@ -1,15 +1,13 @@
 package cn.winddol.ai.test;
 
-import cn.winddol.ai.domain.paper.adapter.ai.ISymbolExtractor;
-import cn.winddol.ai.domain.paper.model.valobj.SymbolDefinition;
-import cn.winddol.ai.domain.paper.service.IPaperEnrichmentService;
+import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
+import cn.winddol.ai.domain.paperTools.service.IPaperEnrichmentService;
 import dev.ai4j.openai4j.Json;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 

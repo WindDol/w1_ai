@@ -1,15 +1,14 @@
 package cn.winddol.ai.infrastructure.adapter.ai;
 
-import cn.winddol.ai.domain.paper.adapter.ai.ISymbolExtractor;
-import cn.winddol.ai.domain.paper.adapter.external.dto.RefMetadata;
-import cn.winddol.ai.domain.paper.model.valobj.SymbolDefinition;
+import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.domain.paperTools.adapter.external.dto.RefMetadata;
+import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
 import com.alibaba.fastjson.JSON;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -19,23 +18,9 @@ import java.util.List;
 @Slf4j
 @Repository
 public class DeepSeekAdapter implements ISymbolExtractor {
-    @Value("${ai.llm.api-key}")
-    private String apiKey;
 
-    private ChatLanguageModel chatModel;
-
-    @PostConstruct
-    public void init(){
-        this.chatModel = OpenAiChatModel.builder()
-                .apiKey(apiKey)
-                .baseUrl("https://api.deepseek.com") // 关键点！
-                .modelName("deepseek-chat")          // DeepSeek V3 模型名
-                .temperature(0.0)                    // 设为 0 让提取更稳定
-                .timeout(java.time.Duration.ofSeconds(60))
-                .logRequests(true)                   // 调试时打印请求
-                .logResponses(true)
-                .build();
-    }
+    @Resource
+    private ChatLanguageModel chatLanguageModel;
 
 
     @Override
@@ -69,9 +54,9 @@ public class DeepSeekAdapter implements ISymbolExtractor {
         """.formatted(paperTitle, content);
 
         try {
-            String response = chatModel.generate(prompt);
+            String response = chatLanguageModel.generate(prompt);
 
-            // 这里的 cleanJson 非常关键，因为模型有时会无视 "No Markdown" 的指令
+            // 防止模型有时会无视 "No Markdown" 的指令
             String jsonStr = cleanJson(response);
 
             if (jsonStr == null || jsonStr.trim().isEmpty()) {
@@ -111,7 +96,7 @@ public class DeepSeekAdapter implements ISymbolExtractor {
             """.formatted(rawText);
 
         try {
-            String json = cleanJson(chatModel.generate(prompt));
+            String json = cleanJson(chatLanguageModel.generate(prompt));
             return JSON.parseObject(json, RefMetadata.class);
         } catch (Exception e) {
             log.error("LLM extraction failed", e);
@@ -138,7 +123,7 @@ public class DeepSeekAdapter implements ISymbolExtractor {
         """.formatted(refIndex, refIndex, joinedSnippets);
 
         try {
-            return chatModel.generate(prompt);
+            return chatLanguageModel.generate(prompt);
         } catch (Exception e) {
             log.error("Context summary failed", e);
             return null;
