@@ -1,6 +1,7 @@
 package cn.winddol.ai.test;
 
 
+import cn.winddol.ai.domain.paper.adapter.tools.ScientificResearchTools;
 import cn.winddol.ai.domain.paper.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paper.service.AgentReaderService;
 import cn.winddol.ai.domain.paper.service.HybridRetrieverService;
@@ -20,6 +21,8 @@ public class TestAgentTools {
     private HybridRetrieverService retriever;
     @Resource
     private AgentReaderService reader;
+    @Resource
+    private ScientificResearchTools scientificResearchTools;
 
     @Test
     public void test1_SearchLibrary() {
@@ -40,8 +43,11 @@ public class TestAgentTools {
         String content = reader.readSectionWithContext(sectionId);
 
         log.info(content);
-        // 核心检查点：
-        // 输出的内容开头，必须包含 "### Context: Mathematical Symbols..."
-        // 这证明我们的【上下文注入】生效了！
+    }
+    @Test
+    public void test3_ScientificResearch() {
+        System.out.println("--- Test Search: 'Möbius transformation' ---");
+        String content = scientificResearchTools.searchLibrary("Möbius transformation",null);
+        log.info(content);
     }
 }

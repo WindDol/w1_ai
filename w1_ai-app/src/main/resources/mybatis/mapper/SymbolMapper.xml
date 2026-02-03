@@ -13,13 +13,22 @@
 
     <!-- 向量检索 SQL -->
     <!-- order by embedding <=> [1,2,3] limit 5 -->
-    <select id="searchByVector" resultMap="SymbolMap">
-    <![CDATA[
-        SELECT id, symbol, description,paper_id,definition_formula,1 - (embedding <=> #{vectorStr}::vector) as score
-        FROM paper_symbols
-        WHERE embedding IS NOT NULL
-        ORDER BY embedding <=> #{vectorStr}::vector
-            LIMIT #{topK}
-        ]]>
+    <select id="searchByVector" resultType="cn.winddol.ai.domain.paper.model.aggregate.SearchResultDTO$SymbolDTO">
+        SELECT
+        sym.id,
+        sym.paper_id AS paperId,
+        sym.symbol,
+        sym.description,
+        sym.definition_formula AS definitionFormula,
+        p.title AS sourcePaperTitle, -- 【关键】
+        1 - (sym.embedding &lt;=&gt; cast(#{vectorStr} as vector)) AS score
+        FROM paper_symbols sym
+        LEFT JOIN papers p ON sym.paper_id = p.id
+        WHERE sym.embedding IS NOT NULL
+        <if test="paperId != null">
+            AND sym.paper_id = #{paperId}
+        </if>
+        ORDER BY sym.embedding &lt;=&gt; cast(#{vectorStr} as vector)
+        LIMIT #{topK}
     </select>
 </mapper>

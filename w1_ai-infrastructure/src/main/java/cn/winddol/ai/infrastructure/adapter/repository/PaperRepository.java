@@ -10,7 +10,6 @@ import cn.winddol.ai.infrastructure.dao.impl.ReferenceSeriveceImpl;
 import cn.winddol.ai.infrastructure.dao.impl.SectionReferenceLinkService;
 import cn.winddol.ai.infrastructure.dao.impl.SymbolServiceImpl;
 import cn.winddol.ai.infrastructure.dao.po.*;
-import cn.winddol.ai.infrastructure.embedding.EmbeddingProcessor;
 import cn.winddol.ai.infrastructure.parser.ReferenceParser;
 import cn.winddol.ai.infrastructure.utils.TreeBuilderUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -157,31 +156,19 @@ public class PaperRepository implements IPaperRepository {
     }
 
     @Override
-    public List<SearchResultDTO.SectionDTO> searchSectionsByVector(String vector, int topK) {
-        List<Section> sections = sectionMapper.searchByVector(vector, topK);
-        if(sections != null && !sections.isEmpty()){
-            return sections.stream().map(s ->
-                    SearchResultDTO.SectionDTO.builder()
-                            .id(s.getId()).paperId(s.getPaperId()).header(s.getHeader())
-                            .parentId(s.getParentId()).idx(s.getIdx()).score(s.getScore()).build()
-            ).toList();
-        }
-        return List.of();
+    public List<SearchResultDTO.SectionDTO> searchSectionsByVector(Long paperId, String vector, int topK) {
+        return  sectionMapper.searchByVector(paperId,vector, topK);
     }
 
     @Override
-    public List<SearchResultDTO.SymbolDTO> searchSymbolsByVector(String vector, int topK) {
-        List<Symbol> symbols = symbolMapper.searchByVector(vector, topK);
-        if(symbols != null && !symbols.isEmpty()){
-            return symbols.stream().map(s ->
-                    SearchResultDTO.SymbolDTO.builder()
-                            .id(s.getId()).paperId(s.getPaperId()).symbol(s.getSymbol())
-                            .description(s.getDescription()).definitionFormula(s.getDefinitionFormula())
-                            .score(s.getScore()).build()
-            ).toList();
-        }
-        return List.of();
+    public List<SearchResultDTO.SymbolDTO> searchSymbolsByVector(Long paperId, String vector, int topK) {
+        return  symbolMapper.searchByVector(paperId,vector, topK);
     }
+    @Override
+    public List<SearchResultDTO.ReferenceDTO> searchReferencesByVector(Long paperId, String vector, int topK) {
+        return referenceMapper.searchReferencesByVector(paperId,vector,topK);
+    }
+
 
     @Override
     public PaperEntity selectPaperById(Long paperId) {
@@ -231,9 +218,10 @@ public class PaperRepository implements IPaperRepository {
     }
 
     @Override
-    public List<SearchResultDTO.SymbolDTO> searchSymbolsByKeyword(String query) {
+    public List<SearchResultDTO.SymbolDTO> searchSymbolsByKeyword(String query, Long paperId) {
         List<Symbol> entities = symbolMapper.selectList(
                 new LambdaQueryWrapper<Symbol>()
+                        .eq(Symbol::getPaperId,paperId)
                         .eq(Symbol::getSymbol, query) // 精确匹配 symbol 字段
         );
         return entities.stream().map(e -> {
@@ -294,6 +282,34 @@ public class PaperRepository implements IPaperRepository {
 
         return links.stream().map(s -> SectionReferenceLinkEntity.builder().sectionId(s.getSectionId()).build()).toList();
     }
+
+    @Override
+    public List<SectionReferenceLinkEntity> selectLinksBySectionId(String sectionId) {
+        List<SectionReferenceLink> links = sectionReferenceLinkMapper.selectList(
+                new LambdaQueryWrapper<SectionReferenceLink>()
+                        .eq(SectionReferenceLink::getSectionId, sectionId)
+        );
+        return links.stream().map(s -> SectionReferenceLinkEntity.builder().paperId(s.getPaperId())
+                .refIndex(s.getRefIndex())
+                .build()).toList();
+    }
+
+    @Override
+    public ReferenceItem selectReferenceByIndex(Long paperId, String refIndex) {
+        List<Reference> referenceList = referenceMapper.selectList(
+                new LambdaQueryWrapper<Reference>()
+                        .eq(Reference::getPaperId, paperId)
+                        .eq(Reference::getRefIndex, refIndex));
+        if(referenceList != null && !referenceList.isEmpty()){
+            Reference reference = referenceList.get(0);
+            return ReferenceItem.builder().rawText(reference.getRawText())
+                    .title(reference.getTitle())
+                    .paperAbstract(reference.getPaperAbstract())
+                    .build();
+        }
+        return null;
+    }
+
 
 
     private static @NonNull Paper getPaper(String title, List<SectionPO> sectionPOs) {

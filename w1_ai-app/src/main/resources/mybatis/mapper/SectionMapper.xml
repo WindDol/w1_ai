@@ -9,15 +9,25 @@
         <result column="idx" property="idx"/>
         <result column="score" property="score"/>
     </resultMap>
-    
-    <select id="searchByVector" resultMap="SectionMap">
-        <![CDATA[
-        SELECT id, paper_id, header, parent_id, idx,
-               1 - (embedding <=> cast(#{vectorStr} as vector)) as score
-        FROM sections
-        WHERE embedding IS NOT NULL
-        ORDER BY embedding <=> cast(#{vectorStr} as vector)
-            LIMIT #{topK}
-        ]]>
+
+    <select id="searchByVector" resultType="cn.winddol.ai.domain.paper.model.aggregate.SearchResultDTO$SectionDTO">
+        SELECT
+        s.id,
+        s.paper_id AS paperId,
+        s.header,
+        s.content,
+        s.parent_id AS parentId,
+        s.idx,
+        p.title AS sourcePaperTitle,  -- 【关键】联表获取论文标题
+        1 - (s.embedding &lt;=&gt; cast(#{vectorStr} as vector)) AS score
+        FROM sections s
+        LEFT JOIN papers p ON s.paper_id = p.id
+        WHERE s.embedding IS NOT NULL
+        <!-- 动态SQL：如果传入了 paperId，则只搜这一篇；否则搜全库 -->
+        <if test="paperId != null">
+            AND s.paper_id = #{paperId}
+        </if>
+        ORDER BY s.embedding &lt;=&gt; cast(#{vectorStr} as vector)
+        LIMIT #{topK}
     </select>
 </mapper>

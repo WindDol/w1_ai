@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.winddol.ai.infrastructure.dao.ReferenceMapper">
+    <select id="searchReferencesByVector" resultType="cn.winddol.ai.domain.paper.model.aggregate.SearchResultDTO$ReferenceDTO">
+        SELECT
+        r.id,
+        r.paper_id AS paperId,
+        r.title,
+        r.abstract AS abstractText,
+        p.title AS sourcePaperTitle, -- 【关键】表示“这篇论文引用了它”
+        1 - (r.embedding &lt;=&gt; cast(#{vectorStr} as vector)) AS score
+        FROM paper_references r
+        LEFT JOIN papers p ON r.paper_id = p.id
+        WHERE r.embedding IS NOT NULL
+        <if test="paperId != null">
+            AND r.paper_id = #{paperId}
+        </if>
+        ORDER BY r.embedding &lt;=&gt; cast(#{vectorStr} as vector)
+        LIMIT #{topK}
+    </select>
+</mapper>

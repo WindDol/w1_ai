@@ -1,10 +1,8 @@
 package cn.winddol.ai.domain.paper.service;
 
 import cn.winddol.ai.domain.paper.adapter.repository.IPaperRepository;
-import cn.winddol.ai.domain.paper.model.entity.OutlineNode;
-import cn.winddol.ai.domain.paper.model.entity.PaperEntity;
-import cn.winddol.ai.domain.paper.model.entity.SectionEntity;
-import cn.winddol.ai.domain.paper.model.entity.SymbolEntity;
+import cn.winddol.ai.domain.paper.model.entity.*;
+import cn.winddol.ai.domain.paper.model.valobj.ReferenceItem;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -66,9 +64,9 @@ public class AgentReaderService {
         if (section.getParentId() != null) {
             SectionEntity parent = repository.selectSectionById(section.getParentId());
             if (parent != null && parent.getContent() != null) {
-                // 只取父节点开头的一部分（比如前 300 字），作为背景知识
-                String parentIntro = parent.getContent().length() > 300 ?
-                        parent.getContent().substring(0, 300) + "..." :
+                // 只取父节点开头的一部分（比如前 500 字），作为背景知识
+                String parentIntro = parent.getContent().length() > 500 ?
+                        parent.getContent().substring(0, 500) + "..." :
                         parent.getContent();
                 // 只有当父节点内容不为空时才添加
                 if (!parentIntro.trim().isEmpty()) {
@@ -81,7 +79,7 @@ public class AgentReaderService {
 
         sb.append("### 📄 Current Section Content\n");
         sb.append(section.getContent()).append("\n\n");
-
+        injectCitationContext(sb,section);
         SectionEntity prev = getSibling(section, -1); // 查 idx - 1
         SectionEntity next = getSibling(section, 1);  // 查 idx + 1
 
@@ -90,6 +88,28 @@ public class AgentReaderService {
         if (next != null) sb.append("- Next: ").append(next.getHeader()).append(" (ID: ").append(next.getId()).append(")\n");
 
         return sb.toString();
+    }
+
+    private void injectCitationContext(StringBuilder sb, SectionEntity section) {
+        List<SectionReferenceLinkEntity> links = repository.selectLinksBySectionId(section.getId());
+        if(!links.isEmpty()){
+            sb.append("### 📚 External References Cited in This Section\n");
+            sb.append("(Note: Use this context to understand references like [x] mentioned in the text.)\n\n");
+            for (SectionReferenceLinkEntity link : links) {
+                // 查询我们在 W2D1/D2 辛苦抓取(或生成)的文献详情
+                ReferenceItem ref = repository.selectReferenceByIndex(section.getPaperId(), link.getRefIndex());
+
+                if (ref != null && ref.getPaperAbstract() != null) {
+                    sb.append(String.format("- **[%s] %s**\n", ref.getRefId(), ref.getTitle()));
+
+                    // 【技巧】截断摘要：控制 Token 数量，避免把主 Prompt 挤爆，保留前 250 字即可
+                    String abs = ref.getPaperAbstract();
+                    String shortAbs = abs.length() > 500 ? abs.substring(0, 500) + "..." : abs;
+
+                    sb.append("  > Abstract/Summary: ").append(shortAbs).append("\n\n");
+                }
+            }
+        }
     }
 
     private String buildBreadcrumb(SectionEntity section) {

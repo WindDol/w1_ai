@@ -18,9 +18,9 @@ public interface IPaperRepository {
 
     void saveEnrichmentData(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection, Map<String, Set<String>> inTextCitationLinks);
 
-    List<SearchResultDTO.SectionDTO> searchSectionsByVector(String vector, int i);
+    List<SearchResultDTO.SectionDTO> searchSectionsByVector(Long paperId, String vector, int i);
 
-    List<SearchResultDTO.SymbolDTO> searchSymbolsByVector(String vector, int topK);
+    List<SearchResultDTO.SymbolDTO> searchSymbolsByVector(Long paperId, String vector, int topK);
 
     PaperEntity selectPaperById(Long paperId);
 
@@ -30,11 +30,15 @@ public interface IPaperRepository {
 
     SectionEntity getSectionSibling(Long paperId, int offset, int i);
 
-    List<SearchResultDTO.SymbolDTO> searchSymbolsByKeyword(String query);
+    List<SearchResultDTO.SymbolDTO> searchSymbolsByKeyword(String query, Long paperId);
 
     List<ReferenceItem> selectReferences();
 
     void updateReferences(ReferenceItem ref);
 
     List<SectionReferenceLinkEntity> selectReferenceLinks(Long paperId, String refId);
+    List<SectionReferenceLinkEntity> selectLinksBySectionId(String sectionId);
+    ReferenceItem selectReferenceByIndex(Long paperId, String refIndex);
+
+    List<SearchResultDTO.ReferenceDTO> searchReferencesByVector(Long paperId, String vector, int topK);
 }
