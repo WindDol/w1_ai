@@ -20,6 +20,8 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
     private IPaperRepository repository;
     @Resource
     private ISymbolExtractor extractor;
+    @Resource
+    private CitationLinkExtractor citationLinkExtractor;
 
     @Override
     public void symbolExtractionAndStorage(Long paperId) {
@@ -64,7 +66,7 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
             if (shouldScan(root.getHeader()) || root.getIdx() < count) {
                 log.info("Extracting symbols from aggregated chapter: {}", root.getHeader());
 
-                // 【一次调用，搞定整章】
+                // 调用ai提取符号
                 List<SymbolDefinition> extracted = extractor.extractFromSection(
                         paper.getTitle(),
                         aggregatedContent.toString()
@@ -79,13 +81,29 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
 
 
         SectionEntity refSection = allSections.stream()
-                .filter(s -> s.getHeader().toUpperCase().contains("REFERENCE"))
+                .filter(s -> {
+                    String h = s.getHeader().toUpperCase();
+                    return h.contains("REFERENCE") || h.contains("BIBLIOGRAPHY") || h.contains("NOTES");
+                })
                 .findFirst()
                 .orElse(null);
 
+        if (refSection == null && !allSections.isEmpty()) {
+            refSection = allSections.get(allSections.size() - 1);
+        }
+
+        Map<String, Set<String>> inTextCitationLinks = new HashMap<>();
+        for (SectionEntity section : allSections) {
+            if (section.equals(refSection)) continue;
+            Set<String> linkedIndices = citationLinkExtractor.extractIndices(section.getContent());
+            if (!linkedIndices.isEmpty()) {
+                inTextCitationLinks.put(section.getId(), linkedIndices);
+            }
+        }
+
         // 6. 存回数据库 (Metadata 字段)
         if (!finalSymbols.isEmpty() || refSection != null) {
-            repository.saveEnrichmentData(paperId, finalSymbols,refSection);
+            repository.saveEnrichmentData(paperId, finalSymbols,refSection,inTextCitationLinks);
             log.info("Paper [{}] enriched with {} symbols.", paperId, finalSymbols.size());
         }
     }

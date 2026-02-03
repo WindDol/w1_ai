@@ -35,3 +35,8 @@ logging:
   level:
     root: info
   config: classpath:logback-spring.xml
+
+academic:
+  s2:
+    base-url: https://api.semanticscholar.org/graph/v1
+    api-key: ""

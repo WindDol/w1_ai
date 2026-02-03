@@ -1,6 +1,8 @@
 package cn.winddol.ai.infrastructure.dao.po;
 
+import cn.winddol.ai.infrastructure.dao.handler.PgVectorHandler;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -20,4 +22,11 @@ public class Reference{
     private String refIndex;
     private String rawText;
     private String title;
+    @TableField(typeHandler = PgVectorHandler.class) // 应用刚才写的 Handler
+    private float[] embedding;
+    @TableField("abstract")
+    private String paperAbstract;
+    private Long linkedPaperId;
+    private String sourceType;
+
 }

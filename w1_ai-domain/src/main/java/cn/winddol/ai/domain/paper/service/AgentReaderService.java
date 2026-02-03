@@ -38,7 +38,18 @@ public class AgentReaderService {
         sb.append("### 📍 Navigation Path\n");
         sb.append(buildBreadcrumb(section)).append("\n\n");
 
-        List<SymbolEntity> relatedSymbols = repository.selectSymbolsByUuids(sectionUuid);
+        String symbolsUuid = section.getParentId();
+        int safetyCounter = 0;
+        while (symbolsUuid != null && safetyCounter < 5) {
+            SectionEntity parent = repository.selectSectionById(symbolsUuid);
+            symbolsUuid = parent.getParentId();
+            if (symbolsUuid == null) {
+                symbolsUuid = parent.getId();
+                break;
+            }
+            safetyCounter++;
+        }
+        List<SymbolEntity> relatedSymbols = repository.selectSymbolsByUuids(symbolsUuid);
 
         if (!relatedSymbols.isEmpty()) {
             sb.append("### 📖 Mathematical Dictionary (Relevant to this section)\n");

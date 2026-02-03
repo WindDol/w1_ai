@@ -1,13 +1,13 @@
 package cn.winddol.ai.domain.paper.adapter.repository;
 
 import cn.winddol.ai.domain.paper.model.aggregate.SearchResultDTO;
-import cn.winddol.ai.domain.paper.model.entity.PaperEntity;
-import cn.winddol.ai.domain.paper.model.entity.SectionEntity;
-import cn.winddol.ai.domain.paper.model.entity.SectionPO;
-import cn.winddol.ai.domain.paper.model.entity.SymbolEntity;
+import cn.winddol.ai.domain.paper.model.entity.*;
+import cn.winddol.ai.domain.paper.model.valobj.ReferenceItem;
 import cn.winddol.ai.domain.paper.model.valobj.SymbolDefinition;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface IPaperRepository {
     void saveFullPaper(String title, List<SectionPO> sectionPOs);
@@ -16,7 +16,7 @@ public interface IPaperRepository {
 
     PaperEntity getPaperById(Long id);
 
-    void saveEnrichmentData(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection);
+    void saveEnrichmentData(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection, Map<String, Set<String>> inTextCitationLinks);
 
     List<SearchResultDTO.SectionDTO> searchSectionsByVector(String vector, int i);
 
@@ -31,4 +31,10 @@ public interface IPaperRepository {
     SectionEntity getSectionSibling(Long paperId, int offset, int i);
 
     List<SearchResultDTO.SymbolDTO> searchSymbolsByKeyword(String query);
+
+    List<ReferenceItem> selectReferences();
+
+    void updateReferences(ReferenceItem ref);
+
+    List<SectionReferenceLinkEntity> selectReferenceLinks(Long paperId, String refId);
 }

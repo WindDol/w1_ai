@@ -1,6 +1,7 @@
 package cn.winddol.ai.infrastructure.adapter.ai;
 
 import cn.winddol.ai.domain.paper.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.domain.paper.adapter.external.dto.RefMetadata;
 import cn.winddol.ai.domain.paper.model.valobj.SymbolDefinition;
 import com.alibaba.fastjson.JSON;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -84,6 +85,75 @@ public class DeepSeekAdapter implements ISymbolExtractor {
             log.error("Failed to extract symbols from paper: {}", paperTitle, e);
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public RefMetadata extractRefMetadata(String rawText) {
+        String prompt = """
+            You are a bibliometric expert. Analyze this citation reference.
+            Raw Text: "%s"
+            
+            Tasks:
+            1. Identify the **Publication Year**.
+            2. Identify **ALL Author Surnames** visible in the text.
+               - Ignore initials (e.g., "J. Smith" -> "Smith").
+               - If "et al." appears, just list the visible authors.
+            3. Identify the **Title**.
+            4. Construct a Search Query.
+            
+            Return JSON ONLY:
+            {
+              "year": 1995,
+              "authorSurnames": ["Smith", "Doe", "Johnson"],  // List of strings
+              "title": "...",
+              "searchString": "..."
+            }
+            """.formatted(rawText);
+
+        try {
+            String json = cleanJson(chatModel.generate(prompt));
+            return JSON.parseObject(json, RefMetadata.class);
+        } catch (Exception e) {
+            log.error("LLM extraction failed", e);
+            return null;
+        }
+    }
+
+    @Override
+    public String summarizeReferenceContext(String refIndex, List<String> snippets) {
+        String joinedSnippets = String.join("\n---\n", snippets);
+
+        String prompt = """
+        You are a scientific researcher. 
+        The following text snippets are from a main paper that cites Reference [%s].
+        
+        [Goal]
+        Infer and summarize the key contribution, method, or finding of Reference [%s] based ONLY on how it is described in these snippets.
+        
+        [Snippets]
+        %s
+        
+        [Output]
+        A concise summary (approx. 50-100 words). Start with: "Based on the context, this reference appears to propose/discuss..."
+        """.formatted(refIndex, refIndex, joinedSnippets);
+
+        try {
+            return chatModel.generate(prompt);
+        } catch (Exception e) {
+            log.error("Context summary failed", e);
+            return null;
+        }
+    }
+
+
+    private String cleanTitle(String response) {
+        if (response == null) return null;
+        String clean = response.trim();
+        // 去掉可能的首尾引号
+        if (clean.startsWith("\"") && clean.endsWith("\"")) {
+            clean = clean.substring(1, clean.length() - 1);
+        }
+        return clean;
     }
 
     private String cleanJson(String response) {

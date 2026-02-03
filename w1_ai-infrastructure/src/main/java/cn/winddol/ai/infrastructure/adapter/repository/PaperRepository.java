@@ -5,19 +5,19 @@ import cn.winddol.ai.domain.paper.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paper.model.entity.*;
 import cn.winddol.ai.domain.paper.model.valobj.ReferenceItem;
 import cn.winddol.ai.domain.paper.model.valobj.SymbolDefinition;
-import cn.winddol.ai.infrastructure.dao.PaperMapper;
-import cn.winddol.ai.infrastructure.dao.SectionMapper;
-import cn.winddol.ai.infrastructure.dao.SymbolMapper;
+import cn.winddol.ai.infrastructure.dao.*;
 import cn.winddol.ai.infrastructure.dao.impl.ReferenceSeriveceImpl;
+import cn.winddol.ai.infrastructure.dao.impl.SectionReferenceLinkService;
 import cn.winddol.ai.infrastructure.dao.impl.SymbolServiceImpl;
-import cn.winddol.ai.infrastructure.dao.po.Paper;
-import cn.winddol.ai.infrastructure.dao.po.Reference;
-import cn.winddol.ai.infrastructure.dao.po.Section;
-import cn.winddol.ai.infrastructure.dao.po.Symbol;
+import cn.winddol.ai.infrastructure.dao.po.*;
+import cn.winddol.ai.infrastructure.embedding.EmbeddingProcessor;
 import cn.winddol.ai.infrastructure.parser.ReferenceParser;
 import cn.winddol.ai.infrastructure.utils.TreeBuilderUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import dev.langchain4j.data.embedding.Embedding;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.output.Response;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -46,6 +45,14 @@ public class PaperRepository implements IPaperRepository {
 
     @Resource
     private ReferenceSeriveceImpl referenceSerivece;
+    @Resource
+    private ReferenceMapper referenceMapper;
+    @Resource
+    private SectionReferenceLinkService sectionReferenceLinkService;
+    @Resource
+    private SectionReferenceLinkMapper sectionReferenceLinkMapper;
+    @Resource
+    private EmbeddingModel embeddingModel;
 
 
     @Override
@@ -112,7 +119,7 @@ public class PaperRepository implements IPaperRepository {
     }
     @Transactional
     @Override
-    public void saveEnrichmentData(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection) {
+    public void saveEnrichmentData(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection, Map<String, Set<String>> citationLinks) {
         List<Symbol> symbols = finalSymbols.stream().map(s -> Symbol.builder()
                 .paperId(paperId)
                 .symbol(s.getSymbol())
@@ -125,13 +132,27 @@ public class PaperRepository implements IPaperRepository {
         symbolService.saveBatch(symbols);
 
         if(refSection != null){
-            List<ReferenceItem> references = referenceParser.parse(refSection.getContent());
+            List<ReferenceItem> references = referenceParser.parse(paperId,refSection.getContent());
             if (references != null && !references.isEmpty()) {
                 List<Reference> referenceList = references.stream().map(r -> Reference.builder()
                         .paperId(paperId).refIndex(r.getRefId()).rawText(r.getRawText()).title(r.getTitle()).build()).toList();
                 referenceSerivece.saveBatch(referenceList);
             }
             log.info("Extracted {} references.", references.size());
+        }
+
+        if (citationLinks != null && !citationLinks.isEmpty()) {
+            List<SectionReferenceLink> links = new ArrayList<>();
+            citationLinks.forEach((sectionId, refIndices) -> {
+                for (String index : refIndices) {
+                    links.add(SectionReferenceLink.builder()
+                            .paperId(paperId)
+                            .sectionId(sectionId)
+                            .refIndex(index)
+                            .build());
+                }
+            });
+            sectionReferenceLinkService.saveBatch(links);
         }
     }
 
@@ -223,6 +244,55 @@ public class PaperRepository implements IPaperRepository {
             dto.setScore(1.0); // 精确匹配给满分
             return dto;
         }).toList();
+    }
+
+    @Override
+    public List<ReferenceItem> selectReferences() {
+        List<Reference> referenceList = referenceMapper.selectList(
+                new LambdaQueryWrapper<Reference>()
+                        .isNull(Reference::getTitle)
+                        .last("LIMIT 50") // 每次只处理 50 条，防止超时
+        );
+        return referenceList.stream().map(s-> ReferenceItem.builder()
+                .id(s.getId())
+                .paperId(s.getPaperId())
+                .refId(s.getRefIndex())
+                .rawText(s.getRawText())
+                .build()).toList();
+    }
+
+    @Override
+    public void updateReferences(ReferenceItem ref) {
+        if (ref.getId() == null) return;
+
+        // 方案 A：直接更新原始对象（如果你的 ReferenceItem 也是个实体）
+        // 方案 B：如果必须转，手动赋值确认
+        Reference po = new Reference();
+        po.setId(ref.getId());
+        po.setTitle(ref.getTitle());
+        po.setPaperAbstract(ref.getPaperAbstract());
+
+        // 防御性编程：如果没有数据，不执行更新
+        if (po.getTitle() == null && po.getPaperAbstract() == null) {
+            return;
+        }
+
+        Response<Embedding> embed = embeddingModel.embed(ref.getTitle() + ref.getPaperAbstract());
+        po.setEmbedding(embed.content().vector());
+        po.setSourceType(ref.getSourceType().getSourceType());
+
+        referenceMapper.updateById(po);
+    }
+
+    @Override
+    public List<SectionReferenceLinkEntity> selectReferenceLinks(Long paperId, String refId) {
+        List<SectionReferenceLink> links = sectionReferenceLinkMapper.selectList(
+                new LambdaQueryWrapper<SectionReferenceLink>()
+                        .eq(SectionReferenceLink::getPaperId, paperId)
+                        .eq(SectionReferenceLink::getRefIndex, refId)
+        );
+
+        return links.stream().map(s -> SectionReferenceLinkEntity.builder().sectionId(s.getSectionId()).build()).toList();
     }
 
 
