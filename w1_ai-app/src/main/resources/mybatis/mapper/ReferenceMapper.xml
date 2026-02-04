@@ -3,19 +3,35 @@
 <mapper namespace="cn.winddol.ai.infrastructure.dao.ReferenceMapper">
     <select id="searchReferencesByVector" resultType="cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO$ReferenceDTO">
         SELECT
-        r.id,
-        r.paper_id AS paperId,
-        r.title,
-        r.abstract AS abstractText,
-        p.title AS sourcePaperTitle, -- 【关键】表示“这篇论文引用了它”
-        1 - (r.embedding &lt;=&gt; cast(#{vectorStr} as vector)) AS score
-        FROM paper_references r
-        LEFT JOIN papers p ON r.paper_id = p.id
-        WHERE r.embedding IS NOT NULL
+        pr.id,
+        pr.paper_id AS paperId,
+        gr.id AS globalId,
+        pr.ref_index as refId,
+        gr.title,
+        gr.abstract AS abstractText,
+        gr.linked_paper_id AS linkedPaperId,
+        p.title AS sourcePaperTitle,
+        1 - (gr.embedding &lt;=&gt; cast(#{vectorStr} as vector)) AS score
+        FROM paper_references pr
+        INNER JOIN global_references gr ON pr.global_ref_id = gr.id
+        LEFT JOIN papers p ON pr.paper_id = p.id
+        WHERE gr.embedding IS NOT NULL
         <if test="paperId != null">
-            AND r.paper_id = #{paperId}
+            AND pr.paper_id = #{paperId}
         </if>
-        ORDER BY r.embedding &lt;=&gt; cast(#{vectorStr} as vector)
+        ORDER BY gr.embedding &lt;=&gt; cast(#{vectorStr} as vector)
         LIMIT #{topK}
+    </select>
+
+    <select id="selectJoinedReference" resultType="cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem">
+        SELECT
+            pr.ref_index as refId,
+            pr.raw_text as rawText,
+            gr.title,
+            gr.abstract as paperAbstract,
+            gr.linked_paper_id as linkedPaperId
+        FROM paper_references pr
+                 JOIN global_references gr ON pr.global_ref_id = gr.id
+        WHERE pr.paper_id = #{paperId} AND pr.ref_index = #{refIndex}
     </select>
 </mapper>

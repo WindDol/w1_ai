@@ -36,22 +36,37 @@ public class ResearchAgentEngine {
             Do NOT hallucinate. If you don't know, search. If you found a location, read it.
             
             [AVAILABLE TOOLS]
-            1. searchLibrary(query, paperId):\s
+            1. searchLibrary(query, paperId):
+                - Search for relevant sections, symbols, and references.
                 - 'query': The search keyword (Required).
                 - 'paperId': Specific paper ID (Optional, Long). Use null to search everywhere.
                 - Usage Example: {"query": "soliton", "paperId": 123} OR just "soliton" for global search.
-            2. getPaperOutline(paperId): ...
-            3. readSection(sectionUuid): ...
-            
+            2. getPaperOutline(paperId): 
+                - Get the hierarchical table of contents for a paper.
+                - Usage: {"paperId": 7}
+            3. readSection(sectionUuid):
+                - Read full content of a section with context and symbols.
+                - Usage: {"sectionUuid": "uuid-string"}
+            4. lookupReference(paperId, refIndex):
+                - Get specific title and abstract for a citation index found in text (e.g., "[12]", "Ref 24").
+                - Use this when text mentions a citation and you need to know what that external work is about.
+                - Usage: {"paperId": 7, "refIndex": "24"}
+                
             [PROTOCOL]
             Output ONLY a JSON object.
-            If a tool requires multiple parameters (like searchLibrary), put them inside 'actionInput' as a JSON structure.
+            If a tool requires multiple parameters (like searchLibrary or lookupReference), put them inside 'actionInput' as a JSON structure.
             
             Example:
             {
               "thought": "I need to search for 'Möbius' inside paper 7.",
               "action": "searchLibrary",\s
               "actionInput": "{\\"query\\": \\"Möbius\\", \\"paperId\\": 7}"\s
+            }
+            Or
+            {
+              "thought": "The text mentions reference [24] in the derivation. I need to check its background.",
+              "action": "lookupReference",
+              "actionInput": "{\\\\"paperId\\\\": 7, \\\\"refIndex\\\\": \\\\"24\\\\"}"
             }
             
             OR, if you have gathered enough information to answer:
@@ -67,7 +82,7 @@ public class ResearchAgentEngine {
         history.add(SystemMessage.from(SYSTEM_PROMPT));
         history.add(UserMessage.from("Question:" + userQuestion));
 
-        int maxSteps = 10;
+        int maxSteps = 20;
         log.info("🤖 Agent started. Question: {}", userQuestion);
         for (int i = 0; i < maxSteps; i++) {
             Response<AiMessage> response = chatLanguageModel.generate(history);
@@ -140,6 +155,26 @@ public class ResearchAgentEngine {
                 String uuid = extractSimpleValue(input, "sectionUuid");
                 return tools.readSection(uuid);
             }
+            // -------------------------------------------------------
+            // Tool 4: lookupReference (多参数)
+            // -------------------------------------------------------
+            if ("lookupReference".equalsIgnoreCase(toolName)) {
+                try {
+                    // 确保输入被当作 JSON 解析
+                    JSONObject params = JSON.parseObject(input);
+                    Long pId = params.getLong("paperId");
+                    String rIdx = params.getString("refIndex");
+
+                    if (pId == null || rIdx == null) {
+                        return "Error: lookupReference requires both 'paperId' and 'refIndex'.";
+                    }
+                    return tools.lookupReference(pId, rIdx);
+                } catch (Exception e) {
+                    // 如果 LLM 没按 JSON 格式传参的兜底处理
+                    log.warn("lookupReference params parsing failed: {}", input);
+                    return "Error: lookupReference requires a JSON input like {\"paperId\": 7, \"refIndex\": \"24\"}";
+                }
+            }
 
             return "Error: Unknown tool '" + toolName + "'";
         } catch (Exception e) {
@@ -164,9 +199,21 @@ public class ResearchAgentEngine {
 
     private AgentStep parseOutput(String llmOutput) {
         try {
-            // 清洗 Markdown 代码块标记
+            // 1. 清除 Markdown 格式块
             String json = llmOutput.replaceAll("```json", "").replaceAll("```", "").trim();
-            return JSON.parseObject(json, AgentStep.class);
+            AgentStep step = JSON.parseObject(json, AgentStep.class);
+
+            // 2. 处理 actionInput 中可能的二次转义问题
+            // 有时模型会输出 "actionInput": "{\"query\": \"Möbius\"}"
+            // FastJSON 有时会将其识别为双重转义字符串，这里确保其为纯 JSON 串
+            if (step.getActionInput() != null) {
+                String input = step.getActionInput().trim();
+                if (input.startsWith("\"") && input.endsWith("\"") && input.length() > 2) {
+                    input = input.substring(1, input.length() - 1).replace("\\\"", "\"");
+                    step.setActionInput(input);
+                }
+            }
+            return step;
         } catch (Exception e) {
             log.error("JSON Parse Error. Output: {}", llmOutput);
             return null;

@@ -66,13 +66,13 @@ public class SearchResultDTO {
     @Builder
     public static class ReferenceDTO {
         private Long id;
+        private Long globalId;
+        private String refId;
         private Long paperId;
-
-        // 【新增】这篇引用是被哪篇主论文引用的？
         private String sourcePaperTitle;
-
-        private String title;         // 引用的标题
-        private String abstractText;  // 引用的摘要
-        private Double score;         // 向量分数
+        private String title;
+        private String abstractText;
+        private Double score;
+        private Long linkedPaperId;
     }
 }

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface IPaperRepository {
-    void saveFullPaper(String title, List<SectionPO> sectionPOs);
+    void saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint);
 
     List<SectionEntity> getSectionByUuid(List<String> uuid);
 
@@ -41,4 +41,16 @@ public interface IPaperRepository {
     ReferenceItem selectReferenceByIndex(Long paperId, String refIndex);
 
     List<SearchResultDTO.ReferenceDTO> searchReferencesByVector(Long paperId, String vector, int topK);
+
+    GlobalReferenceEntity selectGlobalReferenceByS2Id(String s2Id);
+
+    GlobalReferenceEntity selectGlobalReferenceByFingerprint(String fingerprint);
+
+    Long insertGlobalReference(GlobalReferenceEntity globalNode);
+
+    Long updateGlobalReference(GlobalReferenceEntity globalNode);
+
+    Long findPaperIdByFingerprint(String fingerprint);
+
+    ReferenceItem lookupReference(Long paperId, String refIndex);
 }

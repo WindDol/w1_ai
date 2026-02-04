@@ -34,4 +34,5 @@ public class Paper {
     private String filePath;
 
     private LocalDateTime createdAt;
+    private String fingerprint;
 }

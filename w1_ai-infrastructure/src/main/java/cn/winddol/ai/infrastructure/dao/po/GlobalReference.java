@@ -14,17 +14,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@TableName("paper_references")
-public class Reference{
+@TableName("global_references")
+public class GlobalReference {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long paperId;
-    private String refIndex;
-    private String rawText;
+    private String s2Id;
+    private String fingerprint;
     private String title;
     @TableField("abstract")
-    private String paperAbstract;
-    private String sourceType;
-    private Long globalRefId;
+    private String abstractText; // 对应数据库 abstract 字段
 
+    @TableField(typeHandler = PgVectorHandler.class)
+    private float[] embedding;
+    private String sourceType;
+    private Integer citationCount;
+    private Long linkedPaperId;
 }

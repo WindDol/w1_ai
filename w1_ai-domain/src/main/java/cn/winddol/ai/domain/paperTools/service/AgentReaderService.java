@@ -1,6 +1,7 @@
 package cn.winddol.ai.domain.paperTools.service;
 
 import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
+import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.entity.*;
 import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
 import jakarta.annotation.Resource;
@@ -94,13 +95,13 @@ public class AgentReaderService {
             sb.append("### 📚 External References Cited in This Section\n");
             sb.append("(Note: Use this context to understand references like [x] mentioned in the text.)\n\n");
             for (SectionReferenceLinkEntity link : links) {
-                // 查询我们在 W2D1/D2 辛苦抓取(或生成)的文献详情
                 ReferenceItem ref = repository.selectReferenceByIndex(section.getPaperId(), link.getRefIndex());
 
                 if (ref != null && ref.getPaperAbstract() != null) {
                     sb.append(String.format("- **[%s] %s**\n", ref.getRefId(), ref.getTitle()));
-
-                    // 【技巧】截断摘要：控制 Token 数量，避免把主 Prompt 挤爆，保留前 250 字即可
+                    if (ref.getLinkedPaperId() != null) {
+                        sb.append(String.format("  > 🔓 [In-Library Full Text Available] Use `getPaperOutline(%d)` for details.\n", ref.getLinkedPaperId()));
+                    }
                     String abs = ref.getPaperAbstract();
                     String shortAbs = abs.length() > 500 ? abs.substring(0, 500) + "..." : abs;
 
@@ -135,5 +136,32 @@ public class AgentReaderService {
 
     private SectionEntity getSibling(SectionEntity current, int offset) {
         return repository.getSectionSibling(current.getPaperId(),current.getIdx(), offset);
+    }
+
+    public String lookupReference(Long paperId, String refIndex) {
+
+        ReferenceItem ref = repository.lookupReference(paperId, refIndex);
+
+        if (ref == null) {
+            return String.format("Reference [%s] not found in paper %d. Try searchLibrary if you know the topic.", refIndex, paperId);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("### 📖 Details for Reference [").append(ref.getRefId()).append("]\n");
+        sb.append("- **Title**: ").append(ref.getTitle()).append("\n");
+
+        // 标记知识来源（是 API 查到的还是根据上下文合成的）
+        String type = "CONTEXT".equalsIgnoreCase(ref.getSourceType().getSourceType()) ? "Contextual Summary" : "Official Abstract";
+        sb.append("- **Source Type**: ").append(type).append("\n");
+
+        sb.append("- **Abstract/Summary**: ").append(ref.getPaperAbstract()).append("\n");
+
+        // 【核心亮点】引导 Agent 递归阅读
+        if (ref.getLinkedPaperId() != null) {
+            sb.append("\n🔓 **SYSTEM ALERT**: The FULL TEXT of this paper is already in your library!");
+            sb.append("\n- Action Hint: You can explore its full content using `getPaperOutline(paperId=" + ref.getLinkedPaperId() + ")`.");
+        }
+
+        return sb.toString();
     }
 }

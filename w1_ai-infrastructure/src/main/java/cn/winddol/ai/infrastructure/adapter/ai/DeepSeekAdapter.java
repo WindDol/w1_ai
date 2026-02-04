@@ -130,6 +130,30 @@ public class DeepSeekAdapter implements ISymbolExtractor {
         }
     }
 
+    @Override
+    public String fuseSyntheticAbstracts(String desc1, String desc2) {
+        String prompt = """
+            You are a knowledge integration engine. You are given two separate contextual summaries of the same scientific paper, derived from different citing sources.
+            
+            [Summary 1]
+            %s
+            
+            [Summary 2]
+            %s
+            
+            [Task]
+            Synthesize these into a single, cohesive, and more comprehensive summary. 
+            - Eliminate redundancies.
+            - Retain specific details about methods, findings, or applications from both sources.
+            - Maintain a professional, objective tone.
+            - Start with: "Based on multiple contexts, this reference discusses..."
+            
+            [Output]
+            A single paragraph summary (max 200 words).
+            """.formatted(desc1, desc2);
+
+        return chatLanguageModel.generate(prompt);
+    }
 
     private String cleanTitle(String response) {
         if (response == null) return null;

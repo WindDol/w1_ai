@@ -49,4 +49,23 @@ public class TestAgentTools {
         String content = scientificResearchTools.searchLibrary("Möbius transformation",null);
         log.info(content);
     }
+
+    @Test
+    public void test4_ScientificResearch() {
+        System.out.println("--- Test Search: 'Möbius transformation' ---");
+        String content = scientificResearchTools.lookupReference(7l, String.valueOf(21));
+        log.info(content);
+    }
+    @Test
+    public void testLookupReferenceTool() {
+        // 假设 Paper ID 是 7, 参考文献索引是 "24"
+        String result = scientificResearchTools.lookupReference(7L, "24");
+
+        log.info("--- Tool Output ---");
+        log.info(result);
+
+        // 断言检查
+        assert result.contains("Pikovsky"); // 应该是 Pikovsky 的论文
+        assert result.contains("Abstract"); // 应该包含摘要
+    }
 }

@@ -3,6 +3,7 @@ package cn.winddol.ai.infrastructure.adapter.repository;
 import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.entity.*;
+import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceEnum;
 import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
 import cn.winddol.ai.infrastructure.dao.*;
@@ -14,9 +15,8 @@ import cn.winddol.ai.infrastructure.parser.ReferenceParser;
 import cn.winddol.ai.infrastructure.utils.TreeBuilderUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import dev.langchain4j.data.embedding.Embedding;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.output.Response;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -52,16 +52,26 @@ public class PaperRepository implements IPaperRepository {
     private SectionReferenceLinkMapper sectionReferenceLinkMapper;
     @Resource
     private EmbeddingModel embeddingModel;
+    @Resource
+    private GlobalReferenceMapper globalReferenceMapper;
 
 
     @Override
     @Transactional
-    public void saveFullPaper(String title, List<SectionPO> sectionPOs) {
+    public void saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint) {
+        Paper existingPaper = paperMapper.selectOne(
+                new LambdaQueryWrapper<Paper>().eq(Paper::getFingerprint, fingerprint)
+        );
+        if (existingPaper != null) {
+            log.warn("⚠️ Paper already exists in library: {}", title);
+            return; // 或者返回已有的 ID
+        }
         // 1. 构建并保存 Paper 主表
         Paper paper = getPaper(title, sectionPOs);
-
+        paper.setFingerprint(fingerprint);
         // 插入数据库，插入后 paper.id 会自动被回填
         paperMapper.insert(paper);
+        Long newPaperId = paper.getId();
 
         // 2. 批量构建并保存 Section 内容表
         Long paperId = paper.getId();
@@ -77,6 +87,20 @@ public class PaperRepository implements IPaperRepository {
             section.setParentId(po.getParentId());
             sectionMapper.insert(section);
         }
+        List<GlobalReference> danglingNodes = globalReferenceMapper.selectList(
+                new LambdaQueryWrapper<GlobalReference>()
+                        .eq(GlobalReference::getFingerprint, fingerprint)
+                        .isNull(GlobalReference::getLinkedPaperId) // 只有还没连上的才需要连
+        );
+        for (GlobalReference node : danglingNodes) {
+            node.setLinkedPaperId(newPaperId);
+            // 如果这个节点之前是 Contextual (合成) 摘要，现在既然有了正文
+            // 甚至可以用论文 A 的真实 Abstract 覆盖掉那个合成摘要（知识进化）
+            globalReferenceMapper.updateById(node);
+            log.info("🔗 Retroactive Link: Reference node [{}] now linked to Paper ID: {}",
+                    node.getId(), newPaperId);
+        }
+
     }
 
     @Override
@@ -169,6 +193,116 @@ public class PaperRepository implements IPaperRepository {
         return referenceMapper.searchReferencesByVector(paperId,vector,topK);
     }
 
+    @Override
+    public GlobalReferenceEntity selectGlobalReferenceByS2Id(String s2Id) {
+        if (StringUtils.isBlank(s2Id)) return null;
+
+        GlobalReference po = globalReferenceMapper.selectOne(
+                new LambdaQueryWrapper<GlobalReference>().eq(GlobalReference::getS2Id, s2Id)
+        );
+        return GRPoToEntity(po);
+    }
+
+    @Override
+    public GlobalReferenceEntity selectGlobalReferenceByFingerprint(String fingerprint) {
+        if (StringUtils.isBlank(fingerprint)) return null;
+
+        GlobalReference po = globalReferenceMapper.selectOne(
+                new LambdaQueryWrapper<GlobalReference>().eq(GlobalReference::getFingerprint, fingerprint)
+        );
+        return GRPoToEntity(po);
+    }
+
+    @Override
+    @Transactional
+    public Long insertGlobalReference(GlobalReferenceEntity entity) {
+        GlobalReference po = GREntityToPo(entity);
+        String textToEmbed = po.getTitle() + "\n" + po.getAbstractText();
+        float[] vector = embeddingModel.embed(textToEmbed).content().vector();
+        po.setEmbedding(vector);
+        globalReferenceMapper.insert(po);
+        // 回填自增 ID 到领域实体
+        return po.getId();
+    }
+
+    @Override
+    @Transactional
+    public Long updateGlobalReference(GlobalReferenceEntity entity) {
+        if (entity.getId() == null) return null;
+        GlobalReference po = GREntityToPo(entity);
+        String textToEmbed = po.getTitle() + "\n" + po.getAbstractText();
+        po.setEmbedding(embeddingModel.embed(textToEmbed).content().vector());
+        globalReferenceMapper.updateById(po);
+        return po.getId();
+    }
+
+    @Override
+    public Long findPaperIdByFingerprint(String fingerprint) {
+        if (StringUtils.isBlank(fingerprint)) return null;
+
+        // 假设 papers 表中已经增加了 fingerprint 字段
+        // SELECT id FROM papers WHERE fingerprint = ? LIMIT 1
+        Paper paper = paperMapper.selectOne(
+                new LambdaQueryWrapper<Paper>()
+                        .select(Paper::getId) // 只查 ID，性能更好
+                        .eq(Paper::getFingerprint, fingerprint)
+                        .last("LIMIT 1")
+        );
+
+        return paper != null ? paper.getId() : null;
+    }
+
+    @Override
+    public ReferenceItem lookupReference(Long paperId, String refIndex) {
+        String cleanIndex = refIndex.replaceAll("[\\[\\]\\s]", "");
+        Long globalId = referenceMapper.selectGlobalRefId(paperId, cleanIndex);
+
+        if (globalId == null) {
+            return null;
+        }
+        GlobalReference po = globalReferenceMapper.selectGlobalById(globalId);
+
+        if (po == null) {
+            return null;
+        }
+        return ReferenceItem.builder()
+                .refId(refIndex)
+                .paperId(paperId)
+                .globalRefId(po.getId())
+                .title(po.getTitle())
+                .paperAbstract(po.getAbstractText())
+                .linkedPaperId(po.getLinkedPaperId())
+                .sourceType(ReferenceEnum.getCode(po.getSourceType()))
+                .build();
+    }
+
+    private GlobalReferenceEntity GRPoToEntity(GlobalReference po) {
+        if (po == null) return null;
+        return GlobalReferenceEntity.builder()
+                .id(po.getId())
+                .s2Id(po.getS2Id())
+                .fingerprint(po.getFingerprint())
+                .title(po.getTitle())
+                .abstractText(po.getAbstractText())
+                .sourceType(ReferenceEnum.getCode(po.getSourceType()))
+                .linkedPaperId(po.getLinkedPaperId())
+                .citationCount(po.getCitationCount())
+                .build();
+    }
+
+    private GlobalReference GREntityToPo(GlobalReferenceEntity entity) {
+        if (entity == null) return null;
+        GlobalReference po = new GlobalReference();
+        po.setId(entity.getId());
+        po.setS2Id(entity.getS2Id());
+        po.setFingerprint(entity.getFingerprint());
+        po.setTitle(entity.getTitle());
+        po.setCitationCount(entity.getCitationCount()+1);
+        po.setAbstractText(entity.getAbstractText());
+        po.setSourceType(entity.getSourceType().getCode());
+        po.setLinkedPaperId(entity.getLinkedPaperId());
+        return po;
+    }
 
     @Override
     public PaperEntity selectPaperById(Long paperId) {
@@ -259,15 +393,14 @@ public class PaperRepository implements IPaperRepository {
         po.setId(ref.getId());
         po.setTitle(ref.getTitle());
         po.setPaperAbstract(ref.getPaperAbstract());
-
+        po.setGlobalRefId(ref.getGlobalRefId());
         // 防御性编程：如果没有数据，不执行更新
         if (po.getTitle() == null && po.getPaperAbstract() == null) {
             return;
         }
-
-        Response<Embedding> embed = embeddingModel.embed(ref.getTitle() + ref.getPaperAbstract());
-        po.setEmbedding(embed.content().vector());
-        po.setSourceType(ref.getSourceType().getSourceType());
+        if(ref.getSourceType()!= null){
+            po.setSourceType(ref.getSourceType().getSourceType());
+        }
 
         referenceMapper.updateById(po);
     }
@@ -296,22 +429,8 @@ public class PaperRepository implements IPaperRepository {
 
     @Override
     public ReferenceItem selectReferenceByIndex(Long paperId, String refIndex) {
-        List<Reference> referenceList = referenceMapper.selectList(
-                new LambdaQueryWrapper<Reference>()
-                        .eq(Reference::getPaperId, paperId)
-                        .eq(Reference::getRefIndex, refIndex));
-        if(referenceList != null && !referenceList.isEmpty()){
-            Reference reference = referenceList.get(0);
-            return ReferenceItem.builder().rawText(reference.getRawText())
-                    .refId(reference.getRefIndex())
-                    .title(reference.getTitle())
-                    .paperAbstract(reference.getPaperAbstract())
-                    .build();
-        }
-        return null;
+        return referenceMapper.selectJoinedReference(paperId, refIndex);
     }
-
-
 
     private static @NonNull Paper getPaper(String title, List<SectionPO> sectionPOs) {
         Paper paper = new Paper();

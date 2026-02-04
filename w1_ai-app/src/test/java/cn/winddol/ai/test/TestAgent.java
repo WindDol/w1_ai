@@ -22,4 +22,14 @@ public class TestAgent {
         log.info("================ FINAL ANSWER ================");
         log.info(answer);
     }
+
+    @Test
+    public void testReferenceTrackingReasoning() {
+        String question = "在讨论 Möbius 变换的Algebraic method时，作者提到了参考文献 [24]。请问 [24] 这篇论文的标题是什么？它主要解决了什么问题？";
+
+        String answer = agentEngine.run(question);
+
+        log.info("================ FINAL ANSWER ================");
+        log.info(answer);
+    }
 }

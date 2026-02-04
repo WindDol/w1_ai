@@ -11,4 +11,6 @@ public interface ISymbolExtractor {
     RefMetadata extractRefMetadata(String rawReference);
     // 通过前后文生成摘要
     String summarizeReferenceContext(String refIndex, List<String> snippets);
+
+    String fuseSyntheticAbstracts(String oldAbs, String newAbs);
 }

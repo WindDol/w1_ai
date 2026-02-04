@@ -16,6 +16,7 @@ public class ReferenceItem {
     private String rawText;    // 原始引文文本
     private String title;      // 提取出的标题 (可能为空，后续用 API 补全)
     private String paperAbstract;
-    private Long linkedPaperId;
     private ReferenceEnum sourceType;
+    private Long globalRefId;
+    private Long linkedPaperId;
 }

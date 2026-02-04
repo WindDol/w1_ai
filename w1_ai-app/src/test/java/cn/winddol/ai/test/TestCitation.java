@@ -13,7 +13,6 @@ public class TestCitation {
     private CitationEnrichmentService service;
     @Test
     public void testCitation(){
-
         service.enrichReferences();
     }
 }

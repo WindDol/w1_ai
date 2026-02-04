@@ -5,13 +5,16 @@ import cn.winddol.ai.domain.paperTools.adapter.external.SemanticScholarClient;
 import cn.winddol.ai.domain.paperTools.adapter.external.dto.RefMetadata;
 import cn.winddol.ai.domain.paperTools.adapter.external.dto.S2PaperResponse;
 import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
+import cn.winddol.ai.domain.paperTools.model.entity.GlobalReferenceEntity;
 import cn.winddol.ai.domain.paperTools.model.entity.SectionEntity;
 import cn.winddol.ai.domain.paperTools.model.entity.SectionReferenceLinkEntity;
 import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceEnum;
 import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
+import cn.winddol.ai.types.common.utils.FingerprintUtils;
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -39,7 +43,6 @@ public class CitationEnrichmentService {
         log.info("🚀 Starting enrichment for {} references...", pendingRefs.size());
 
         for (ReferenceItem ref : pendingRefs) {
-            boolean enriched = false;
             int maxRetries = 5;
             int attempt = 0;
             boolean success = false;
@@ -74,59 +77,39 @@ public class CitationEnrichmentService {
                         break; // 其他错误不重试
                     }
                 }
+                String finalTitle = null;
+                String finalAbstract = null;
+                String s2Id = null;
+                ReferenceEnum sourceType = ReferenceEnum.API;
 
                 // --- 第三步：核心修复 - 严格匹配验证 ---
                 if (success && isValidMatch(meta, matchedPaper)) {
                     // 只有校验通过才写入摘要和真实标题
-                    ref.setSourceType(ReferenceEnum.API);
-                    ref.setTitle(matchedPaper.getTitle());
-                    if(!StringUtils.isBlank(matchedPaper.getAbstractText())){
-                        ref.setPaperAbstract(matchedPaper.getAbstractText());
-                        enriched = true;
-                    }
+                    finalTitle = matchedPaper.getTitle();
+                    s2Id = matchedPaper.getPaperId();
+                    finalAbstract = matchedPaper.getAbstractText();
                     Thread.sleep(2000);
-                    log.info("✅ [Success] Ref {}: {} ({})",
-                            ref.getRefId(), matchedPaper.getTitle(), matchedPaper.getYear());
-                } else {
-                    if(matchedPaper != null || success){
+                    log.info("✅ API Match: {} ({})", finalTitle, matchedPaper.getYear());
+                }
+                
+                if (success && StringUtils.isBlank(finalAbstract)) {
+                    log.info("API failed for [{}], switching to Context Generation...", ref.getRefId());
+                    String syntheticAbstract = generateSyntheticAbstract(ref);
+                    if (syntheticAbstract != null) {
+                        finalTitle = StringUtils.isBlank(finalTitle) ? "Contextual Reference [" + ref.getRefId() + "]" : finalTitle;
+                        finalAbstract = syntheticAbstract;
+                        sourceType = ReferenceEnum.CONTEXT;
+                    }
+                }
+                if(success){
+                    if (finalAbstract != null) {
+                        linkToGlobalReference(ref, meta, s2Id, finalTitle, finalAbstract, sourceType);
+                    } else {
+                        // 彻底找不到
                         ref.setTitle("NOT_FOUND");
+                        repository.updateReferences(ref);
                     }
-                    String reason = (matchedPaper == null) ? "No result from API" :
-                            "Year mismatch (Expected: " + meta.getYear() + ", Found: " + matchedPaper.getYear() + ")";
-                    log.warn("❌ [Discarded] Ref {}: {}", ref.getRefId(), reason);
-
                 }
-                if(!enriched && !StringUtils.isBlank(ref.getTitle())){
-                    log.info("API failed for abstract [{}], switching to Context Generation... {}", ref.getRefId(),ref.getTitle());
-                    List<SectionReferenceLinkEntity> links = repository.selectReferenceLinks(ref.getPaperId(),ref.getRefId());
-                    if(!links.isEmpty()){
-                        List<String> contextSnippets = new ArrayList<>();
-                        for(SectionReferenceLinkEntity link:links){
-                            SectionEntity section = repository.selectSectionById(link.getSectionId());
-                            if (section != null) {
-                                // 3. 截取窗口 (前后40 字符)
-                                String snippet = extractWindow(section.getContent(), ref.getRefId());
-                                contextSnippets.add(snippet);
-                            }
-                        }
-                        if (!contextSnippets.isEmpty()) {
-                            String syntheticAbstract = extractor.summarizeReferenceContext(
-                                    ref.getRefId(), contextSnippets
-                            );
-                            if(StringUtils.isBlank(ref.getTitle()) || ref.getTitle().equals("NOT_FOUND")){
-                                ref.setTitle("Contextual Reference [" + ref.getRefId() + "]");
-                            }
-                            ref.setPaperAbstract(syntheticAbstract);
-
-                            log.info("✅ Context Generated for [{}]", ref.getRefId());
-                            enriched = true;
-                        }
-                    }
-                    ref.setSourceType(ReferenceEnum.CONTEXT);
-
-                }
-                // 4. 持久化结果
-                repository.updateReferences(ref);
 
             } catch (Exception e) {
                 log.error("🔥 Critical error processing ref {}: ", ref.getRefId(), e);
@@ -134,27 +117,123 @@ public class CitationEnrichmentService {
         }
     }
 
+
+    public void linkToGlobalReference(ReferenceItem localRef, RefMetadata meta, String s2Id, String title, String abstractText, ReferenceEnum sourceType) {
+        String fingerprint = FingerprintUtils.generateRefFingerprint(
+                meta.getAuthorSurnames(), meta.getYear());
+        GlobalReferenceEntity globalNode = null;
+        if (s2Id != null) {
+            globalNode = repository.selectGlobalReferenceByS2Id(s2Id);
+        }
+        if (globalNode == null) {
+            globalNode = repository.selectGlobalReferenceByFingerprint(fingerprint);
+        }
+        Long Id = null;
+        // 3. 维护全局节点
+        if (globalNode == null) {
+            // A. 创建新节点
+            globalNode = new GlobalReferenceEntity();
+            globalNode.setS2Id(s2Id);
+            globalNode.setFingerprint(fingerprint);
+            globalNode.setTitle(title);
+            globalNode.setCitationCount(0);
+            globalNode.setAbstractText(abstractText);
+            globalNode.setSourceType(sourceType);
+            Long internalId = repository.findPaperIdByFingerprint(fingerprint);
+            globalNode.setLinkedPaperId(internalId);
+
+            Id = repository.insertGlobalReference(globalNode);// 插入后返回 ID
+            log.info("✨ Created New Global Node: {}", title);
+        } else {
+            // B. 节点已存在，检查是否需要“进化”摘要 (例如从 Synthetic 变为 API 真摘要)
+            ReferenceEnum oldType = globalNode.getSourceType();
+            String fusedAbstract = mergeKnowledge(
+                    globalNode.getAbstractText(), oldType,
+                    abstractText, sourceType
+            );
+
+            if (!fusedAbstract.equals(globalNode.getAbstractText())) {
+                globalNode.setAbstractText(fusedAbstract);
+                if (s2Id != null) globalNode.setS2Id(s2Id);
+                Id = repository.updateGlobalReference(globalNode);
+                log.info("🧠 Knowledge Fused for: {}", globalNode.getTitle());
+            }
+
+        }
+
+        // 4. 更新本地 paper_references 表，建立外键关联
+        localRef.setGlobalRefId(Id);
+        localRef.setSourceType(sourceType);
+        localRef.setTitle(globalNode.getTitle()); // 冗余一份标题方便查询
+        localRef.setPaperAbstract(globalNode.getAbstractText()); // 冗余一份摘要
+
+        repository.updateReferences(localRef);
+    }
+
+    private String mergeKnowledge(String oldAbs, ReferenceEnum oldType, String newAbs, ReferenceEnum newType) {
+        // 情况 A：新旧都是合成的，需要 LLM 合并
+        if (oldType == ReferenceEnum.CONTEXT && newType == ReferenceEnum.CONTEXT) {
+            return extractor.fuseSyntheticAbstracts(oldAbs, newAbs);
+        }
+
+        // 情况 B：旧的是合成，新的是 API（真理降临）
+        if (oldType == ReferenceEnum.CONTEXT && newType == ReferenceEnum.API) {
+            return newAbs + "\n\n[Community Insight]: " + oldAbs.replace("Based on the context, ", "");
+        }
+
+        // 情况 C：旧的是 API，新的是合成（补充视角）
+        if (oldType == ReferenceEnum.API && newType == ReferenceEnum.CONTEXT) {
+            // 如果新信息已经在旧信息里体现了，可以不加。简单处理则直接追加。
+            if (oldAbs.contains(newAbs.substring(0, Math.min(20, newAbs.length())))) return oldAbs;
+            return oldAbs + "\n\n[Additional Context]: " + newAbs.replace("Based on the context, ", "");
+        }
+
+        return oldAbs;
+    }
+
+    private String generateSyntheticAbstract(ReferenceItem ref) {
+        List<SectionReferenceLinkEntity> links = repository.selectReferenceLinks(ref.getPaperId(), ref.getRefId());
+        if (links.isEmpty()) return null;
+
+        List<String> contextSnippets = new ArrayList<>();
+        for (SectionReferenceLinkEntity link : links) {
+            SectionEntity section = repository.selectSectionById(link.getSectionId());
+            if (section != null) {
+                contextSnippets.add(extractWindow(section.getContent(), ref.getRefId()));
+            }
+        }
+        return contextSnippets.isEmpty() ? null : extractor.summarizeReferenceContext(ref.getRefId(), contextSnippets);
+    }
+
     /**
      * 严格验证逻辑：防止张冠李戴
      */
     private boolean isValidMatch(RefMetadata meta, S2PaperResponse.S2PaperData apiResult) {
-        if (apiResult == null) return false;
+        if (apiResult == null) {
+            log.warn("🚨 Strict Author mismatch!");
+            return false;
+        }
 
         // 1. 勘误表/索引一票否决
         String title = apiResult.getTitle().toLowerCase();
         if (title.contains("erratum") || title.contains("correction") || title.contains("author index")) {
+            log.warn("🚨 Strict Author mismatch!");
             return false;
         }
 
         // 2. 年份校验 (±1年)
         if (meta.getYear() != null && apiResult.getYear() != 0) {
-            if (Math.abs(meta.getYear() - apiResult.getYear()) > 1) return false;
+            if (Math.abs(meta.getYear() - apiResult.getYear()) > 1) {
+                log.warn("🚨 Strict Author mismatch!");
+                return false;
+            }
         }
 
         // 3. 【新增】作者姓氏校验 - 这是防撞衫最有效的办法
         List<String> expectedSurnames = meta.getAuthorSurnames();
         if (expectedSurnames != null && !expectedSurnames.isEmpty()) {
             if (apiResult.getAuthors() == null || apiResult.getAuthors().isEmpty()) {
+                log.warn("🚨 Strict Author mismatch!");
                 return false;
             }
             for (String expectedSurname : expectedSurnames) {

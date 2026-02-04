@@ -40,6 +40,17 @@ public class ScientificResearchTools {
         return readerService.readSectionWithContext(sectionUuid);
     }
 
+    @Tool("""
+    Look up the specific details (Title and Abstract) of a reference cited in the paper. 
+    Use this tool when you encounter citation marks like '[12]', 'Ref. 24', or 'in [5]' in the text 
+    and you need to understand what that external source is about.
+    Input: paperId (Long), refIndex (String, e.g., '24').
+    """)
+    public String lookupReference(Long paperId, String refIndex) {
+        return readerService.lookupReference(paperId, refIndex);
+    }
+
+
     // --- 辅助方法：格式化输出给 LLM 看 ---
     private String formatSearchResult(SearchResultDTO result) {
         StringBuilder sb = new StringBuilder();
@@ -77,15 +88,18 @@ public class ScientificResearchTools {
 
         if (result.getReferences() != null && !result.getReferences().isEmpty()) {
             sb.append("### 📚 Found References (External Context):\n");
-            sb.append("(These papers are CITED by the source papers)\n");
             for (SearchResultDTO.ReferenceDTO r : result.getReferences()) {
-                sb.append(String.format("- **Title**: %s\n", r.getTitle()));
-                sb.append(String.format("  **Cited By**: \"%s\"\n", r.getSourcePaperTitle())); // 关键：谁引用了它
-                // 展示摘要预览
+                sb.append(String.format("- **[%s] %s**\n", r.getRefId(), r.getTitle()));
+
+                if (r.getLinkedPaperId() != null) {
+                    sb.append(String.format("  🌟 [FULL TEXT AVAILABLE] This paper is in your library. ID: %d\n", r.getLinkedPaperId()));
+                    sb.append(String.format("  Action Hint: You can use `getPaperOutline(%d)` to explore it deeper.\n", r.getLinkedPaperId()));
+                }
+
+                sb.append(String.format("  **Cited By**: \"%s\" (Paper ID: %d)\n", r.getSourcePaperTitle(), r.getPaperId()));
                 String abstractPreview = r.getAbstractText() != null ? truncate(r.getAbstractText(), 200) : "No abstract available.";
                 sb.append(String.format("  **Abstract**: %s\n\n", abstractPreview));
             }
-            hasContent = true;
         }
 
         if (!hasContent) {
