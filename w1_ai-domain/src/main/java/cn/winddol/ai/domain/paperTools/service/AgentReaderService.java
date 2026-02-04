@@ -151,7 +151,7 @@ public class AgentReaderService {
         sb.append("- **Title**: ").append(ref.getTitle()).append("\n");
 
         // 标记知识来源（是 API 查到的还是根据上下文合成的）
-        String type = "CONTEXT".equalsIgnoreCase(ref.getSourceType().getSourceType()) ? "Contextual Summary" : "Official Abstract";
+        String type = "CONTEXT".equalsIgnoreCase(ref.getSourceType().getSourceType()) ? "Semantic Scholar API" : "Inferred from Citation Context (API Unavailable)";
         sb.append("- **Source Type**: ").append(type).append("\n");
 
         sb.append("- **Abstract/Summary**: ").append(ref.getPaperAbstract()).append("\n");
