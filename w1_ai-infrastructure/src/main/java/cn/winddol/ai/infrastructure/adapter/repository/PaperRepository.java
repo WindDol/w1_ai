@@ -158,7 +158,7 @@ public class PaperRepository implements IPaperRepository {
             List<ReferenceItem> references = referenceParser.parse(paperId,refSection.getContent());
             if (references != null && !references.isEmpty()) {
                 List<Reference> referenceList = references.stream().map(r -> Reference.builder()
-                        .paperId(paperId).refIndex(r.getRefId()).rawText(r.getRawText()).title(r.getTitle()).build()).toList();
+                        .paperId(paperId).refIndex(r.getRefId()).rawText(r.getRawText()).build()).toList();
                 referenceSerivece.saveBatch(referenceList);
             }
             log.info("Extracted {} references.", references.size());
