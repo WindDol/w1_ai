@@ -56,11 +56,17 @@ public class TestMarkdownParser {
     @Test
     public void testInsert() throws Exception {
         // 1. 读取并解析文件 (Day 2 的代码)
-        String markdown = Files.readString(Paths.get("C:\\Users\\Mr Ding.LAPTOP-H54HCE12\\Desktop\\ai_pdf\\python\\output_test.md"));
+        String markdown = Files.readString(Paths.get("C:\\Users\\Mr Ding.LAPTOP-H54HCE12\\Desktop\\ai_pdf\\python\\output_test1.md"));
         MarkdownParser parser = new MarkdownParser();
         List<SectionPO> pos = parser.parse(markdown);
-        String headerContent = pos.get(0).getContent() + (pos.size() > 1 ? pos.get(1).getContent() : "");
-        RefMetadata paperMeta = extractor.extractRefMetadata(headerContent);
+        String title = parser.extractTitle(markdown);
+        StringBuilder headerContent = new StringBuilder(pos.get(0).getContent());
+        for(SectionPO  po:pos){
+            if(po.header.equals(title)){
+                headerContent.append(po.getContent());
+            }
+        }
+        RefMetadata paperMeta = extractor.extractRefMetadata(headerContent.toString());
         if (paperMeta == null || paperMeta.getAuthorSurnames().isEmpty() || paperMeta.getYear() == 0) {
             log.error("❌ Metadata extraction failed. Aborting ingestion to prevent library pollution.");
             return;
@@ -70,14 +76,14 @@ public class TestMarkdownParser {
                 paperMeta.getYear()
         );
         // 2. 调用 Service 入库
-        String title = "Identical phase oscillators with global sinusoidal coupling evolve by Möbius group action";
+
         repository.saveFullPaper(title, pos,fingerprint);
 
         System.out.println("入库成功！请在 DBeaver 中查看数据。");
     }
 
     @Test
-    public void  testF() throws Exception{
+    public void  testF() {
         String a = """
                 Chaos
                 An Interdisciplinary Journal of Nonlinear Science
@@ -102,7 +108,7 @@ public class TestMarkdownParser {
                 In this paper we show that the group of Möbius transformations is the key to understanding this class of dynamical systems. Our analysis unifies the previous treatments of
                 $^a$)Electronic mail: sam255@cornell.edu.
                 Josephson arrays and the Kuramoto model, and clarifies the geometric and algebraic structures responsible for their low-dimensional behavior. One spinoff of our approach is a new set of constants of motion; these generalize the constants found previously and hold for a wider class of oscillator arrays.
-                The paper is organized as follows. To keep the treatment self-contained and to establish notation, Sec. II reviews the relevant background about coupled oscillators and the Möbius group. In Sec. III we show how to use Möbius transformations to reduce the dynamics of identical oscillators with global sinusoidal coupling, the type of coupling that appears in both the Josephson and Kuramoto models. The reduced flow lives on a set of invariant three-dimensional manifolds, arising naturally as the so-called group orbits of the Möbius group. The results obtained in this way are then compared with previous findings (Sec. IV) and used to generate new constants of motion via the classical cross ratio construction (Sec. V). We explore the dynamics on the invariant manifolds in Sec. VI and show that the phase portraits for resistively coupled Josephson arrays are filled with chaos and island chains, reminiscent of the pictures encountered in Hamiltonian chaos and Kolmogorov–Arnold–Moser theory.        
+                The paper is organized as follows. To keep the treatment self-contained and to establish notation, Sec. II reviews the relevant background about coupled oscillators and the Möbius group. In Sec. III we show how to use Möbius transformations to reduce the dynamics of identical oscillators with global sinusoidal coupling, the type of coupling that appears in both the Josephson and Kuramoto models. The reduced flow lives on a set of invariant three-dimensional manifolds, arising naturally as the so-called group orbits of the Möbius group. The results obtained in this way are then compared with previous findings (Sec. IV) and used to generate new constants of motion via the classical cross ratio construction (Sec. V). We explore the dynamics on the invariant manifolds in Sec. VI and show that the phase portraits for resistively coupled Josephson arrays are filled with chaos and island chains, reminiscent of the pictures encountered in Hamiltonian chaos and Kolmogorov–Arnold–Moser theory.
                 """;
         String headerContent = a + b;
         RefMetadata paperMeta = extractor.extractRefMetadata(headerContent);
@@ -110,6 +116,7 @@ public class TestMarkdownParser {
                 paperMeta.getAuthorSurnames(),
                 paperMeta.getYear()
         );
+        log.info(fingerprint);
 
     }
 }

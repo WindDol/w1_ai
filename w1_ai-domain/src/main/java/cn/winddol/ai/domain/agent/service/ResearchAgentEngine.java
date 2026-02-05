@@ -1,5 +1,6 @@
 package cn.winddol.ai.domain.agent.service;
 
+import cn.winddol.ai.domain.agent.adapter.repository.IAiAdapter;
 import cn.winddol.ai.domain.agent.model.entity.AgentStep;
 import cn.winddol.ai.domain.paperTools.adapter.tools.ScientificResearchTools;
 import com.alibaba.fastjson.JSON;
@@ -8,8 +9,11 @@ import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.output.Response;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,21 +30,32 @@ public class ResearchAgentEngine {
     private ChatLanguageModel chatLanguageModel;
     @Resource
     private ScientificResearchTools tools;
-
+    @Resource
+    private ChatMemoryStore chatMemoryStore;
+    @Resource
+    private IAiAdapter aiAdapter;
     private static final String SYSTEM_PROMPT = """
             You are 'ScholarBrain', an advanced autonomous research assistant.
             You have access to a private library of parsed scientific papers.
             
             [YOUR GOAL]
-            Answer the user's question accurately using the provided tools. 
+            Answer the user's question accurately using the provided tools.
             Do NOT hallucinate. If you don't know, search. If you found a location, read it.
+            Think like a scientist: analyze the structure, find symbols, read sections, and follow references.
+            
+            [LANGUAGE PROTOCOL]
+            1. INTERNAL REASONING: All your 'thought' fields MUST be written in ENGLISH.
+            2. TOOL CALLS: All search queries and tool parameters MUST be in ENGLISH.
+            3. FINAL OUTPUT: Your 'finalAnswer' MUST be written in CHINESE (Simplified).
             
             [AVAILABLE TOOLS]
-            1. searchLibrary(query, paperId):
+            1. searchLibrary(query, paperId, threshold):
                 - Search for relevant sections, symbols, and references.
                 - 'query': The search keyword (Required).
                 - 'paperId': Specific paper ID (Optional, Long). Use null to search everywhere.
-                - Usage Example: {"query": "soliton", "paperId": 123} OR just "soliton" for global search.
+                - 'threshold': Similarity threshold (Optional, Double). Range [0.35, 0.7]. Default is 0.5.
+                   Hint: Increase to 0.6 if results are irrelevant; decrease to 0.35 if no results found.
+                - Usage Example: {"query": "soliton", "paperId": 123, "threshold": 0.5} OR just "soliton" for global search.
             2. getPaperOutline(paperId): 
                 - Get the hierarchical table of contents for a paper.
                 - Usage: {"paperId": 7}
@@ -60,7 +75,7 @@ public class ResearchAgentEngine {
             {
               "thought": "I need to search for 'Möbius' inside paper 7.",
               "action": "searchLibrary",\s
-              "actionInput": "{\\"query\\": \\"Möbius\\", \\"paperId\\": 7}"\s
+              "actionInput": "{\\"query\\": \\"Möbius\\", \\"paperId\\": 7, \\"threshold\\": 0.5}"\s
             }
             Or
             {
@@ -76,14 +91,44 @@ public class ResearchAgentEngine {
               "finalAnswer": "Your comprehensive answer here..."
             }
             """;
+    private ChatMemory getMemory(String sessionId) {
+        return MessageWindowChatMemory.builder()
+                .id(sessionId)              // 关键：ID 对应 Redis 中的 Key
+                .maxMessages(20)            // 保留最近 20 条消息
+                .chatMemoryStore(chatMemoryStore) // 关键：数据持久化到 Redis
+                .build();
+    }
+
+    public String run(String sessionId, String userQuestion){
+        ChatMemory memory = getMemory(sessionId);
+        String refinedQuestion = aiAdapter.rewriteQueryIfNecessary(userQuestion, memory.messages());
+        log.info("📝 Original: '{}' -> Rewritten: '{}'", userQuestion, refinedQuestion);
+
+        memory.add(UserMessage.from(userQuestion));
+        List<ChatMessage> context = new ArrayList<>();
+        context.add(SystemMessage.from(SYSTEM_PROMPT));
+        context.addAll(memory.messages());
+        context.add(UserMessage.from(
+                "The user's request (resolved and translated): " + refinedQuestion
+        ));
+        log.info("🤖 Agent started. Question: {}", userQuestion);
+        String finalAnswer = executeReActLoop(context);
+        memory.add(AiMessage.from(finalAnswer));
+        return finalAnswer;
+    }
+
 
     public String run(String userQuestion) {
         List<ChatMessage> history = new ArrayList<>();
         history.add(SystemMessage.from(SYSTEM_PROMPT));
         history.add(UserMessage.from("Question:" + userQuestion));
-
-        int maxSteps = 20;
         log.info("🤖 Agent started. Question: {}", userQuestion);
+        return executeReActLoop(history);
+    }
+
+    private String executeReActLoop(List<ChatMessage> history){
+        int maxSteps = 20;
+
         for (int i = 0; i < maxSteps; i++) {
             Response<AiMessage> response = chatLanguageModel.generate(history);
             String llmOutput = response.content().text();
@@ -113,7 +158,7 @@ public class ResearchAgentEngine {
             if ("searchLibrary".equalsIgnoreCase(toolName)) {
                 String query;
                 Long paperId = null;
-
+                Double threshold = null;
                 // 尝试检测是否为 JSON 格式 (简单的启发式判断)
                 String trimmedInput = input.trim();
                 if (trimmedInput.startsWith("{") && trimmedInput.endsWith("}")) {
@@ -125,6 +170,9 @@ public class ResearchAgentEngine {
                         if (params.containsKey("paperId")) {
                             paperId = params.getLong("paperId");
                         }
+                        if (params.containsKey("threshold")) {
+                            threshold = params.getDouble("threshold");
+                        }
                     } catch (Exception e) {
                         // 如果解析 JSON 失败，回退到将整个 input 当作 query
                         log.warn("Failed to parse searchLibrary params as JSON, using raw string. Error: {}", e.getMessage());
@@ -135,7 +183,7 @@ public class ResearchAgentEngine {
                     query = trimmedInput;
                 }
 
-                return tools.searchLibrary(query, paperId);
+                return tools.searchLibrary(query, paperId,threshold);
             }
 
             // -------------------------------------------------------

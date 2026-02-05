@@ -19,9 +19,9 @@ public class ScientificResearchTools {
     @Resource
     private AgentReaderService readerService;
 
-    @Tool("Search the paper library. 'query' is the keyword/sentence. 'paperId' is optional: set specific ID to search within one paper, or set NULL to search the entire library. Returns candidate sections, symbols, and references.")
-    public String searchLibrary(String query, Long paperId) {
-        SearchResultDTO result = retrieverService.searchLibrary(query, paperId);
+    @Tool("Search the paper library. 'query' is the keyword/sentence. 'paperId' is optional: set specific ID to search within one paper, or set NULL to search the entire library. 'threshold' is optional (0.35-0.7), or set NULL. Returns candidate sections, symbols, and references.")
+    public String searchLibrary(String query, Long paperId, Double threshold) {
+        SearchResultDTO result = retrieverService.searchLibrary(query, paperId, threshold);
         return formatSearchResult(result);
     }
 
@@ -41,7 +41,7 @@ public class ScientificResearchTools {
     }
 
     @Tool("""
-    Look up the specific details (Title and Abstract) of a reference cited in the paper. 
+    Look up the specific details (Title and Abstract) of a reference cited in the paper.
     Use this tool when you encounter citation marks like '[12]', 'Ref. 24', or 'in [5]' in the text 
     and you need to understand what that external source is about.
     Input: paperId (Long), refIndex (String, e.g., '24').
@@ -103,7 +103,7 @@ public class ScientificResearchTools {
         }
 
         if (!hasContent) {
-            return "No relevant information found in the library for query: " + result.toString(); // 简单防空
+            return "No relevant information found in the library for query: " + result; // 简单防空
         }
 
         return sb.toString();

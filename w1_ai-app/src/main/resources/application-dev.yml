@@ -40,3 +40,10 @@ academic:
   s2:
     base-url: https://api.semanticscholar.org/graph/v1
     api-key: ""
+
+redis:
+  sdk:
+    config:
+      host: 127.0.0.1
+      port: 16379
+      database: 2

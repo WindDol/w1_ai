@@ -54,13 +54,17 @@ public class TestAdapter {
                 Equation (24) is a Riccati equation with the form of Eq. (23a)—another coincidence that seems a bit surprising when approached this way. In Sec. III B, we will see how these Riccati equations emerge naturally from the infinitesimal generators of the Möbius group.
                 """;
         String title = "Identical phase oscillators with global sinusoidal coupling evolve by Möbius group action";
-        List<SymbolDefinition> symbolDefinitions = extractor.extractFromSection(title,context);
+        try{
+            List<SymbolDefinition> symbolDefinitions = extractor.extractFromSection(title,context);
+            log.info(Json.toJson(symbolDefinitions));
+        }catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
 
-        log.info(Json.toJson(symbolDefinitions));
     }
     @Test
     public void testEnrichment() throws Exception {
-        enrichmentService.symbolExtractionAndStorage(7l);
+        enrichmentService.symbolExtractionAndStorage(9L);
     }
 
 

@@ -1,23 +1,27 @@
 package cn.winddol.ai.infrastructure.adapter.ai;
 
+import cn.winddol.ai.domain.agent.adapter.repository.IAiAdapter;
 import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
 import cn.winddol.ai.domain.paperTools.adapter.external.dto.RefMetadata;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
 import com.alibaba.fastjson.JSON;
+
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import jakarta.annotation.PostConstruct;
+
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-public class DeepSeekAdapter implements ISymbolExtractor {
+public class DeepSeekAdapter implements ISymbolExtractor, IAiAdapter {
 
     @Resource
     private ChatLanguageModel chatLanguageModel;
@@ -59,7 +63,7 @@ public class DeepSeekAdapter implements ISymbolExtractor {
             // 防止模型有时会无视 "No Markdown" 的指令
             String jsonStr = cleanJson(response);
 
-            if (jsonStr == null || jsonStr.trim().isEmpty()) {
+            if ( jsonStr.trim().isEmpty()) {
                 return Collections.emptyList();
             }
 
@@ -75,25 +79,36 @@ public class DeepSeekAdapter implements ISymbolExtractor {
     @Override
     public RefMetadata extractRefMetadata(String rawText) {
         String prompt = """
-            You are a bibliometric expert. Analyze this citation reference.
-            Raw Text: "%s"
-            
-            Tasks:
-            1. Identify the **Publication Year**.
-            2. Identify **ALL Author Surnames** visible in the text.
-               - Ignore initials (e.g., "J. Smith" -> "Smith").
-               - If "et al." appears, just list the visible authors.
-            3. Identify the **Title**.
-            4. Construct a Search Query.
-            
-            Return JSON ONLY:
-            {
-              "year": 1995,
-              "authorSurnames": ["Smith", "Doe", "Johnson"],  // List of strings
-              "title": "...",
-              "searchString": "..."
-            }
-            """.formatted(rawText);
+        ### Role
+        You are an advanced Bibliometric Parsing AI. Your task is to structure raw citation text into precise metadata and generate an optimized search query.
+
+        ### Input Data
+        Raw Text: "%s"
+
+        ### Extraction Tasks
+        1. **Year**: Identify the 4-digit publication year (e.g., 2023).
+        2. **Authors**: Extract all author surnames.
+           - Remove initials (e.g., "J. Smith" -> "Smith").
+           - Keep compound surnames intact (e.g., "Van der Waals").
+        3. **Title**: Identify the full title of the paper.
+        4. **Journal/Venue**: Identify the journal, conference abbreviation, or publisher (e.g., "Nature", "CVPR", "arXiv", "Phys. Rev. B").
+
+        ### Search String Construction (CRITICAL)
+        Generate a `searchString` optimized for academic search engines (Google Scholar).
+        **Pattern**: `[First Author Surname] [Year] [Journal/Venue] [Title]`
+        - **Requirement**: You MUST include the **Journal/Venue** if visible in the text.
+        - **Formatting**: Remove all non-alphanumeric punctuation (commas, brackets) from the search string to ensure broad matching.
+
+        ### Output Format
+        Return STRICT JSON only (no markdown code blocks, no explanation):
+        {
+          "year": 2024,
+          "authorSurnames": ["Smith", "Doe"],
+          "title": "The theory of everything",
+          "journal": "Nature Physics",
+          "searchString": "Smith 2024 Nature Physics The theory of everything"
+        }
+        """.formatted(rawText);
 
         try {
             String json = cleanJson(chatLanguageModel.generate(prompt));
@@ -109,7 +124,7 @@ public class DeepSeekAdapter implements ISymbolExtractor {
         String joinedSnippets = String.join("\n---\n", snippets);
 
         String prompt = """
-        You are a scientific researcher. 
+        You are a scientific researcher.
         The following text snippets are from a main paper that cites Reference [%s].
         
         [Goal]
@@ -119,7 +134,7 @@ public class DeepSeekAdapter implements ISymbolExtractor {
         %s
         
         [Output]
-        A concise summary (approx. 50-100 words). Start with: "Based on the context, this reference appears to propose/discuss..."
+        A concise summary (approx. 100-200 words). Start with: "Based on the context, this reference appears to propose/discuss..."
         """.formatted(refIndex, refIndex, joinedSnippets);
 
         try {
@@ -142,14 +157,14 @@ public class DeepSeekAdapter implements ISymbolExtractor {
             %s
             
             [Task]
-            Synthesize these into a single, cohesive, and more comprehensive summary. 
+            Synthesize these into a single, cohesive, and more comprehensive summary.
             - Eliminate redundancies.
             - Retain specific details about methods, findings, or applications from both sources.
             - Maintain a professional, objective tone.
             - Start with: "Based on multiple contexts, this reference discusses..."
             
             [Output]
-            A single paragraph summary (max 200 words).
+            A single paragraph summary (max 250 words).
             """.formatted(desc1, desc2);
 
         return chatLanguageModel.generate(prompt);
@@ -176,5 +191,39 @@ public class DeepSeekAdapter implements ISymbolExtractor {
             response = response.substring(0, response.length() - 3);
         }
         return response.trim();
+    }
+
+    @Override
+    public String rewriteQueryIfNecessary(String currentQuestion, List<ChatMessage> history) {
+        String rewritePrompt = """
+        You are an expert research assistant.
+        Your task:
+        1. Analyze the conversation history and the follow-up question.
+        2. Resolve pronouns (it, this, that, etc.) based on history.
+        3. Translate the resolved question into a concise, professional academic English search query.
+        
+        [Rules]
+        - Output ONLY the English rewritten question.
+        - Do not provide any explanations.
+        
+        [History]
+        %s
+        
+        [Follow-up Question]
+        %s
+        
+        [English Standalone Question]
+        """.formatted(formatHistory(history), currentQuestion);
+
+        // 调用 LLM (建议用 DeepSeek-V3，翻译和逻辑都极强)
+        String response = chatLanguageModel.generate(rewritePrompt);
+        return response.trim();
+    }
+
+    private String formatHistory(List<ChatMessage> history) {
+        if (history == null || history.isEmpty()) return "No history.";
+        return history.stream()
+                .map(m -> (m instanceof UserMessage ? "User: " : "AI: ") + m.text())
+                .collect(Collectors.joining("\n"));
     }
 }

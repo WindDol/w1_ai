@@ -38,6 +38,10 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j</artifactId>
+        </dependency>
         <!-- 系统模块 -->
         <dependency>
             <groupId>cn.winddol.ai</groupId>

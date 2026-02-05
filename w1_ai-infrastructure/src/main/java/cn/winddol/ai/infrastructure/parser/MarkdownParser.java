@@ -13,6 +13,7 @@ public class MarkdownParser {
 
     /**
      * 核心方法：解析 Markdown 文本
+     *
      * @param markdown 昨天的 output_test.md 的内容
      * @return 解析好的章节列表
      */
@@ -37,9 +38,6 @@ public class MarkdownParser {
                     mainTitle = line.trim();
                 }
 
-                if (PaperCleaner.isNoise(line, mainTitle)) {
-                    continue; // 丢弃页眉
-                }
 
                 if (PaperCleaner.isNoise(line)) {
                     continue;
@@ -50,7 +48,7 @@ public class MarkdownParser {
                 // 判断是否是标题行
                 if (matcher.matches()) {
                     // 1. 保存上一章 (如果内容不为空)
-                    if (currentSection.contentBuffer.length() > 0 || currentSection.level > 0) {
+                    if (!currentSection.contentBuffer.isEmpty() || currentSection.level > 0) {
                         sections.add(currentSection);
                     }
 
@@ -58,7 +56,7 @@ public class MarkdownParser {
                     int level = matcher.group(1).length(); // # 的数量
                     String headerText = matcher.group(2).trim();
                     String parentId = (level > 1) ? activeParentIds[level - 1] : null;
-                    currentSection = new SectionPO(headerText, level,parentId);
+                    currentSection = new SectionPO(headerText, level, parentId);
                     activeParentIds[level] = currentSection.uuid;
                     for (int i = level + 1; i < activeParentIds.length; i++) {
                         activeParentIds[i] = null;
@@ -92,5 +90,79 @@ public class MarkdownParser {
             outline.put(key, sec.uuid);
         }
         return outline;
+    }
+
+    /**
+     * 专门提取论文标题的方法
+     * 逻辑：寻找文档中第一个一级标题 (# )
+     *
+     * @param markdown 全文 Markdown
+     * @return 标题字符串，如果没找到则返回 "Untitled Paper"
+     */
+    public String extractTitle(String markdown) {
+        if (markdown == null || markdown.isEmpty()) {
+            return "Untitled Paper";
+        }
+
+        try (BufferedReader reader = new BufferedReader(new StringReader(markdown))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String trimmedLine = line.trim();
+
+                // 跳过空行
+                if (trimmedLine.isEmpty()) continue;
+
+                // 跳过可能存在的噪音 (复用之前的逻辑)
+                if (PaperCleaner.isNoise(trimmedLine)) continue;
+
+                // 1. 优先匹配一级标题 "# Title"
+                if (trimmedLine.startsWith("# ")) {
+                    return cleanMarkdownSyntax(trimmedLine);
+                }
+
+                // 2. 兜底策略：如果 LLM 没生成 #，而是生成了 ## Title (有时候会发生)
+                // 且这一行不是常见的章节名 (Abstract, Introduction)，那它可能是标题
+                if (trimmedLine.startsWith("## ")) {
+                    String potentialTitle = cleanMarkdownSyntax(trimmedLine);
+                    if (!isStandardSectionHeader(potentialTitle)) {
+                        return potentialTitle;
+                    }
+                }
+
+                // 为了防止读取整个文件，如果读了前 50 行还没找到标题，就停止
+                // (通常标题肯定在前 20 行内)
+                // 这里可以加个计数器，略。
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "Untitled Paper";
+    }
+
+    /**
+     * 辅助方法：清洗标题中的 Markdown 符号
+     * 例如: "# **The Theory of Everything**" -> "The Theory of Everything"
+     */
+    private String cleanMarkdownSyntax(String text) {
+        // 1. 去掉开头的 # 和空格
+        String temp = text.replaceAll("^#+\\s*", "");
+        // 2. 去掉粗体/斜体符号 (*, _)
+        temp = temp.replaceAll("[*_]{2,}", ""); // 去掉 ** 或 __
+        temp = temp.replaceAll("[*_]", "");     // 去掉单 * 或 _
+        return temp.trim();
+    }
+
+    /**
+     * 辅助方法：判断是不是标准的章节名
+     * 用于防止把 "## Abstract" 误判为论文标题
+     */
+    private boolean isStandardSectionHeader(String title) {
+        String t = title.toLowerCase();
+        return t.equals("abstract") ||
+                t.startsWith("introduction") ||
+                t.startsWith("author") ||
+                t.equals("index");
+
     }
 }

@@ -25,9 +25,26 @@ public class TestAgent {
 
     @Test
     public void testReferenceTrackingReasoning() {
-        String question = "在讨论 Möbius 变换的Algebraic method时，作者提到了参考文献 [24]。请问 [24] 这篇论文的标题是什么？它主要解决了什么问题？";
+        String question = "What are the characteristics of the traveling wave status";
 
         String answer = agentEngine.run(question);
+
+        log.info("================ FINAL ANSWER ================");
+        log.info(answer);
+    }
+
+    @Test
+    public void testSession() {
+
+        String answer = agentEngine.run("session_1", "谁在 2009 年研究了 Möbius 变换在振子系统中的应用？");
+
+        log.info("================ FINAL ANSWER ================");
+        log.info(answer);
+    }
+    @Test
+    public void testSession1() {
+
+        String answer = agentEngine.run("session_1", "他在推导公式 21 时用了什么方法？");
 
         log.info("================ FINAL ANSWER ================");
         log.info(answer);

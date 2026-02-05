@@ -27,7 +27,7 @@ public class TestAgentTools {
     public void test1_SearchLibrary() {
         // 测试雷达
         System.out.println("--- Test Search: 'Möbius transformation' ---");
-        SearchResultDTO result = retriever.searchLibrary("Möbius transformation");
+        SearchResultDTO result = retriever.searchLibrary("Möbius transformation",null);
 
         // 断言：应该能找到 Header 包含 Möbius 的章节
        log.info(JSON.toJSONString(result));
@@ -36,7 +36,7 @@ public class TestAgentTools {
     @Test
     public void test2_SmartRead() {
         // 测试阅读器 (你需要先去数据库里找一个存在的 sectionId)
-        String sectionId = "c704a54e-06c8-422e-a5a4-718e3d24e881";
+        String sectionId = "1d0f26cf-61ee-4978-9faa-f37e21687569";
 
         System.out.println("--- Test Read: " + sectionId + " ---");
         String content = reader.readSectionWithContext(sectionId);
@@ -45,15 +45,15 @@ public class TestAgentTools {
     }
     @Test
     public void test3_ScientificResearch() {
-        System.out.println("--- Test Search: 'Möbius transformation' ---");
-        String content = scientificResearchTools.searchLibrary("Möbius transformation",null);
+        System.out.println("--- Test Search: 'What are the characteristics of the traveling wave status ---");
+        String content = scientificResearchTools.searchLibrary(" What are the characteristics of the traveling wave status",null,null);
         log.info(content);
     }
 
     @Test
     public void test4_ScientificResearch() {
         System.out.println("--- Test Search: 'Möbius transformation' ---");
-        String content = scientificResearchTools.lookupReference(7l, String.valueOf(21));
+        String content = scientificResearchTools.lookupReference(7L, String.valueOf(21));
         log.info(content);
     }
     @Test
