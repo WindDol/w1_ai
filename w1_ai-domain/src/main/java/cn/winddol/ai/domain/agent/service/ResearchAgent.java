@@ -1,6 +1,6 @@
 package cn.winddol.ai.domain.agent.service;
 
-import cn.winddol.ai.domain.agent.adapter.repository.IAiAdapter;
+import cn.winddol.ai.domain.agent.adapter.repository.IAgentRepository;
 import cn.winddol.ai.domain.agent.model.entity.AgentStep;
 import cn.winddol.ai.domain.paperTools.adapter.tools.ScientificResearchTools;
 import com.alibaba.fastjson.JSON;
@@ -10,30 +10,28 @@ import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.output.Response;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Component
 @Slf4j
-public class ResearchAgentEngine {
+public class ResearchAgent {
 
     @Resource
     private ChatLanguageModel chatLanguageModel;
     @Resource
     private ScientificResearchTools tools;
     @Resource
-    private ChatMemoryStore chatMemoryStore;
-    @Resource
-    private IAiAdapter aiAdapter;
+    private IAgentRepository repository;
+
     private static final String SYSTEM_PROMPT = """
             You are 'ScholarBrain', an advanced autonomous research assistant.
             You have access to a private library of parsed scientific papers.
@@ -91,45 +89,30 @@ public class ResearchAgentEngine {
               "finalAnswer": "Your comprehensive answer here..."
             }
             """;
-    private ChatMemory getMemory(String sessionId) {
-        return MessageWindowChatMemory.builder()
-                .id(sessionId)              // 关键：ID 对应 Redis 中的 Key
-                .maxMessages(20)            // 保留最近 20 条消息
-                .chatMemoryStore(chatMemoryStore) // 关键：数据持久化到 Redis
-                .build();
-    }
-
-    public String run(String sessionId, String userQuestion){
-        ChatMemory memory = getMemory(sessionId);
-        String refinedQuestion = aiAdapter.rewriteQueryIfNecessary(userQuestion, memory.messages());
-        log.info("📝 Original: '{}' -> Rewritten: '{}'", userQuestion, refinedQuestion);
-
-        memory.add(UserMessage.from(userQuestion));
+    public String doResearch(String sessionId, String taskDescription, ChatMemory memory) {
         List<ChatMessage> context = new ArrayList<>();
         context.add(SystemMessage.from(SYSTEM_PROMPT));
         context.addAll(memory.messages());
         context.add(UserMessage.from(
-                "The user's request (resolved and translated): " + refinedQuestion
+                "The user's request (resolved and translated): " + taskDescription
         ));
-        log.info("🤖 Agent started. Question: {}", userQuestion);
-        String finalAnswer = executeReActLoop(context);
+        log.info("🤖 Agent started. Question: {}", taskDescription);
+        String finalAnswer = executeReActLoop(sessionId,context);
         memory.add(AiMessage.from(finalAnswer));
         return finalAnswer;
     }
 
 
-    public String run(String userQuestion) {
-        List<ChatMessage> history = new ArrayList<>();
-        history.add(SystemMessage.from(SYSTEM_PROMPT));
-        history.add(UserMessage.from("Question:" + userQuestion));
-        log.info("🤖 Agent started. Question: {}", userQuestion);
-        return executeReActLoop(history);
-    }
-
-    private String executeReActLoop(List<ChatMessage> history){
+    private String executeReActLoop(String sessionId, List<ChatMessage> history){
         int maxSteps = 20;
 
         for (int i = 0; i < maxSteps; i++) {
+            if(i == maxSteps-1){
+                history.add(UserMessage.from(
+                        "CRITICAL: Step limit reached. Do NOT use any more tools. " +
+                                "Synthesize all observations above and provide your best possible FINAL ANSWER in Chinese now."
+                ));
+            }
             Response<AiMessage> response = chatLanguageModel.generate(history);
             String llmOutput = response.content().text();
             history.add(AiMessage.from(llmOutput));
@@ -139,16 +122,20 @@ public class ResearchAgentEngine {
                 history.add(UserMessage.from("System Error: Invalid JSON format. Please output strictly JSON."));
                 continue;
             }
-            log.info("🔄 Step {}: [Thought] {} -> [Action] {}({})",
-                    i + 1, step.getThought(), step.getAction(), step.getActionInput());
             if (step.getFinalAnswer() != null && !StringUtils.isBlank(step.getFinalAnswer())) {
                 log.info("🛑 Step {}: [Final Answer Ready] {}", i+1, step.getThought());
+                repository.logStep(sessionId, i + 1, step, "FINAL_ANSWER_GENERATED");
                 return step.getFinalAnswer();
             }
+            log.info("🔄 Step {}: [Thought] {} -> [Action] {}({})",
+                    i + 1, step.getThought(), step.getAction(), step.getActionInput());
+            if (i == maxSteps - 1) {
+                log.warn("⚠️ Agent failed to provide finalAnswer in last step. Fallback to thought summary.");
+                return "【自动汇总】由于搜索步数达到上限，根据已有资料整理如下：" + step.getThought();
+            }
             String observation = executeTool(step.getAction(), step.getActionInput());
-
             history.add(UserMessage.from("Observation: " + observation));
-
+            repository.logStep(sessionId,i+1,step,observation);
         }
         return "❌ Failed to answer within step limit.";
     }
@@ -267,4 +254,6 @@ public class ResearchAgentEngine {
             return null;
         }
     }
+
+
 }

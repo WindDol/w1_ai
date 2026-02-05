@@ -1,6 +1,6 @@
 package cn.winddol.ai.infrastructure.adapter.ai;
 
-import cn.winddol.ai.domain.agent.adapter.repository.IAiAdapter;
+import cn.winddol.ai.domain.agent.adapter.ai.IAiAdapter;
 import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
 import cn.winddol.ai.domain.paperTools.adapter.external.dto.RefMetadata;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
