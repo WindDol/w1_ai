@@ -19,6 +19,10 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+  servlet:
+    multipart:
+      max-file-size: 10MB      # 单个文件的最大限制
+      max-request-size: 50MB
 # MyBatis 配置【如需使用记得打开】
 mybatis-plus:
   mapper-locations: classpath:mybatis/mapper/*.xml

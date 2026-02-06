@@ -11,34 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class KnowledgeRelationEntity {
 
-    /**
-     * 被关联论文的 ID
-     */
-    private Long targetId;
+    private Long relatedId;      // 对方论文ID
+    private String relatedTitle; // 对方论文标题
+    private String type;         // EXTEND, SUPPORT, etc.
+    private String description;  // 评价内容
+    private String direction;    // OUTGOING (当前论文评价别人) / INCOMING (别人评价当前论文)
 
-    /**
-     * 被关联论文的标题
-     */
-    private String targetTitle;
-
-    /**
-     * 关系类型：SUPPORT (支持), CONTRADICT (冲突), EXTEND (扩展)
-     */
-    private String type;
-
-    /**
-     * Librarian 给出的详细审计描述（例如：为什么是扩展关系，具体公式的变化）
-     */
-    private String description;
-
-    /**
-     * 辅助方法：将其格式化为 Agent 易读的字符串
-     */
-    @Override
-    public String toString() {
-        return String.format(
-                "Relation: [%s]\nTarget Paper: (ID: %d) \"%s\"\nLibrarian Insight: %s",
-                type, targetId, targetTitle, description
-        );
-    }
 }

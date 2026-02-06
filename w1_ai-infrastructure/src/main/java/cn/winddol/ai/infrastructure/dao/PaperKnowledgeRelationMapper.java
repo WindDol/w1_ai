@@ -17,10 +17,29 @@ public interface PaperKnowledgeRelationMapper extends BaseMapper<PaperKnowledgeR
      * 用于 Agent 的 checkPaperRelations 工具
      */
     @Select("""
-        SELECT r.*, p.title as target_paper_title 
+        -- 第一部分：当前论文是作者（Source），评价别人（Target）
+        SELECT 
+            r.target_paper_id as related_paper_id, 
+            p.title as related_paper_title, 
+            r.relation_type, 
+            r.description,
+            'OUTGOING' as direction -- 主动评价
         FROM paper_knowledge_relations r
         JOIN papers p ON r.target_paper_id = p.id
         WHERE r.source_paper_id = #{paperId}
+        
+        UNION ALL
+        
+        -- 第二部分：当前论文是被评价者（Target），别人（Source）评价它
+        SELECT 
+            r.source_paper_id as related_paper_id, 
+            p.title as related_paper_title, 
+            r.relation_type, 
+            r.description,
+            'INCOMING' as direction -- 被动评价
+        FROM paper_knowledge_relations r
+        JOIN papers p ON r.source_paper_id = p.id
+        WHERE r.target_paper_id = #{paperId}
     """)
-    List<Map<String, Object>> selectRelationsWithTitle(@Param("paperId") Long paperId);
+    List<Map<String, Object>> selectBidirectionalRelations(@Param("paperId") Long paperId);
 }

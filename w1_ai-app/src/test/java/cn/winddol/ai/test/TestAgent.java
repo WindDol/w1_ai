@@ -50,5 +50,13 @@ public class TestAgent {
         log.info("================ FINAL ANSWER ================");
         log.info(answer);
     }
+    @Test
+    public void testSession2() {
+
+        String answer = agent.ask("session_5", "Identical phase oscillators with global sinusoidal coupling evolve by Möbius group action (2009) 的论文后续有什么发展");
+
+        log.info("================ FINAL ANSWER ================");
+        log.info(answer);
+    }
 
 }

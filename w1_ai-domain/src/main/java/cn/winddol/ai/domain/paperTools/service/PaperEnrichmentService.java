@@ -81,9 +81,12 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
         SectionEntity refSection = allSections.stream()
                 .filter(s -> {
                     String h = s.getHeader().toUpperCase();
-                    return h.contains("REFERENCE") || h.contains("BIBLIOGRAPHY") || h.contains("NOTES")|| h.contains("REFERENCES") || h.contains("ACKNOWLEDGMENTS");
+                    return h.contains("REFERENCE") || h.contains("BIBLIOGRAPHY") ||
+                            h.contains("NOTES") || h.contains("REFERENCES") ||
+                            h.contains("ACKNOWLEDGMENTS");
                 })
-                .findFirst()
+                // 使用 max 算子，根据内容的长度进行比较
+                .max(Comparator.comparingInt(s -> s.getContent() != null ? s.getContent().length() : 0))
                 .orElse(null);
 
         if (refSection == null && !allSections.isEmpty()) {

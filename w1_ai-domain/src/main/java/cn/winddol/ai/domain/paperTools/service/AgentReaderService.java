@@ -35,11 +35,17 @@ public class AgentReaderService {
             return "The Librarian found no direct conflicts or specific relations with other papers in the library.";
         }
 
-        StringBuilder sb = new StringBuilder("The Librarian has identified the following relations:\n");
+        StringBuilder sb = new StringBuilder("Inter-paper relations from the Librarian's audit:\n");
         for (KnowledgeRelationEntity rel : relations) {
-            sb.append(String.format("- Relation with Paper [%d] (%s):\n", rel.getTargetId(), rel.getTargetTitle()));
-            sb.append("  Type: ").append(rel.getType()).append("\n");
-            sb.append("  Insight: ").append(rel.getDescription()).append("\n\n");
+            if ("OUTGOING".equals(rel.getDirection())) {
+                // 当前论文 -> 评价 -> 别人
+                sb.append(String.format("- This paper [%s] %s Paper [%d] (%s). Reason: %s\n",
+                        rel.getType(), rel.getType(), rel.getRelatedId(), rel.getRelatedTitle(), rel.getDescription()));
+            } else {
+                // 别人 -> 评价 -> 当前论文
+                sb.append(String.format("- This paper IS %s BY Paper [%d] (%s). Note: %s\n",
+                        rel.getType(), rel.getRelatedId(), rel.getRelatedTitle(), rel.getDescription()));
+            }
         }
         return sb.toString();
     }

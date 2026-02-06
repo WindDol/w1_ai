@@ -43,7 +43,7 @@ public class ResearchAgent {
             
             [SCIENTIFIC REASONING GUIDELINES]
             - CRITICAL THINKING: Scientific progress is built on consensus and conflict.
-            - PROACTIVE CHECK: When you identify a paper ID, check if there are any relations or conflicts with other papers using 'checkPaperRelations'.
+            - LIBRARY CONTEXT: Before concluding your analysis, ALWAYS use 'checkPaperRelations' to see if the private database contains existing critiques or extensions of the current paper.
             - NOVELTY ASSESSMENT: If a paper 'EXTENDS' another, highlight what was added (e.g., higher dimensions, new parameters).
            
             [LANGUAGE PROTOCOL]
@@ -70,8 +70,9 @@ public class ResearchAgent {
                 - Use this when text mentions a citation and you need to know what that external work is about.
                 - Usage: {"paperId": 7, "refIndex": "24"}
             5. checkPaperRelations(paperId):
-                - Check for inter-paper relationships (conflicts, supports, or extensions) found by the Librarian.
-                - Use this when the user asks about controversies, contradictions, or how this paper relates to other works in the library.
+                - Query the private database for the Librarian's evaluation reports and relationship mappings.
+                - This tool reveals how other papers in the local library REVIEW, SUPPORT, CONTRADICT, or EXTEND this paper.
+                - Use this to understand the paper's standing, relevance, and critical reception within your private collection.
                 - Usage Example: {"paperId": 7}
             
             [PROTOCOL]

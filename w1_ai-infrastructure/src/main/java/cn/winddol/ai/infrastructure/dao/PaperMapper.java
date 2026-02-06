@@ -12,16 +12,17 @@ import java.util.Map;
 @Mapper
 public interface PaperMapper extends BaseMapper<Paper> {
     @Select("""
-        SELECT id, title, metadata, 
-               1 - (abstract_embedding <=> #{vectorStr}::vector) as score
+        SELECT id, title, metadata, abstract as abstractText,
+               1 - (embedding <=> #{vectorStr}::vector) as score
         FROM papers
         WHERE id != #{excludeId} 
-          AND abstract_embedding IS NOT NULL
-          AND (1 - (abstract_embedding <=> #{vectorStr}::vector)) > 0.5 -- 仅返回相关度高的
-        ORDER BY abstract_embedding <=> #{vectorStr}::vector
+          AND embedding IS NOT NULL
+          AND (1 - (embedding <=> #{vectorStr}::vector)) > 0.5 -- 仅返回相关度高的
+        ORDER BY embedding <=> #{vectorStr}::vector
         LIMIT #{limit}
     """)
     List<Map<String, Object>> searchSimilar(@Param("vectorStr") String vectorStr,
                                             @Param("limit") int limit,
                                             @Param("excludeId") Long excludeId);
+
 }

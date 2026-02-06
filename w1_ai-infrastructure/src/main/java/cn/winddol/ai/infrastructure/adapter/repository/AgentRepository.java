@@ -51,12 +51,13 @@ public class AgentRepository implements IAgentRepository {
 
     @Override
     public List<KnowledgeRelationEntity> findRelationsByPaperId(Long paperId) {
-        List<Map<String, Object>> rawData = relationMapper.selectRelationsWithTitle(paperId);
+        List<Map<String, Object>> rawData = relationMapper.selectBidirectionalRelations(paperId);
         return rawData.stream().map(map -> KnowledgeRelationEntity.builder()
-                .targetId((Long) map.get("target_paper_id"))
-                .targetTitle((String) map.get("target_paper_title"))
+                .relatedId((Long) map.get("related_paper_id"))
+                .relatedTitle((String) map.get("related_paper_title"))
                 .type((String) map.get("relation_type"))
                 .description((String) map.get("description"))
+                .direction((String) map.get("direction"))
                 .build()).toList();
     }
 
@@ -70,6 +71,8 @@ public class AgentRepository implements IAgentRepository {
         return PaperEntity.builder()
                 .id(id)
                 .outline(paper.getOutline())
+                .abstractText(paper.getAbstractText())
+                .embedding(paper.getEmbedding())
                 .title(paper.getTitle())
                 .build();
     }
@@ -86,6 +89,7 @@ public class AgentRepository implements IAgentRepository {
             PaperEntity entity = new PaperEntity();
             entity.setId((Long) map.get("id"));
             entity.setTitle((String) map.get("title"));
+            entity.setAbstractText((String)map.get("abstracttext"));
             return entity;
         }).collect(Collectors.toList());
     }

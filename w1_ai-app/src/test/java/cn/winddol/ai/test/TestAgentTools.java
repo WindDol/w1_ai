@@ -1,6 +1,7 @@
 package cn.winddol.ai.test;
 
 
+import cn.winddol.ai.domain.agent.service.LibrarianAuditService;
 import cn.winddol.ai.domain.paperTools.adapter.tools.ScientificResearchTools;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
@@ -26,6 +27,8 @@ public class TestAgentTools {
     private ScientificResearchTools scientificResearchTools;
     @Resource
     private ReferenceMapper referenceMapper;
+    @Resource
+    private LibrarianAuditService auditService;
 
     @Test
     public void test1_SearchLibrary() {
@@ -63,10 +66,8 @@ public class TestAgentTools {
     @Test
     public void testLookupReferenceTool() {
         // 假设 Paper ID 是 7, 参考文献索引是 "24"
-        ReferenceItem referenceItem = referenceMapper.selectJoinedReference(11L, "Markdahl 2017");
+        auditService.auditAgainstLibrary(14L);
 
-        log.info("--- Tool Output ---");
-        log.info(String.valueOf(referenceItem));
 
     }
 }
