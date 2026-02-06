@@ -28,7 +28,7 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
         PaperEntity paper = repository.getPaperById(paperId);
         List<OutlineNode> outlineTree  = paper.getOutline();
         List<String> allUuids = flattenOutlineIds(outlineTree);
-        int count = allUuids.size() >> 1 ;
+        int count = (int) (allUuids.size() * 0.7);
 
         List<SectionEntity> allSections = repository.getSectionByUuid(allUuids);
         // key: parentId, value: 子章节列表
@@ -38,6 +38,7 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
 
         List<SectionEntity> rootSections = allSections.stream()
                 .filter(s -> s.getParentId() == null)
+                .sorted(Comparator.comparingInt(SectionEntity::getIdx))
                 .toList();
 
         Map<String, SymbolDefinition> globalSymbolMap = new LinkedHashMap<>();
@@ -45,35 +46,32 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
         for (SectionEntity root : rootSections) {
 
             // 策略：构建“聚合文本” = 父节点文本 + 所有子节点文本
-            StringBuilder aggregatedContent = new StringBuilder();
+            List<SectionEntity> flatTree = new ArrayList<>();
+            collectSectionsRecursively(root, hierarchyMap, flatTree);
 
-            // 5.1 加入父节点内容
-            aggregatedContent.append(root.getHeader()).append("\n")
-                    .append(root.getContent()).append("\n\n");
 
-            // 5.2 查找并加入子节点内容
-            List<SectionEntity> children = hierarchyMap.getOrDefault(root.getId(), Collections.emptyList());
-            // 按 idx 排序，保证阅读顺序
-            children.sort(Comparator.comparingInt(SectionEntity::getIdx));
+            for (SectionEntity section : flatTree) {
 
-            for (SectionEntity child : children) {
-                aggregatedContent.append(child.getHeader()).append("\n")
-                        .append(child.getContent()).append("\n\n");
-            }
+                // 检查：如果内容太短（比如只是个标题），跳过，省钱
+                if (section.getContent().length() < 50) continue;
 
-            // 5.3 只有当聚合后的内容足够丰富（比如 > 200 字符）且在扫描范围内才提取
-            // 这里的 shouldScan 逻辑可以用之前的“前 50%”或“关键词”策略
-            if (shouldScan(root.getHeader()) || root.getIdx() < count) {
-                log.info("Extracting symbols from aggregated chapter: {}", root.getHeader());
+                // 检查：是否在扫描范围内 (前 70% 或 关键词)
+                if (shouldScan(section.getHeader()) || section.getIdx() < count) {
 
-                // 调用ai提取符号
-                List<SymbolDefinition> extracted = extractor.extractFromSection(
-                        paper.getTitle(),
-                        aggregatedContent.toString()
-                );
+                    log.info("Extracting symbols from: {}", section.getHeader());
 
-                // 归并
-                mergeSymbols(globalSymbolMap, extracted, root.getId());
+
+                    String contextHeader = "Context: " + root.getHeader() + " > " + section.getHeader();
+                    String contentWithContext = contextHeader + "\n\n" + section.getContent();
+
+                    List<SymbolDefinition> extracted = extractor.extractFromSection(
+                            paper.getTitle(),
+                            contentWithContext
+                    );
+
+                    // 归并 (SourceId 还是记录当前 Section 的 ID，这样溯源更精准！)
+                    mergeSymbols(globalSymbolMap, extracted, root.getId());
+                }
             }
 
         }
@@ -83,7 +81,7 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
         SectionEntity refSection = allSections.stream()
                 .filter(s -> {
                     String h = s.getHeader().toUpperCase();
-                    return h.contains("REFERENCE") || h.contains("BIBLIOGRAPHY") || h.contains("NOTES");
+                    return h.contains("REFERENCE") || h.contains("BIBLIOGRAPHY") || h.contains("NOTES")|| h.contains("REFERENCES") || h.contains("ACKNOWLEDGMENTS");
                 })
                 .findFirst()
                 .orElse(null);
@@ -105,6 +103,28 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
         if (!finalSymbols.isEmpty() || refSection != null) {
             repository.saveEnrichmentData(paperId, finalSymbols,refSection,inTextCitationLinks);
             log.info("Paper [{}] enriched with {} symbols.", paperId, finalSymbols.size());
+        }
+    }
+
+    /**
+     * 递归收集章节对象 (深度优先遍历 DFS)
+     * 结果 list 的顺序就是：父 -> 子1 -> 子1.1 -> 子2 ...
+     */
+    private void collectSectionsRecursively(SectionEntity current,
+                                            Map<String, List<SectionEntity>> hierarchyMap,
+                                            List<SectionEntity> accumulator) {
+        // 1. 把自己加入列表
+        accumulator.add(current);
+
+        // 2. 获取子节点
+        List<SectionEntity> children = hierarchyMap.get(current.getId());
+
+        // 3. 排序并递归
+        if (children != null && !children.isEmpty()) {
+            children.sort(Comparator.comparingInt(SectionEntity::getIdx));
+            for (SectionEntity child : children) {
+                collectSectionsRecursively(child, hierarchyMap, accumulator);
+            }
         }
     }
 
@@ -136,9 +156,22 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
 
             if (map.containsKey(key)) {
                 target = map.get(key);
-                if (isValidDescription(newSym.getDescription()) &&
-                        newSym.getDescription().length() > target.getDescription().length() + 5) {
-                    target.setDescription(newSym.getDescription());
+                String newDesc = newSym.getDescription();
+                String oldDesc = target.getDescription();
+                boolean shouldUpdate = false;
+
+                if (isValidDescription(newDesc)) {
+                    // 1. 如果现有的描述本来就是空的，直接更新
+                    if (!isValidDescription(oldDesc)) {
+                        shouldUpdate = true;
+                    }
+                    // 2. 如果新描述明显更长、更详细，则更新
+                    else if (newDesc.length() > oldDesc.length() + 5) {
+                        shouldUpdate = true;
+                    }
+                }
+                if (shouldUpdate) {
+                    target.setDescription(newDesc);
                     target.setLatex(newSym.getLatex());
                     target.setDefinitionFormula(newSym.getDefinitionFormula());
                 }
@@ -161,6 +194,9 @@ public class PaperEnrichmentService implements IPaperEnrichmentService{
     }
 
     private boolean isValidDescription(String desc) {
-        return desc != null && !desc.trim().isEmpty() && !desc.equalsIgnoreCase("symbol");
+        return desc != null &&
+                !desc.trim().isEmpty() &&
+                !desc.equalsIgnoreCase("null") &&
+                !desc.equalsIgnoreCase("none");
     }
 }

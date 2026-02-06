@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface IPaperRepository {
-    void saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint);
+    Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint);
 
     List<SectionEntity> getSectionByUuid(List<String> uuid);
 
@@ -53,4 +53,10 @@ public interface IPaperRepository {
     Long findPaperIdByFingerprint(String fingerprint);
 
     ReferenceItem lookupReference(Long paperId, String refIndex);
+
+    List<ReferenceItem> selectPendingReferencesByPaperId(Long paperId);
+
+    void updateStatus(Long paperId, String status);
+
+    void updateStatusWithError(Long paperId, String status, String errorMessage);
 }

@@ -1,15 +1,16 @@
 package cn.winddol.ai.infrastructure.parser;
 import cn.winddol.ai.domain.paperTools.model.entity.SectionPO;
 import com.alibaba.fastjson2.JSONObject;
+import org.springframework.stereotype.Component;
+
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+@Component
 public class MarkdownParser {
-
 
     /**
      * 核心方法：解析 Markdown 文本
@@ -63,7 +64,19 @@ public class MarkdownParser {
                     }
                 } else {
                     // 普通行：追加到当前章节内容
-                    currentSection.contentBuffer.append(line).append("\n");
+                    String trimmedLine = line.trim();
+                    if (trimmedLine.isEmpty()) {
+                        currentSection.contentBuffer.append("\n"); // 真正的空行才换行
+                        continue;
+                    }
+
+                    if (shouldMergeWithPreviousLine(currentSection.contentBuffer)) {
+                        // 删除缓冲区末尾可能的换行符，追加空格
+                        trimTrailingNewline(currentSection.contentBuffer);
+                        currentSection.contentBuffer.append(" ").append(trimmedLine).append("\n");
+                    } else {
+                        currentSection.contentBuffer.append(line).append("\n");
+                    }
                 }
             }
             // 保存最后一章
@@ -164,5 +177,29 @@ public class MarkdownParser {
                 t.startsWith("author") ||
                 t.equals("index");
 
+    }
+
+    private boolean shouldMergeWithPreviousLine(StringBuilder sb) {
+        if (sb.length() == 0) return false;
+        // 找到最后一个非空字符
+        int i = sb.length() - 1;
+        while (i >= 0 && Character.isWhitespace(sb.charAt(i))) {
+            i--;
+        }
+        if (i < 0) return false;
+
+        char lastChar = sb.charAt(i);
+        // 如果不是句号、问号、感叹号、冒号，说明句子可能断了
+        // 这里的规则可以根据需要调整，比如允许分号换行
+        return ".!?:;".indexOf(lastChar) == -1;
+    }
+
+    // 辅助方法 2
+    private void trimTrailingNewline(StringBuilder sb) {
+        int i = sb.length() - 1;
+        while (i >= 0 && (sb.charAt(i) == '\n' || sb.charAt(i) == '\r')) {
+            sb.deleteCharAt(i);
+            i--;
+        }
     }
 }

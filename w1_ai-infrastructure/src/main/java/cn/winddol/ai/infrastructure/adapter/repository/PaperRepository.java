@@ -25,6 +25,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Slf4j
 @Repository
@@ -58,13 +61,13 @@ public class PaperRepository implements IPaperRepository {
 
     @Override
     @Transactional
-    public void saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint) {
+    public Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint) {
         Paper existingPaper = paperMapper.selectOne(
                 new LambdaQueryWrapper<Paper>().eq(Paper::getFingerprint, fingerprint)
         );
         if (existingPaper != null) {
             log.warn("⚠️ Paper already exists in library: {}", title);
-            return; // 或者返回已有的 ID
+            return existingPaper.getId(); // 或者返回已有的 ID
         }
         // 1. 构建并保存 Paper 主表
         Paper paper = getPaper(title, sectionPOs);
@@ -100,7 +103,7 @@ public class PaperRepository implements IPaperRepository {
             log.info("🔗 Retroactive Link: Reference node [{}] now linked to Paper ID: {}",
                     node.getId(), newPaperId);
         }
-
+        return paperId;
     }
 
     @Override
@@ -153,12 +156,20 @@ public class PaperRepository implements IPaperRepository {
                 .isGlobal(s.isGlobal()).build()).toList();
 
         symbolService.saveBatch(symbols);
-
+        Set<String> validRefIds = new HashSet<>(); //去重
         if(refSection != null){
             List<ReferenceItem> references = referenceParser.parse(paperId,refSection.getContent());
             if (references != null && !references.isEmpty()) {
-                List<Reference> referenceList = references.stream().map(r -> Reference.builder()
-                        .paperId(paperId).refIndex(r.getRefId()).rawText(r.getRawText()).build()).toList();
+                List<Reference> referenceList = references.stream()
+                        .filter(distinctByKey(ReferenceItem::getRefId)) // 自定义去重
+                        .map(r -> {
+                            validRefIds.add(r.getRefId());
+                            return Reference.builder()
+                                    .paperId(paperId)
+                                    .refIndex(r.getRefId()) // 这里可能是 "1" 也可能是 "Altafini 2013"
+                                    .rawText(r.getRawText())
+                                    .build();
+                        }).toList();
                 referenceSerivece.saveBatch(referenceList);
             }
             log.info("Extracted {} references.", references.size());
@@ -168,15 +179,28 @@ public class PaperRepository implements IPaperRepository {
             List<SectionReferenceLink> links = new ArrayList<>();
             citationLinks.forEach((sectionId, refIndices) -> {
                 for (String index : refIndices) {
-                    links.add(SectionReferenceLink.builder()
-                            .paperId(paperId)
-                            .sectionId(sectionId)
-                            .refIndex(index)
-                            .build());
+                    if (validRefIds.contains(index) || isNumeric(index)) {
+                        links.add(SectionReferenceLink.builder()
+                                .paperId(paperId)
+                                .sectionId(sectionId)
+                                .refIndex(index)
+                                .build());
+                    }
                 }
             });
-            sectionReferenceLinkService.saveBatch(links);
+            if (!links.isEmpty()) {
+                sectionReferenceLinkService.saveBatch(links);
+            }
         }
+    }
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    // 辅助：判断是否纯数字 (兼容旧逻辑)
+    private boolean isNumeric(String str) {
+        return str != null && str.matches("\\d+");
     }
 
     @Override
@@ -254,7 +278,7 @@ public class PaperRepository implements IPaperRepository {
 
     @Override
     public ReferenceItem lookupReference(Long paperId, String refIndex) {
-        String cleanIndex = refIndex.replaceAll("[\\[\\]\\s]", "");
+        String cleanIndex = refIndex.replaceAll("[\\[\\]]", "").trim();
         Long globalId = referenceMapper.selectGlobalRefId(paperId, cleanIndex);
 
         if (globalId == null) {
@@ -274,6 +298,39 @@ public class PaperRepository implements IPaperRepository {
                 .linkedPaperId(po.getLinkedPaperId())
                 .sourceType(ReferenceEnum.getCode(po.getSourceType()))
                 .build();
+    }
+
+    @Override
+    public List<ReferenceItem> selectPendingReferencesByPaperId(Long paperId) {
+        List<Reference> referenceList = referenceMapper.selectList(
+                new LambdaQueryWrapper<Reference>()
+                        .eq(Reference::getPaperId, paperId)
+                        .isNull(Reference::getTitle)
+                        .last("LIMIT 50") // 每次只处理 50 条，防止超时
+        );
+        return referenceList.stream().map(s-> ReferenceItem.builder()
+                .id(s.getId())
+                .paperId(s.getPaperId())
+                .refId(s.getRefIndex())
+                .rawText(s.getRawText())
+                .build()).toList();
+    }
+
+    @Override
+    public void updateStatus(Long paperId, String status) {
+        Paper po = new Paper();
+        po.setId(paperId);
+        po.setStatus(status);
+        paperMapper.updateById(po);
+    }
+
+    @Override
+    public void updateStatusWithError(Long paperId, String status, String errorMessage) {
+        Paper po = new Paper();
+        po.setId(paperId);
+        po.setStatus(status);
+        po.setStatusMessage(errorMessage); // 记录错误详情
+        paperMapper.updateById(po);
     }
 
     private GlobalReferenceEntity GRPoToEntity(GlobalReference po) {

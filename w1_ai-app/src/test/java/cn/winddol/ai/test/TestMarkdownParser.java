@@ -24,7 +24,7 @@ public class TestMarkdownParser {
     @Test
     public void test() throws Exception {
         // 1. 读取昨天的文件
-        String filePath = "C:\\Users\\Mr Ding.LAPTOP-H54HCE12\\Desktop\\ai_pdf\\python\\output_test.md"; // 确保路径对
+        String filePath = "C:\\Users\\Mr Ding.LAPTOP-H54HCE12\\Desktop\\ai_pdf\\w1_ai\\data\\out.md"; // 确保路径对
         String markdown = Files.readString(Paths.get(filePath));
 
         // 2. 解析
@@ -56,7 +56,7 @@ public class TestMarkdownParser {
     @Test
     public void testInsert() throws Exception {
         // 1. 读取并解析文件 (Day 2 的代码)
-        String markdown = Files.readString(Paths.get("C:\\Users\\Mr Ding.LAPTOP-H54HCE12\\Desktop\\ai_pdf\\python\\output_test1.md"));
+        String markdown = Files.readString(Paths.get("C:\\Users\\Mr Ding.LAPTOP-H54HCE12\\Desktop\\ai_pdf\\w1_ai\\data\\out.md"));
         MarkdownParser parser = new MarkdownParser();
         List<SectionPO> pos = parser.parse(markdown);
         String title = parser.extractTitle(markdown);

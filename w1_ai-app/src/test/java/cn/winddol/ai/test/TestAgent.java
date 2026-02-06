@@ -45,7 +45,7 @@ public class TestAgent {
     @Test
     public void testSession1() {
 
-        String answer = agent.ask("session_2", "“根据 Seth Marvel (2009) 的论文，他的方法与 Watanabe (1994) [Ref 21] 提出的方法在处理 N 个振子时的维度缩减结果有什么具体不同？”");
+        String answer = agent.ask("session_3", "“根据 Seth Marvel (2009) 的论文，他的方法与 Watanabe (1994) [Ref 21] 提出的方法在处理 N 个振子时的维度缩减结果有什么具体不同？”");
 
         log.info("================ FINAL ANSWER ================");
         log.info(answer);

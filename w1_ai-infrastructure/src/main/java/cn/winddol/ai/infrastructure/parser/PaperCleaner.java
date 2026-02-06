@@ -36,7 +36,8 @@ public class PaperCleaner {
 
     // 6. 版权符号
     private static final Pattern COPYRIGHT_PATTERN = Pattern.compile(".*(©|\\(c\\)|Copyright|Downloaded from|Rights reserved).*", Pattern.CASE_INSENSITIVE);
-
+    private static final Pattern CITATION_START_PATTERN = Pattern.compile("^\\s*(\\[\\d+]|\\d+\\.|\\(\\d+\\)).*");
+    private static final int MAX_HEADER_LENGTH = 120;
 
     /**
      * 判断某一行是否是页眉/页脚噪音
@@ -46,7 +47,12 @@ public class PaperCleaner {
             return false; // 保留空行用于Markdown分段
         }
         String content = line.trim();
-
+        if (CITATION_START_PATTERN.matcher(content).matches()) {
+            return false;
+        }
+        if (content.length() > MAX_HEADER_LENGTH) {
+            return false;
+        }
         // --- 规则 1: 绝对噪音 (版权、下载信息) ---
         if (COPYRIGHT_PATTERN.matcher(content).matches()) {
             return true;

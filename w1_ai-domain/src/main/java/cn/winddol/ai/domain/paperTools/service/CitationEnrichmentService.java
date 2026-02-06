@@ -38,10 +38,20 @@ public class CitationEnrichmentService {
     /*
      富华引用文献
      */
+    public void enrichPaperReferences(Long paperId) {
+        List<ReferenceItem> pendingRefs = repository.selectPendingReferencesByPaperId(paperId);
+        if (pendingRefs.isEmpty()) return;
+
+        log.info("🚀 [Targeted Enrichment] Processing {} refs for Paper ID: {}", pendingRefs.size(), paperId);
+        processReferences(pendingRefs);
+    }
     public void enrichReferences() {
         List<ReferenceItem> pendingRefs = repository.selectReferences();
-        log.info("🚀 Starting enrichment for {} references...", pendingRefs.size());
+        log.info("🧹 [Global Cleanup] Processing {} leftover refs...", pendingRefs.size());
+        processReferences(pendingRefs);
+    }
 
+    private void processReferences(List<ReferenceItem> pendingRefs) {
         for (ReferenceItem ref : pendingRefs) {
             int maxRetries = 5;
             int attempt = 0;
@@ -323,5 +333,7 @@ public class CitationEnrichmentService {
         }
         return false;
     }
+
+
 }
 

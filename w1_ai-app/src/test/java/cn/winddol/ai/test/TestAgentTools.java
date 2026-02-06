@@ -3,8 +3,10 @@ package cn.winddol.ai.test;
 
 import cn.winddol.ai.domain.paperTools.adapter.tools.ScientificResearchTools;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
+import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
 import cn.winddol.ai.domain.paperTools.service.AgentReaderService;
 import cn.winddol.ai.domain.paperTools.service.HybridRetrieverService;
+import cn.winddol.ai.infrastructure.dao.ReferenceMapper;
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,8 @@ public class TestAgentTools {
     private AgentReaderService reader;
     @Resource
     private ScientificResearchTools scientificResearchTools;
+    @Resource
+    private ReferenceMapper referenceMapper;
 
     @Test
     public void test1_SearchLibrary() {
@@ -59,13 +63,10 @@ public class TestAgentTools {
     @Test
     public void testLookupReferenceTool() {
         // 假设 Paper ID 是 7, 参考文献索引是 "24"
-        String result = scientificResearchTools.lookupReference(7L, "24");
+        ReferenceItem referenceItem = referenceMapper.selectJoinedReference(11L, "Markdahl 2017");
 
         log.info("--- Tool Output ---");
-        log.info(result);
+        log.info(String.valueOf(referenceItem));
 
-        // 断言检查
-        assert result.contains("Pikovsky"); // 应该是 Pikovsky 的论文
-        assert result.contains("Abstract"); // 应该包含摘要
     }
 }

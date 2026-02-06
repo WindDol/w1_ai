@@ -33,28 +33,32 @@ public class DeepSeekAdapter implements ISymbolExtractor, IAiAdapter {
         // 2. 增加更明确的结构定界符
         // 3. 强化对 JSON 格式的约束
         String prompt = """
-        You are a rigorous research assistant specializing in scientific literature.
+        You are a strict data extraction engine.
         
-        [Context]
-        Paper Title: "%s"
+        [CONTEXT]
+        Paper Domain Context: "%s"
+        (Use this ONLY to understand the physics/math meaning of symbols, NOT as a source to extract from.)
         
-        [Task]
-        Extract all mathematical symbols and their specific meanings from the provided text snippet, AND their defining equations (if present).
+        [TASK]
+        Extract mathematical symbols and their definitions found **EXPLICITLY** in the text snippet provided below.
         
-        [Rules]
-        1. Format: [{"symbol": "...", "latex": "...", "description": "...", "definition_formula": "..."}]
-        2. "symbol": The variable itself (e.g., "z").
-        3. "latex": The LaTeX code for the symbol (e.g., "z").
-        4. "description": Physical or mathematical meaning.
-        5. "definition_formula": If the text explicitly defines the symbol with an equation (e.g., "z = x + iy"), extract the right-hand side LaTeX. If not, return null.
+        [STRICT RULES]
+        1. **NO HALLUCINATION**: If a symbol is not physically present in the text snippet below, DO NOT extract it, even if it is common in this field.
+        2. **SOURCE OF TRUTH**: Only the text snippet below is the source of truth.
+        3. **Format**: Return a JSON array: [{"symbol": "...", "latex": "...", "description": "...", "definition_formula": "..."}]
+        4. **Definition Formula**: Only extract if there is an explicit equals sign or definition (e.g., "x = y + z"). Otherwise null.
         
-        [Example]
-        Text: "The order parameter z is defined as z = \\frac{1}{N}\\sum e^{i\\theta_j}."
-        Output: [{"symbol": "z", "latex": "z", "description": "Order parameter", "definition_formula": "\\\\frac{1}{N}\\\\sum e^{i\\\\theta_j}"}]
-        [Text to Analyze]
-        ---
+        [Example 1]
+        Text: "The system evolves." (No symbols)
+        Output: []
+        
+        [Example 2]
+        Text: "Let $x$ be the state vector."
+        Output: [{"symbol": "x", "latex": "$x$", "description": "State vector", "definition_formula": null}]
+
+        [TEXT TO ANALYZE START]
         %s
-        ---
+        [TEXT TO ANALYZE END]
         """.formatted(paperTitle, content);
 
         try {
@@ -81,24 +85,24 @@ public class DeepSeekAdapter implements ISymbolExtractor, IAiAdapter {
         String prompt = """
         ### Role
         You are an advanced Bibliometric Parsing AI. Your task is to structure raw citation text into precise metadata and generate an optimized search query.
-
+        
         ### Input Data
         Raw Text: "%s"
-
+        
         ### Extraction Tasks
         1. **Year**: Identify the 4-digit publication year (e.g., 2023).
         2. **Authors**: Extract all author surnames.
            - Remove initials (e.g., "J. Smith" -> "Smith").
            - Keep compound surnames intact (e.g., "Van der Waals").
-        3. **Title**: Identify the full title of the paper.
-        4. **Journal/Venue**: Identify the journal, conference abbreviation, or publisher (e.g., "Nature", "CVPR", "arXiv", "Phys. Rev. B").
-
+        3. **Title**: Identify the full title of the paper. If not found, leave as null.
+        4. **Journal/Venue**: Identify the journal, conference, or publisher.
+        
         ### Search String Construction (CRITICAL)
-        Generate a `searchString` optimized for academic search engines (Google Scholar).
-        **Pattern**: `[First Author Surname] [Year] [Journal/Venue] [Title]`
-        - **Requirement**: You MUST include the **Journal/Venue** if visible in the text.
-        - **Formatting**: Remove all non-alphanumeric punctuation (commas, brackets) from the search string to ensure broad matching.
-
+        Generate a `searchString` following these strict priority rules:
+        1. **If a Title is identified**: The `searchString` MUST be exactly the **Title** text.
+        2. **If NO Title is identified**: The `searchString` MUST consist of all **Author Surnames** (each enclosed in double quotes, separated by commas) followed by the **Year**.
+           - Example: `"Smith", "Doe" 2024`
+        
         ### Output Format
         Return STRICT JSON only (no markdown code blocks, no explanation):
         {
@@ -106,7 +110,7 @@ public class DeepSeekAdapter implements ISymbolExtractor, IAiAdapter {
           "authorSurnames": ["Smith", "Doe"],
           "title": "The theory of everything",
           "journal": "Nature Physics",
-          "searchString": "Smith 2024 Nature Physics The theory of everything"
+          "searchString": "The theory of everything"
         }
         """.formatted(rawText);
 

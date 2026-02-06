@@ -35,4 +35,6 @@ public class Paper {
 
     private LocalDateTime createdAt;
     private String fingerprint;
+    private String status;
+    private String statusMessage;
 }

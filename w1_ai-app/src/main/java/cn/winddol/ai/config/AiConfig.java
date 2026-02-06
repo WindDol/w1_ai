@@ -37,7 +37,8 @@ public class AiConfig {
                 .baseUrl("https://api.deepseek.com") // 关键点！
                 .modelName("deepseek-chat")          // DeepSeek V3 模型名
                 .temperature(0.0)                    // 设为 0 让提取更稳定
-                .timeout(java.time.Duration.ofSeconds(60))
+                .timeout(java.time.Duration.ofSeconds(500))
+                .maxRetries(1)
                 .logRequests(true)                   // 调试时打印请求
                 .logResponses(true)
                 .build();
