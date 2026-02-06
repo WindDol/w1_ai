@@ -1,6 +1,7 @@
 package cn.winddol.ai.infrastructure.parser;
 import cn.winddol.ai.domain.paperTools.model.entity.SectionPO;
 import com.alibaba.fastjson2.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -10,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
+@Slf4j
 public class MarkdownParser {
 
     /**
@@ -201,5 +203,112 @@ public class MarkdownParser {
             sb.deleteCharAt(i);
             i--;
         }
+    }
+
+    public String extractAbstract(List<SectionPO> sections) {
+        if (sections == null || sections.isEmpty()) return "";
+
+        // --- 阶段 1：精准定位 (优先找标题或明显标签) ---
+        String content = findByExplicitMethod(sections);
+        if (!content.isEmpty()) return cleanAbstractNoise(content);
+
+        // --- 阶段 2：深度扫描 (扫描文档前 50% 的章节内容) ---
+        // 这是你要求的：如果前面没找到，就地毯式搜索前半部分
+        log.info("🔍 Entering Deep Scan mode for Abstract extraction...");
+        String deepScanResult = scanContentHeuristically(sections);
+        if (!deepScanResult.isEmpty()) {
+            return cleanAbstractNoise(deepScanResult);
+        }
+
+        return "Abstract Not Found";
+    }
+
+    /**
+     * 策略：扫描前 50% 的章节，通过关键词和段落特征寻找摘要
+     */
+    private String scanContentHeuristically(List<SectionPO> sections) {
+        // 只扫描前 50% 的章节，避免扫到结论或参考文献
+        int scanLimit = Math.max(1, sections.size() / 2);
+
+        for (int i = 0; i < scanLimit; i++) {
+            String content = sections.get(i).getContent();
+            if (content == null || content.length() < 100) continue;
+
+            // 1. 寻找文本内部的 "Abstract" 关键词
+            int abstractIndex = content.toUpperCase().indexOf("ABSTRACT");
+            if (abstractIndex != -1) {
+                // 找到了关键词，截取之后的部分
+                // 注意：如果这章后面跟着 Introduction，我们只取到 Introduction 之前
+                String sub = content.substring(abstractIndex);
+                if (sub.toUpperCase().contains("INTRODUCTION")) {
+                    sub = sub.substring(0, sub.toUpperCase().indexOf("INTRODUCTION"));
+                }
+                return sub;
+            }
+
+            // 2. 启发式：寻找“看起来像摘要”的段落
+            // 如果没有关键词，找这一章里长度在 300-2000 字符之间，
+            // 且包含 "in this paper", "we propose", "this study" 等词的段落
+            String[] paragraphs = content.split("\n\n");
+            for (String p : paragraphs) {
+                String pUp = p.toUpperCase();
+                if (p.length() > 300 && p.length() < 2500) {
+                    if (pUp.contains("IN THIS PAPER") || pUp.contains("WE PROPOSE") ||
+                            pUp.contains("STUDY") || pUp.contains("RESULTS SHOW")) {
+                        return p;
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
+    /**
+     * 整合之前的几种快速定位方法
+     */
+    private String findByExplicitMethod(List<SectionPO> sections) {
+        // A. 找标题
+        Optional<SectionPO> headerMatch = sections.stream()
+                .filter(s -> s.getHeader().toUpperCase().contains("ABSTRACT"))
+                .findFirst();
+        if (headerMatch.isPresent()) return headerMatch.get().getContent();
+
+        // B. 找第一章（Pre-Introduction）的末尾
+        String preIntro = sections.get(0).getContent();
+        if (preIntro.toUpperCase().contains("ABSTRACT")) {
+            return preIntro.substring(preIntro.toUpperCase().indexOf("ABSTRACT"));
+        }
+
+        return "";
+    }
+    /**
+     * 清理摘要中的噪音（邮件、DOI、版权、期刊名）
+     */
+    private String cleanAbstractNoise(String text) {
+        if (text == null) return "";
+
+        String cleaned = text;
+        // 1. 去掉起始标签
+        cleaned = cleaned.replaceAll("^(?i)Abstract[:\\s\\*]*", "");
+
+        // 2. 去掉版权信息 (针对第 3 篇)
+        cleaned = cleaned.replaceAll("(?i)Copyright ©.*", "");
+        cleaned = cleaned.replaceAll("(?i)All rights reserved.*", "");
+
+        // 3. 去掉关键字标签 (针对第 2, 3 篇)
+        cleaned = cleaned.replaceAll("(?i)\\*\\*Keywords:\\*\\*.*", "");
+        cleaned = cleaned.replaceAll("(?i)Keywords:.*", "");
+
+        // 4. 去掉作者邮件和地址 (针对第 1 篇)
+        // 匹配类似 {ziqiao.zhang,...}@gatech.edu 或 (e-mails: ...)
+        cleaned = cleaned.replaceAll("\\{?[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\\}?", "");
+        cleaned = cleaned.replaceAll("(?i)\\(e-mails:.*\\)", "");
+
+        // 5. 去掉 DOI 和 URL
+        cleaned = cleaned.replaceAll("https?://\\S+", "");
+        cleaned = cleaned.replaceAll("(?i)DOI:.*", "");
+
+        // 6. 去掉多余的空行和首尾空格
+        return cleaned.trim().replaceAll("\n{3,}", "\n\n");
     }
 }

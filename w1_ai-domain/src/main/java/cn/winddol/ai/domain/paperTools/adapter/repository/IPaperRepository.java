@@ -1,5 +1,6 @@
 package cn.winddol.ai.domain.paperTools.adapter.repository;
 
+import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.entity.*;
 import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface IPaperRepository {
-    Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint);
+    Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint, String abstractText);
 
     List<SectionEntity> getSectionByUuid(List<String> uuid);
 
@@ -59,4 +60,5 @@ public interface IPaperRepository {
     void updateStatus(Long paperId, String status);
 
     void updateStatusWithError(Long paperId, String status, String errorMessage);
+    List<KnowledgeRelationEntity> findRelationsByPaperId(Long paperId);
 }

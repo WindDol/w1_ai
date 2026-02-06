@@ -31,4 +31,9 @@ public class PaperParser implements IPaperParser {
     public String extractTitle(String markdown) {
         return parser.extractTitle(markdown);
     }
+
+    @Override
+    public String extractAbstract(List<SectionPO> pos) {
+        return parser.extractAbstract(pos);
+    }
 }

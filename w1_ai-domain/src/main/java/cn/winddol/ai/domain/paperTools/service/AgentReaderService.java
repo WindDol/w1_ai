@@ -1,5 +1,6 @@
 package cn.winddol.ai.domain.paperTools.service;
 
+import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
 import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.entity.*;
@@ -22,6 +23,25 @@ public class AgentReaderService {
     public List<OutlineNode> getPaperOutline(Long paperId) {
         PaperEntity paper = repository.selectPaperById(paperId);
         return paper.getOutline();
+    }
+
+    /**
+     * 工具：相关性论文获取
+     * Agent 用这个来获取知识库中与该论文相似的资源
+     */
+    public String checkPaperRelations(Long paperId) {
+        List<KnowledgeRelationEntity> relations = repository.findRelationsByPaperId(paperId);
+        if (relations.isEmpty()) {
+            return "The Librarian found no direct conflicts or specific relations with other papers in the library.";
+        }
+
+        StringBuilder sb = new StringBuilder("The Librarian has identified the following relations:\n");
+        for (KnowledgeRelationEntity rel : relations) {
+            sb.append(String.format("- Relation with Paper [%d] (%s):\n", rel.getTargetId(), rel.getTargetTitle()));
+            sb.append("  Type: ").append(rel.getType()).append("\n");
+            sb.append("  Insight: ").append(rel.getDescription()).append("\n\n");
+        }
+        return sb.toString();
     }
 
     /**
@@ -164,4 +184,6 @@ public class AgentReaderService {
 
         return sb.toString();
     }
+
+
 }

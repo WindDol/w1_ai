@@ -1,5 +1,6 @@
 package cn.winddol.ai.infrastructure.event;
 
+import cn.winddol.ai.domain.agent.service.LibrarianAuditService;
 import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
 import cn.winddol.ai.domain.paperTools.service.CitationEnrichmentService;
 import cn.winddol.ai.domain.paperTools.service.PaperEnrichmentService;
@@ -21,7 +22,8 @@ public class PaperAuditListener {
     private EmbeddingProcessor embeddingProcessor;
     @Resource
     private IPaperRepository paperRepository;
-
+    @Resource
+    private LibrarianAuditService auditService;
     @Async
     @EventListener
     public void onAuditCommand(cn.winddol.ai.domain.paperTools.event.PaperIngestedEvent event) {
@@ -45,7 +47,7 @@ public class PaperAuditListener {
             embeddingProcessor.embedReferences(paperId);
             embeddingProcessor.embedSections(paperId);
             // 4. (可选) 冲突检测
-            // conflictCheckService.check(paperId);
+            auditService.auditAgainstLibrary(paperId);
             paperRepository.updateStatus(paperId, "COMPLETED");
             log.info("✅ Paper [{}] 所有的后台处理工作已完成！", paperId);
 

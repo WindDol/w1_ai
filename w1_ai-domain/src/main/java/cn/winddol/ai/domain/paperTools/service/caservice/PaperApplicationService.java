@@ -49,6 +49,7 @@ public class PaperApplicationService {
             String markdown = parser.parsePdfToMarkdown(tempFile.getAbsolutePath());
             List<SectionPO> pos = parser.parse(markdown);
             String title = parser.extractTitle(markdown);
+            String abstractText = parser.extractAbstract(pos);
 
             StringBuilder headerContent = new StringBuilder(pos.get(0).getContent());
             for(SectionPO  po:pos){
@@ -66,7 +67,7 @@ public class PaperApplicationService {
                     paperMeta.getYear()
             );
 
-            Long paperId = paperRepository.saveFullPaper(title, pos, fingerprint);
+            Long paperId = paperRepository.saveFullPaper(title, pos, fingerprint,abstractText);
             paperRepository.updateStatus(paperId, "PARSED");
             librarian.initiateAudit(paperId, title);
             return paperId;

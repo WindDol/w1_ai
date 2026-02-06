@@ -1,5 +1,6 @@
 package cn.winddol.ai.infrastructure.adapter.repository;
 
+import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
 import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.entity.*;
@@ -16,7 +17,9 @@ import cn.winddol.ai.infrastructure.utils.TreeBuilderUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.output.Response;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -57,11 +60,13 @@ public class PaperRepository implements IPaperRepository {
     private EmbeddingModel embeddingModel;
     @Resource
     private GlobalReferenceMapper globalReferenceMapper;
+    @Resource
+    private PaperKnowledgeRelationMapper relationMapper;
 
 
     @Override
     @Transactional
-    public Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint) {
+    public Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint, String abstractText) {
         Paper existingPaper = paperMapper.selectOne(
                 new LambdaQueryWrapper<Paper>().eq(Paper::getFingerprint, fingerprint)
         );
@@ -71,6 +76,10 @@ public class PaperRepository implements IPaperRepository {
         }
         // 1. 构建并保存 Paper 主表
         Paper paper = getPaper(title, sectionPOs);
+        paper.setAbstractText(abstractText);
+        String textToEmbed = title + "\n" + abstractText;
+        float[] vector = embeddingModel.embed(textToEmbed).content().vector();
+        paper.setEmbedding(vector);
         paper.setFingerprint(fingerprint);
         // 插入数据库，插入后 paper.id 会自动被回填
         paperMapper.insert(paper);
@@ -331,6 +340,17 @@ public class PaperRepository implements IPaperRepository {
         po.setStatus(status);
         po.setStatusMessage(errorMessage); // 记录错误详情
         paperMapper.updateById(po);
+    }
+
+    @Override
+    public List<KnowledgeRelationEntity> findRelationsByPaperId(Long paperId) {
+        List<Map<String, Object>> rawData = relationMapper.selectRelationsWithTitle(paperId);
+        return rawData.stream().map(map -> KnowledgeRelationEntity.builder()
+                .targetId((Long) map.get("target_paper_id"))
+                .targetTitle((String) map.get("target_paper_title"))
+                .type((String) map.get("relation_type"))
+                .description((String) map.get("description"))
+                .build()).toList();
     }
 
     private GlobalReferenceEntity GRPoToEntity(GlobalReference po) {

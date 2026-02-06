@@ -1,5 +1,6 @@
 package cn.winddol.ai.domain.paperTools.adapter.tools;
 
+import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.entity.OutlineNode;
 import cn.winddol.ai.domain.paperTools.service.AgentReaderService;
@@ -48,6 +49,16 @@ public class ScientificResearchTools {
     """)
     public String lookupReference(Long paperId, String refIndex) {
         return readerService.lookupReference(paperId, refIndex);
+    }
+
+    @Tool("""
+    Check for inter-paper relationships, such as conflicts, supports, or extensions 
+    discovered by the Librarian. Use this when the user asks about how a paper 
+    relates to the rest of the library or if there are contradictions.
+    Input: paperId (Long).
+    """)
+    public String checkPaperRelations(Long paperId) {
+        return readerService.checkPaperRelations(paperId);
     }
 
 

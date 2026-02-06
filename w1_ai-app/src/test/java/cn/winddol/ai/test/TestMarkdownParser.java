@@ -56,10 +56,11 @@ public class TestMarkdownParser {
     @Test
     public void testInsert() throws Exception {
         // 1. 读取并解析文件 (Day 2 的代码)
-        String markdown = Files.readString(Paths.get("C:\\Users\\Mr Ding.LAPTOP-H54HCE12\\Desktop\\ai_pdf\\w1_ai\\data\\out.md"));
+        String markdown = Files.readString(Paths.get("C:\\Users\\Mr Ding.LAPTOP-H54HCE12\\Desktop\\ai_pdf\\python\\output_test1.md"));
         MarkdownParser parser = new MarkdownParser();
         List<SectionPO> pos = parser.parse(markdown);
         String title = parser.extractTitle(markdown);
+        String abstractText = parser.extractAbstract(pos);
         StringBuilder headerContent = new StringBuilder(pos.get(0).getContent());
         for(SectionPO  po:pos){
             if(po.header.equals(title)){
@@ -77,7 +78,7 @@ public class TestMarkdownParser {
         );
         // 2. 调用 Service 入库
 
-        repository.saveFullPaper(title, pos,fingerprint);
+        repository.saveFullPaper(title, pos,fingerprint, abstractText);
 
         System.out.println("入库成功！请在 DBeaver 中查看数据。");
     }

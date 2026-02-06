@@ -1,6 +1,9 @@
 package cn.winddol.ai.infrastructure.adapter.ai;
 
 import cn.winddol.ai.domain.agent.adapter.ai.IAiAdapter;
+import cn.winddol.ai.domain.agent.model.entity.PaperAuditResult;
+import cn.winddol.ai.domain.agent.model.entity.PaperEntity;
+import cn.winddol.ai.domain.agent.model.valobj.KnowledgeAuditReport;
 import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
 import cn.winddol.ai.domain.paperTools.adapter.external.dto.RefMetadata;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
@@ -224,10 +227,62 @@ public class DeepSeekAdapter implements ISymbolExtractor, IAiAdapter {
         return response.trim();
     }
 
+    @Override
+    public PaperAuditResult analyzeRelation(PaperEntity newPaper, PaperEntity oldPaper, String newAbstract) {
+        String prompt = """
+            You are a senior peer reviewer. 
+            Compare the NEW PAPER with the EXISTING PAPER from our library.
+            
+            [NEW PAPER: %s]
+            Abstract: %s
+            
+            [EXISTING PAPER: %s]
+            Abstract: %s
+            
+            [TASK]
+            1. Identify the relationship: Does the NEW paper SUPPORT, CONTRADICT, or EXTEND the EXISTING paper?
+            2. Write a 2-sentence technical summary of this relationship.
+            3. If there is a direct mathematical conflict (e.g., different values for the same parameter), highlight it.
+            
+            Output JSON format: {"type": "SUPPORT/CONTRADICT/EXTEND", "reason": "..."}
+            """.formatted(newPaper.getTitle(), newAbstract, oldPaper.getTitle(), oldPaper.getAbstractText());
+
+        // 1. 获取 LLM 返回的字符串
+        String response = chatLanguageModel.generate(prompt);
+        log.info("🦉 Librarian Audit Response: {}", response);
+
+        // 2. 清洗字符串
+        String jsonStr = cleanLlmJsonResponse(response);
+
+        // 3. 使用 FastJSON 或 Jackson 解析为对象
+        PaperAuditResult auditResult = JSON.parseObject(jsonStr, PaperAuditResult.class);
+        return auditResult;
+    }
+
+
     private String formatHistory(List<ChatMessage> history) {
         if (history == null || history.isEmpty()) return "No history.";
         return history.stream()
                 .map(m -> (m instanceof UserMessage ? "User: " : "AI: ") + m.text())
                 .collect(Collectors.joining("\n"));
+    }
+    private String cleanLlmJsonResponse(String response) {
+        if (response == null || response.isEmpty()) return "{}";
+
+        // 1. 移除 Markdown 代码块标记 ```json 和 ```
+        String cleaned = response.replaceAll("```json", "").replaceAll("```", "").trim();
+
+        // 2. 启发式处理：如果 AI 还是吐了废话，截取第一个 { 和最后一个 } 之间的内容
+        try {
+            int firstBrace = cleaned.indexOf("{");
+            int lastBrace = cleaned.lastIndexOf("}");
+            if (firstBrace >= 0 && lastBrace >= 0) {
+                cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to locate JSON braces in response");
+        }
+
+        return cleaned;
     }
 }

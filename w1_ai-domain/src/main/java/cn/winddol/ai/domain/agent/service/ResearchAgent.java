@@ -41,6 +41,11 @@ public class ResearchAgent {
             Do NOT hallucinate. If you don't know, search. If you found a location, read it.
             Think like a scientist: analyze the structure, find symbols, read sections, and follow references.
             
+            [SCIENTIFIC REASONING GUIDELINES]
+            - CRITICAL THINKING: Scientific progress is built on consensus and conflict.
+            - PROACTIVE CHECK: When you identify a paper ID, check if there are any relations or conflicts with other papers using 'checkPaperRelations'.
+            - NOVELTY ASSESSMENT: If a paper 'EXTENDS' another, highlight what was added (e.g., higher dimensions, new parameters).
+           
             [LANGUAGE PROTOCOL]
             1. INTERNAL REASONING: All your 'thought' fields MUST be written in ENGLISH.
             2. TOOL CALLS: All search queries and tool parameters MUST be in ENGLISH.
@@ -54,7 +59,7 @@ public class ResearchAgent {
                 - 'threshold': Similarity threshold (Optional, Double). Range [0.35, 0.7]. Default is 0.5.
                    Hint: Increase to 0.6 if results are irrelevant; decrease to 0.35 if no results found.
                 - Usage Example: {"query": "soliton", "paperId": 123, "threshold": 0.5} OR just "soliton" for global search.
-            2. getPaperOutline(paperId): 
+            2. getPaperOutline(paperId):
                 - Get the hierarchical table of contents for a paper.
                 - Usage: {"paperId": 7}
             3. readSection(sectionUuid):
@@ -64,7 +69,11 @@ public class ResearchAgent {
                 - Get specific title and abstract for a citation index found in text (e.g., "[12]", "Ref 24").
                 - Use this when text mentions a citation and you need to know what that external work is about.
                 - Usage: {"paperId": 7, "refIndex": "24"}
-                
+            5. checkPaperRelations(paperId):
+                - Check for inter-paper relationships (conflicts, supports, or extensions) found by the Librarian.
+                - Use this when the user asks about controversies, contradictions, or how this paper relates to other works in the library.
+                - Usage Example: {"paperId": 7}
+            
             [PROTOCOL]
             Output ONLY a JSON object.
             If a tool requires multiple parameters (like searchLibrary or lookupReference), put them inside 'actionInput' as a JSON structure.
@@ -107,10 +116,10 @@ public class ResearchAgent {
         int maxSteps = 20;
 
         for (int i = 0; i < maxSteps; i++) {
-            if(i == maxSteps-1){
-                history.add(UserMessage.from(
-                        "CRITICAL: Step limit reached. Do NOT use any more tools. " +
-                                "Synthesize all observations above and provide your best possible FINAL ANSWER in Chinese now."
+            if (i == maxSteps - 2) {
+                history.add(SystemMessage.from(
+                        "WARNING: You have almost reached the step limit. " +
+                                "Stop searching. Synthesize what you have gathered so far and generate the 'finalAnswer' immediately."
                 ));
             }
             Response<AiMessage> response = chatLanguageModel.generate(history);
@@ -119,7 +128,8 @@ public class ResearchAgent {
 
             AgentStep step = parseOutput(llmOutput);
             if (step == null) {
-                history.add(UserMessage.from("System Error: Invalid JSON format. Please output strictly JSON."));
+                history.add(UserMessage.from("System Error: Your output was not valid JSON. Please fix the format and output ONLY JSON."));
+                i--;
                 continue;
             }
             if (step.getFinalAnswer() != null && !StringUtils.isBlank(step.getFinalAnswer())) {
@@ -140,82 +150,70 @@ public class ResearchAgent {
         return "❌ Failed to answer within step limit.";
     }
 
-    private String executeTool(String toolName, String input) {
+    private String executeTool(String toolName, String inputRaw) {
         try {
-            if ("searchLibrary".equalsIgnoreCase(toolName)) {
-                String query;
-                Long paperId = null;
-                Double threshold = null;
-                // 尝试检测是否为 JSON 格式 (简单的启发式判断)
-                String trimmedInput = input.trim();
-                if (trimmedInput.startsWith("{") && trimmedInput.endsWith("}")) {
-                    try {
-                        // 解析 JSON 参数
-                        JSONObject params = JSON.parseObject(trimmedInput);
-                        query = params.getString("query");
-                        // 处理 paperId (可能是 Integer 或 Long)
-                        if (params.containsKey("paperId")) {
-                            paperId = params.getLong("paperId");
-                        }
-                        if (params.containsKey("threshold")) {
-                            threshold = params.getDouble("threshold");
-                        }
-                    } catch (Exception e) {
-                        // 如果解析 JSON 失败，回退到将整个 input 当作 query
-                        log.warn("Failed to parse searchLibrary params as JSON, using raw string. Error: {}", e.getMessage());
-                        query = trimmedInput;
+            // 1. 统一预处理：确保 input 是个合法的 JSON 对象
+            // 如果 LLM 偷懒直接传了字符串 "soliton"，我们帮它包装成 {"query": "soliton"}
+            JSONObject params = smartParseInput(inputRaw);
+
+            switch (toolName) {
+                case "searchLibrary":
+                    String query = params.getString("query");
+                    // 默认值处理
+                    Long pId = params.getLong("paperId"); // fastjson 若无key返回 null
+                    Double threshold = params.getDouble("threshold");
+                    // 智能兜底：如果没传 query 但传了 raw string
+                    if (query == null && !params.isEmpty()) query = inputRaw;
+
+                    return tools.searchLibrary(query, pId, threshold);
+
+                case "getPaperOutline":
+                    return tools.getPaperOutline(params.getLong("paperId"));
+
+                case "readSection":
+                    return tools.readSection(params.getString("sectionUuid"));
+
+                case "lookupReference":
+                    Long refPaperId = params.getLong("paperId");
+                    String refIndex = params.getString("refIndex");
+                    if (refPaperId == null || refIndex == null) {
+                        return "Error: Missing parameters. Required: paperId, refIndex.";
                     }
-                } else {
-                    // 如果不是 JSON，说明 Agent 只是想做全局搜索
-                    query = trimmedInput;
-                }
-
-                return tools.searchLibrary(query, paperId,threshold);
-            }
-
-            // -------------------------------------------------------
-            // Tool 2: getPaperOutline (通常是单参数 ID)
-            // -------------------------------------------------------
-            if ("getPaperOutline".equalsIgnoreCase(toolName)) {
-                // 这里的 input 应该是个数字字符串，但防止 Agent 传了 JSON {"paperId": 7}
-                String idStr = extractSimpleValue(input, "paperId");
-                return tools.getPaperOutline(Long.parseLong(idStr));
-            }
-
-            // -------------------------------------------------------
-            // Tool 3: readSection (单参数 UUID)
-            // -------------------------------------------------------
-            if ("readSection".equalsIgnoreCase(toolName)) {
-                // 防止 Agent 传了 {"sectionUuid": "..."}
-                String uuid = extractSimpleValue(input, "sectionUuid");
-                return tools.readSection(uuid);
-            }
-            // -------------------------------------------------------
-            // Tool 4: lookupReference (多参数)
-            // -------------------------------------------------------
-            if ("lookupReference".equalsIgnoreCase(toolName)) {
-                try {
-                    // 确保输入被当作 JSON 解析
-                    JSONObject params = JSON.parseObject(input);
-                    Long pId = params.getLong("paperId");
-                    String rIdx = params.getString("refIndex");
-
-                    if (pId == null || rIdx == null) {
-                        return "Error: lookupReference requires both 'paperId' and 'refIndex'.";
+                    return tools.lookupReference(refPaperId, refIndex);
+                case "checkPaperRelations":
+                    Long paperId = params.getLong("paperId");
+                    if (paperId == null) {
+                        return "Error: Missing parameters. Required: paperId.";
                     }
-                    return tools.lookupReference(pId, rIdx);
-                } catch (Exception e) {
-                    // 如果 LLM 没按 JSON 格式传参的兜底处理
-                    log.warn("lookupReference params parsing failed: {}", input);
-                    return "Error: lookupReference requires a JSON input like {\"paperId\": 7, \"refIndex\": \"24\"}";
-                }
+                    return tools.checkPaperRelations(paperId);
+                default:
+                    return "Error: Unknown tool '" + toolName + "'. Check tool definitions.";
             }
-
-            return "Error: Unknown tool '" + toolName + "'";
         } catch (Exception e) {
-            log.error("Tool execution failed", e);
-            return "Error executing tool: " + e.getMessage();
+            log.error("Tool Execution Error: {} | Input: {}", toolName, inputRaw, e);
+            return "System Error executing tool: " + e.getMessage();
         }
+    }
+    private JSONObject smartParseInput(String input) {
+        if (input == null || input.isBlank()) return new JSONObject();
+        String trimmed = input.trim();
+
+        // 如果看起来像 JSON
+        if (trimmed.startsWith("{")) {
+            try {
+                return JSON.parseObject(trimmed);
+            } catch (Exception e) {
+                // 解析失败，降级处理
+            }
+        }
+
+        // 如果不是 JSON，或者是解析失败的 JSON，尝试作为单参数处理
+        // 这里假设这就 query 或者 uuid
+        JSONObject fallback = new JSONObject();
+        fallback.put("query", trimmed);       // 适配 search
+        fallback.put("sectionUuid", trimmed); // 适配 read
+        fallback.put("paperId", trimmed.replaceAll("\\D", "")); // 适配 outline (只取数字)
+        return fallback;
     }
 
 

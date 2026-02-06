@@ -11,4 +11,6 @@ public interface IPaperParser {
     List<SectionPO> parse(String markdown);
 
     String extractTitle(String markdown);
+
+    String extractAbstract(List<SectionPO> pos);
 }

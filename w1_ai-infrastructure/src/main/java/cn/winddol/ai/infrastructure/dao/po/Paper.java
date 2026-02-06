@@ -2,6 +2,7 @@ package cn.winddol.ai.infrastructure.dao.po;
 
 import cn.winddol.ai.domain.paperTools.model.entity.OutlineNode;
 import cn.winddol.ai.infrastructure.dao.handler.OutlineNodeTypeHandler;
+import cn.winddol.ai.infrastructure.dao.handler.PgVectorHandler;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.AllArgsConstructor;
@@ -37,4 +38,9 @@ public class Paper {
     private String fingerprint;
     private String status;
     private String statusMessage;
+    @TableField(typeHandler = PgVectorHandler.class)
+    private float[] embedding;
+
+    @TableField("abstract")
+    private String abstractText;
 }
