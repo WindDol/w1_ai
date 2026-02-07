@@ -35,7 +35,7 @@ public class AiConfig {
         return  OpenAiChatModel.builder()
                 .apiKey(limApiKey)
                 .baseUrl("https://api.deepseek.com") // 关键点！
-                .modelName("deepseek-reasoner")          // DeepSeek V3 模型名
+                .modelName("deepseek-chat")          // DeepSeek V3 模型名
                 .temperature(0.0)                    // 设为 0 让提取更稳定
                 .timeout(java.time.Duration.ofSeconds(500))
                 .maxRetries(1)

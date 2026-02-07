@@ -4,6 +4,7 @@ import json
 import uuid
 import html  # 引入 html 库用于转义
 from sseclient import SSEClient
+import textwrap
 
 # --- 1. 页面基础配置 ---
 st.set_page_config(
@@ -108,7 +109,16 @@ if "processing" not in st.session_state:
 
 # --- 后端配置 ---
 BASE_URL = "http://localhost:8091"
+import re
+def format_to_html(text):
+    # 1. 先把 ### 这种标题换成 <b> 标签
+    # 匹配 ### 开头，直到行尾的内容
+    text = re.sub(r'###\s*(.*)', r'<b style="font-size:1.1em; color:#1976d2;">\1</b>', text)
 
+    # 2. 将 \n 换行符替换为 HTML 的 <br>，否则 HTML 会忽略换行
+    text = text.replace("\n", "<br>")
+
+    return text
 # --- 4. 侧边栏逻辑 ---
 with st.sidebar:
     st.title("🎓 ScholarBrain")
@@ -228,44 +238,46 @@ if prompt:
                     if msg_type == "THOUGHT":
                         # 转义内容，防止 HTML 注入破坏格式
                         safe_content = html.escape(content).replace("\n", "<br>")
-                        new_html = f"""
-                        <div class="log-card thought-card">
-                            <div>
-                                <span class="step-badge badge-thought">STEP {step}</span>
-                                <b>Thought</b>
+                        new_html =  textwrap.dedent( f"""
+                            <div class="log-card thought-card">
+                                <div>
+                                    <span class="step-badge badge-thought">STEP {step}</span>
+                                    <b>Thought</b>
+                                </div>
+                                <div style="margin-top:5px; color:#333;">{safe_content}</div>
                             </div>
-                            <div style="margin-top:5px; color:#333;">{safe_content}</div>
-                        </div>
-                        """
+                        """)
 
                     elif msg_type == "ACTION":
-                        action_input = html.escape(str(event_data.get("data", "")))
+                        raw_data = event_data.get("data", "")
+                        action_input = html.escape(json.dumps(raw_data, ensure_ascii=False) if isinstance(raw_data, (dict, list)) else str(raw_data))
                         safe_content = html.escape(content)
-                        new_html = f"""
-                        <div class="log-card action-card">
-                            <div>
-                                <span class="step-badge badge-action">STEP {step}</span>
-                                <b>Action:</b> <code>{safe_content}</code>
+
+                        new_html = textwrap.dedent(f"""
+                            <div class="log-card action-card">
+                                <div>
+                                    <span class="step-badge badge-action">STEP {step}</span>
+                                    <b>Action:</b> <code>{safe_content}</code>
+                                </div>
+                                <div style="margin-top:5px; font-size:0.9em; color:#555;">
+                                    <b>Input:</b> <code>{action_input}</code>
+                                </div>
                             </div>
-                            <div style="margin-top:5px; font-size:0.9em; color:#555;">
-                                <b>Input:</b> <code>{action_input}</code>
-                            </div>
-                        </div>
-                        """
+                        """)
 
                     elif msg_type == "OBSERVATION":
-                        # 截断显示
-                        display_content = content[:800] + "..." if len(content) > 800 else content
-                        safe_content = html.escape(display_content)
-                        new_html = f"""
-                        <div class="log-card obs-card">
-                            <div>
-                                <span class="step-badge badge-obs">STEP {step}</span>
-                                <b>Observation</b>
+                        display_content = content[:3000] + "..." if len(content) > 3000 else content
+                        safe_content = format_to_html(display_content)
+
+                        new_html = textwrap.dedent(f"""
+                            <div class="log-card obs-card">
+                                <div>
+                                    <span class="step-badge badge-obs">STEP {step}</span>
+                                    <b>Observation</b>
+                                </div>
+                                <div style="margin-top:5px; white-space: pre-wrap;">{safe_content}</div>
                             </div>
-                            <div style="margin-top:5px;">{safe_content}</div>
-                        </div>
-                        """
+                        """)
 
                     elif msg_type == "ANSWER" or msg_type == "FINAL_ANSWER_GENERATED":
                         status_container.update(label="✅ 思考完成", state="complete", expanded=False)
@@ -275,11 +287,13 @@ if prompt:
 
                     if new_html:
                         full_logs_html += new_html
-                        # 每次更新都重新渲染整个容器，利用 CSS 实现内部滚动
-                        # 使用 JavaScript (scrollTo) 可选，但 CSS 的 flex-direction: column-reverse
-                        # 或者让用户自己滑体验可能更好。这里保持自然顺序。
+
                         log_placeholder.markdown(
-                            f'<div class="log-scroll-container">{full_logs_html}</div>',
+                            f"""
+                            <div class="log-scroll-container">
+                                {full_logs_html}
+                            </div>
+                            """,
                             unsafe_allow_html=True
                         )
 
