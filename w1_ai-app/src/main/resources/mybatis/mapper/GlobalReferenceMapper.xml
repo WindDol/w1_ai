@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.winddol.ai.infrastructure.dao.GlobalReferenceMapper">
+    <select id="getTopFrequentReferences" resultType="cn.winddol.ai.infrastructure.dao.po.GlobalReference">
+        SELECT
+            id as id,
+            title as title,
+            fingerprint as fingerprint,
+            source_type as sourceType,
+            citation_count as CitationCount
+        FROM global_references
+        ORDER BY citation_count DESC
+            LIMIT #{limit}
+    </select>
+</mapper>

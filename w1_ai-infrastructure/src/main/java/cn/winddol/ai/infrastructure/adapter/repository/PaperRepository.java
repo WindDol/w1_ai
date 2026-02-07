@@ -17,9 +17,8 @@ import cn.winddol.ai.infrastructure.utils.TreeBuilderUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.output.Response;
+
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -352,6 +351,26 @@ public class PaperRepository implements IPaperRepository {
                 .description((String) map.get("description"))
                 .direction((String) map.get("direction"))
                 .build()).toList();
+    }
+
+    @Override
+    public List<PaperEntity> searchPapers(String query, Double threshold) {
+        double defaultThreshold = 0.5;
+        if (threshold != null){
+            defaultThreshold = threshold;
+        }
+        // 1. 将查询语句向量化
+        float[] queryVector = embeddingModel.embed(query).content().vector();
+        String vectorStr = Arrays.toString(queryVector);
+
+        return paperMapper.searchPapers(query, vectorStr, defaultThreshold, 5);
+    }
+
+    @Override
+    public List<GlobalReferenceEntity> getTopFrequentReferences(Integer limit) {
+        if (limit == null) limit = 5;
+        List<GlobalReference> globalReferenceEntities = globalReferenceMapper.getTopFrequentReferences(limit);
+        return globalReferenceEntities.stream().map(this::GRPoToEntity).toList();
     }
 
     private GlobalReferenceEntity GRPoToEntity(GlobalReference po) {

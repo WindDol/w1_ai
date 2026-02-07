@@ -53,7 +53,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- 1. 数据库驱动 -->
+            <!-- 1. 驱动 -->
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
@@ -69,6 +69,7 @@
                 <artifactId>pgvector</artifactId>
                 <version>0.1.6</version>
             </dependency>
+
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>

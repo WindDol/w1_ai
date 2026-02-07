@@ -1,8 +1,8 @@
 package cn.winddol.ai.domain.paperTools.adapter.tools;
 
-import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.entity.OutlineNode;
+import cn.winddol.ai.domain.paperTools.service.AgentCommonTools;
 import cn.winddol.ai.domain.paperTools.service.AgentReaderService;
 import cn.winddol.ai.domain.paperTools.service.HybridRetrieverService;
 import com.alibaba.fastjson.JSON;
@@ -19,6 +19,8 @@ public class ScientificResearchTools {
     private HybridRetrieverService retrieverService;
     @Resource
     private AgentReaderService readerService;
+    @Resource
+    private AgentCommonTools agentCommonTools;
 
     @Tool("Search the paper library. 'query' is the keyword/sentence. 'paperId' is optional: set specific ID to search within one paper, or set NULL to search the entire library. 'threshold' is optional (0.35-0.7), or set NULL. Returns candidate sections, symbols, and references.")
     public String searchLibrary(String query, Long paperId, Double threshold) {
@@ -43,7 +45,7 @@ public class ScientificResearchTools {
 
     @Tool("""
     Look up the specific details (Title and Abstract) of a reference cited in the paper.
-    Use this tool when you encounter citation marks like '[12]', 'Ref. 24', or 'in [5]' in the text 
+    Use this tool when you encounter citation marks like '[12]', 'Ref. 24', or 'in [5]' in the text
     and you need to understand what that external source is about.
     Input: paperId (Long), refIndex (String, e.g., '24').
     """)
@@ -52,13 +54,31 @@ public class ScientificResearchTools {
     }
 
     @Tool("""
-    Check for inter-paper relationships, such as conflicts, supports, or extensions 
-    discovered by the Librarian. Use this when the user asks about how a paper 
+    Check for inter-paper relationships, such as conflicts, supports, or extensions
+    discovered by the Librarian. Use this when the user asks about how a paper
     relates to the rest of the library or if there are contradictions.
     Input: paperId (Long).
     """)
     public String checkPaperRelations(Long paperId) {
         return readerService.checkPaperRelations(paperId);
+    }
+
+    @Tool("""
+    Search for specific papers in the library metadata (Title, Authors, Abstract, Year).
+    Use this when the user asks 'Do we have any papers by [Author]?' or 'List papers about [Topic]'.
+    Returns a list of Paper IDs and Titles.
+    Input: query (String), threshold is optional (0.35-0.7).
+    """)
+    public String findPapers(String query, Double threshold) {
+        return agentCommonTools.findPapers(query,threshold);
+    }
+    @Tool("""
+    Identify the most influential references within the private library.
+    Use this to find 'foundational works' or 'common baselines' that multiple papers cite.
+    Input: limit (Integer, optional, default 5).
+    """)
+    public String getTopCitedReferences(Integer limit) {
+        return agentCommonTools.getTopCitedReferences(limit);
     }
 
 

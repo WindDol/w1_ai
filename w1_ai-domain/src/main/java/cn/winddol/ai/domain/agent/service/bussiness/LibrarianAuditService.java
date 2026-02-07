@@ -1,4 +1,4 @@
-package cn.winddol.ai.domain.agent.service;
+package cn.winddol.ai.domain.agent.service.bussiness;
 
 import cn.winddol.ai.domain.agent.adapter.ai.IAiAdapter;
 import cn.winddol.ai.domain.agent.adapter.repository.IAgentRepository;

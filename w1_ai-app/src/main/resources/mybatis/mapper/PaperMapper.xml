@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.winddol.ai.infrastructure.dao.PaperMapper">
+    <select id="searchPapers" resultType="cn.winddol.ai.domain.paperTools.model.entity.PaperEntity">
+        SELECT
+        id,
+        title,
+        abstract AS abstractText,
+        metadata,
+        -- 计算向量得分
+        1 - (embedding &lt;=&gt;  cast(#{vectorStr} as vector)) as score
+        FROM papers
+        WHERE
+        -- 逻辑：语义得分 > 阈值 OR 标题包含关键词
+        (1 - (embedding &lt;=&gt;  cast(#{vectorStr} as vector)) > #{threshold})
+        OR (title ILIKE '%' || #{query} || '%')
+        ORDER BY score DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

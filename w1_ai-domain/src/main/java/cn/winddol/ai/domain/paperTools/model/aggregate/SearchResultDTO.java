@@ -74,5 +74,6 @@ public class SearchResultDTO {
         private String abstractText;
         private Double score;
         private Long linkedPaperId;
+        private Integer citationCount;
     }
 }

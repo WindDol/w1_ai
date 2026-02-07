@@ -1,7 +1,9 @@
-package cn.winddol.ai.domain.agent.service;
+package cn.winddol.ai.domain.agent.service.bussiness;
 
 import cn.winddol.ai.domain.agent.adapter.repository.IAgentRepository;
+import cn.winddol.ai.domain.agent.event.ResearchEvent;
 import cn.winddol.ai.domain.agent.model.entity.AgentStep;
+import cn.winddol.ai.domain.agent.service.ResearchProcessListener;
 import cn.winddol.ai.domain.paperTools.adapter.tools.ScientificResearchTools;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -45,7 +47,7 @@ public class ResearchAgent {
             - CRITICAL THINKING: Scientific progress is built on consensus and conflict.
             - LIBRARY CONTEXT: Before concluding your analysis, ALWAYS use 'checkPaperRelations' to see if the private database contains existing critiques or extensions of the current paper.
             - NOVELTY ASSESSMENT: If a paper 'EXTENDS' another, highlight what was added (e.g., higher dimensions, new parameters).
-           
+            - MACRO vs MICRO: For broad questions like "what papers do we have?", use 'findPapers'. For deep reading, use 'readSection'.
             [LANGUAGE PROTOCOL]
             1. INTERNAL REASONING: All your 'thought' fields MUST be written in ENGLISH.
             2. TOOL CALLS: All search queries and tool parameters MUST be in ENGLISH.
@@ -74,6 +76,17 @@ public class ResearchAgent {
                 - This tool reveals how other papers in the local library REVIEW, SUPPORT, CONTRADICT, or EXTEND this paper.
                 - Use this to understand the paper's standing, relevance, and critical reception within your private collection.
                 - Usage Example: {"paperId": 7}
+            6. getTopCitedReferences(limit):
+                - Identify the most influential references within the library.
+                - Use this to find foundational works (e.g., "What is the most cited paper here?").
+                - Input: {"limit": 5} (Optional)
+            7. findPapers(query, threshold):
+                - Search for papers by title, author, or abstract keywords.
+                - Use this for MACRO-level discovery (e.g., "List papers by Seth Marvel").
+                - 'query': The search keyword (Required).
+                - 'threshold': Similarity threshold (Optional, Double). Default is 0.5.
+                   Strategy: If previous search returned 0 results, retry with threshold=0.35. If too many irrelevant results, retry with 0.7.
+                - Usage: {"query": "Kuramoto model", "threshold": 0.5}
             
             [PROTOCOL]
             Output ONLY a JSON object.
@@ -99,7 +112,7 @@ public class ResearchAgent {
               "finalAnswer": "Your comprehensive answer here..."
             }
             """;
-    public String doResearch(String sessionId, String taskDescription, ChatMemory memory) {
+    public String doResearch(String sessionId, String taskDescription, ChatMemory memory, ResearchProcessListener listener) {
         List<ChatMessage> context = new ArrayList<>();
         context.add(SystemMessage.from(SYSTEM_PROMPT));
         context.addAll(memory.messages());
@@ -107,13 +120,13 @@ public class ResearchAgent {
                 "The user's request (resolved and translated): " + taskDescription
         ));
         log.info("🤖 Agent started. Question: {}", taskDescription);
-        String finalAnswer = executeReActLoop(sessionId,context);
+        String finalAnswer = executeReActLoop(sessionId,context,listener);
         memory.add(AiMessage.from(finalAnswer));
         return finalAnswer;
     }
 
 
-    private String executeReActLoop(String sessionId, List<ChatMessage> history){
+    private String executeReActLoop(String sessionId, List<ChatMessage> history, ResearchProcessListener listener){
         int maxSteps = 20;
 
         for (int i = 0; i < maxSteps; i++) {
@@ -133,11 +146,31 @@ public class ResearchAgent {
                 i--;
                 continue;
             }
+            listener.onStep(ResearchEvent.builder()
+                            .sessionId(sessionId)
+                            .type("THOUGHT")
+                            .content(step.getThought())
+                            .step(i)
+                            .build());
             if (step.getFinalAnswer() != null && !StringUtils.isBlank(step.getFinalAnswer())) {
                 log.info("🛑 Step {}: [Final Answer Ready] {}", i+1, step.getThought());
                 repository.logStep(sessionId, i + 1, step, "FINAL_ANSWER_GENERATED");
+                listener.onStep(ResearchEvent.builder()
+                        .sessionId(sessionId)
+                        .type("ANSWER")
+                        .content(step.getFinalAnswer())
+                        .step(i)
+                        .build());
                 return step.getFinalAnswer();
             }
+            listener.onStep(ResearchEvent.builder()
+                    .sessionId(sessionId)
+                    .type("ACTION")
+                    .content(step.getAction())
+                    .data(step.getActionInput())
+                    .step(i)
+                    .build());
+
             log.info("🔄 Step {}: [Thought] {} -> [Action] {}({})",
                     i + 1, step.getThought(), step.getAction(), step.getActionInput());
             if (i == maxSteps - 1) {
@@ -145,11 +178,24 @@ public class ResearchAgent {
                 return "【自动汇总】由于搜索步数达到上限，根据已有资料整理如下：" + step.getThought();
             }
             String observation = executeTool(step.getAction(), step.getActionInput());
+            String preview = observation;
+            if (observation.length() > 1000) {
+                // 截取前 1000 字，并加上省略号和统计信息，增加透明度
+                preview = observation.substring(0, 1000) + "\n\n...(Total " + observation.length() + " chars, truncated for display)";
+            }
+            listener.onStep(ResearchEvent.builder()
+                    .sessionId(sessionId)
+                    .type("OBSERVATION")
+                    .content(preview)
+                    .step(i)
+                    .build());
             history.add(UserMessage.from("Observation: " + observation));
             repository.logStep(sessionId,i+1,step,observation);
         }
         return "❌ Failed to answer within step limit.";
     }
+
+
 
     private String executeTool(String toolName, String inputRaw) {
         try {
@@ -187,6 +233,16 @@ public class ResearchAgent {
                         return "Error: Missing parameters. Required: paperId.";
                     }
                     return tools.checkPaperRelations(paperId);
+                case "getTopCitedReferences":
+                    Integer limit = params.getInteger("limit");
+                    if (limit == null) limit = 5; // 默认查 Top 5
+                    return tools.getTopCitedReferences(limit);
+                case "findPapers":
+                    String paperQuery = params.getString("query");
+                    Double paperThreshold = params.getDouble("threshold");
+                    if (paperQuery == null && !params.isEmpty()) paperQuery = inputRaw;
+                    if (paperQuery == null) return "Error: Missing 'query' parameter.";
+                    return tools.findPapers(paperQuery, paperThreshold);
                 default:
                     return "Error: Unknown tool '" + toolName + "'. Check tool definitions.";
             }

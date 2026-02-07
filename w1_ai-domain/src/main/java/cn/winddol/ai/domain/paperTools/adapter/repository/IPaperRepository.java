@@ -61,4 +61,8 @@ public interface IPaperRepository {
 
     void updateStatusWithError(Long paperId, String status, String errorMessage);
     List<KnowledgeRelationEntity> findRelationsByPaperId(Long paperId);
+
+    List<PaperEntity> searchPapers(String query, Double threshold);
+
+    List<GlobalReferenceEntity> getTopFrequentReferences(Integer limit);
 }

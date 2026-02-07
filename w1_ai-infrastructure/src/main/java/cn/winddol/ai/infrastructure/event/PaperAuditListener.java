@@ -1,6 +1,6 @@
 package cn.winddol.ai.infrastructure.event;
 
-import cn.winddol.ai.domain.agent.service.LibrarianAuditService;
+import cn.winddol.ai.domain.agent.service.bussiness.LibrarianAuditService;
 import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
 import cn.winddol.ai.domain.paperTools.service.CitationEnrichmentService;
 import cn.winddol.ai.domain.paperTools.service.PaperEnrichmentService;

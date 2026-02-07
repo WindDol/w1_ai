@@ -20,4 +20,6 @@ public class PaperEntity {
     private List<OutlineNode>  outline;
 
     private Map<String, Object> metadata;
+    private String abstractText;
+    private Double score;
 }

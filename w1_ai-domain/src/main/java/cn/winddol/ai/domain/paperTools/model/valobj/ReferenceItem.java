@@ -19,4 +19,5 @@ public class ReferenceItem {
     private ReferenceEnum sourceType;
     private Long globalRefId;
     private Long linkedPaperId;
+    private Integer citationCount;
 }

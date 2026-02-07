@@ -15,7 +15,7 @@ import redis.clients.jedis.JedisClientConfig;
 import redis.clients.jedis.JedisPooled;
 
 public class RedisChatMemoryStore implements ChatMemoryStore {
-    private final JedisPooled client;
+    private  final JedisPooled client;
 
     public RedisChatMemoryStore(String host, Integer port, String user, String password,Integer database) {
         String finalHost = ValidationUtils.ensureNotBlank(host, "host");
@@ -31,6 +31,10 @@ public class RedisChatMemoryStore implements ChatMemoryStore {
                     (JedisClientConfig) DefaultJedisClientConfig.builder().database(finalDatabase).build());
         }
 
+    }
+
+    public RedisChatMemoryStore(JedisPooled jedisPooled) {
+        this.client = jedisPooled;
     }
 
     public List<ChatMessage> getMessages(Object memoryId) {

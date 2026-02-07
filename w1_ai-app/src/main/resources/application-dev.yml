@@ -53,7 +53,7 @@ redis:
       database: 2
 python:
   path-python: "D:/anaconda/envs/py12/python.exe"
-  script-path: "C:/Users/Mr Ding.LAPTOP-H54HCE12/Desktop/ai_pdf/w1_ai/w1_ai-app/src/main/java/cn/winddol/ai/python/paper_parser.py"
+  script-path: "C:/Users/Mr Ding.LAPTOP-H54HCE12/Desktop/ai_pdf/w1_ai/python/paper_parser.py"
 
 upload:
   path: "C:/Users/Mr Ding.LAPTOP-H54HCE12/Desktop/ai_pdf"

@@ -1,13 +1,11 @@
 package cn.winddol.ai.test;
 
 
-import cn.winddol.ai.domain.agent.service.LibrarianAuditService;
+import cn.winddol.ai.domain.agent.service.bussiness.LibrarianAuditService;
 import cn.winddol.ai.domain.paperTools.adapter.tools.ScientificResearchTools;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
-import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
 import cn.winddol.ai.domain.paperTools.service.AgentReaderService;
 import cn.winddol.ai.domain.paperTools.service.HybridRetrieverService;
-import cn.winddol.ai.infrastructure.dao.ReferenceMapper;
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +23,6 @@ public class TestAgentTools {
     private AgentReaderService reader;
     @Resource
     private ScientificResearchTools scientificResearchTools;
-    @Resource
-    private ReferenceMapper referenceMapper;
     @Resource
     private LibrarianAuditService auditService;
 
@@ -67,6 +63,21 @@ public class TestAgentTools {
     public void testLookupReferenceTool() {
         // 假设 Paper ID 是 7, 参考文献索引是 "24"
         auditService.auditAgainstLibrary(14L);
+
+
+    }
+
+    @Test
+    public void testFindPapers() {
+        // 假设 Paper ID 是 7, 参考文献索引是 "24"
+        scientificResearchTools.findPapers("Mobius",0.3);
+
+
+    }
+    @Test
+    public void testFindPapers1() {
+        // 假设 Paper ID 是 7, 参考文献索引是 "24"
+        scientificResearchTools.getTopCitedReferences(3);
 
 
     }

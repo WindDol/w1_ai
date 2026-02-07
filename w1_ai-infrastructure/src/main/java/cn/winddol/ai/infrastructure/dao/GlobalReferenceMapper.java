@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface GlobalReferenceMapper extends BaseMapper<GlobalReference> {
     @Select("""
@@ -14,4 +16,6 @@ public interface GlobalReferenceMapper extends BaseMapper<GlobalReference> {
     WHERE id = #{id}
 """)
     GlobalReference selectGlobalById(@Param("id") Long id);
+
+    List<GlobalReference> getTopFrequentReferences(@Param("limit") Integer limit);
 }

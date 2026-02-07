@@ -10,6 +10,7 @@
         gr.title,
         gr.abstract AS abstractText,
         gr.linked_paper_id AS linkedPaperId,
+        gr.citation_count AS citationCount,
         p.title AS sourcePaperTitle,
         1 - (gr.embedding &lt;=&gt; cast(#{vectorStr} as vector)) AS score
         FROM paper_references pr
@@ -29,6 +30,7 @@
             pr.raw_text as rawText,
             gr.title,
             gr.abstract as paperAbstract,
+            gr.citation_count AS citationCount,
             gr.linked_paper_id as linkedPaperId
         FROM paper_references pr
                  JOIN global_references gr ON pr.global_ref_id = gr.id

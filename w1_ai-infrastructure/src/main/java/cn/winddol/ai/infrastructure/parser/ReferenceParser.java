@@ -11,19 +11,32 @@ import java.util.regex.Pattern;
 @Component
 public class ReferenceParser {
 
-    // 更加健壮的序号匹配：Group 1 永远是我们要的纯数字 ID
+    // --- 模式 A: 数字引用 ---
+    // 匹配 [1], 1., <sup>1</sup>
     private static final Pattern NUMBERED_PATTERN = Pattern.compile(
-            "^(?:<sup>(\\d+)</sup>|\\[(\\d+)\\]|(\\d+)\\.?)\\s*(.*)$"
+            "^(?:<sup>(\\d+)</sup>|\\[(\\d+)]|(\\d+)\\.?)\\s*(.*)$"
     );
 
-    // 作者年份正则：放宽行首限制，允许前面有序号或标签后的残余
+    // --- 模式 B: 作者-年份引用 ---
+    // 修改点：[a-zA-Z\\-\\.] 增加了点号，支持 "J. T. Beale" 这种缩写形式
     private static final Pattern AUTHOR_YEAR_PATTERN = Pattern.compile(
-            "([A-Z][a-zA-Z\\-]+(?:, [A-Z]\\.| et al\\.)?.*?)\\s*\\((\\d{4}[a-z]?)\\)(?:\\.|\\s)(.*)$"
+            "^([A-Z][a-zA-Z\\-\\.]+(?:, [A-Z]\\.| et al\\.|\\s+[A-Z]\\.)?.*?)\\s*\\((\\d{4}[a-z]?)\\)(?:\\.|\\s)(.*)$"
+    );
+
+    // --- 预处理正则：用于炸开粘连的引用 ---
+    // 逻辑：寻找 "空格/标点 + 数字 + 点 + 空格 + 大写字母"
+    // 例如匹配 "...50586 2. R. C..." 中的 " 2. R"
+    private static final Pattern INLINE_NUMBERED_REF = Pattern.compile(
+            "(?<=[\\s.;])(\\d+)\\.\\s+(?=[A-Z])"
     );
 
     public List<ReferenceItem> parse(Long paperId, String content) {
+        // 1. 【核心修复】预处理：把粘连在一起的引用强制换行
+        String normalizedContent = normalizeContent(content);
+
         List<ReferenceItem> refs = new ArrayList<>();
-        String[] lines = content.split("\n");
+        String[] lines = normalizedContent.split("\n");
+
         StringBuilder buffer = new StringBuilder();
         String currentId = null;
 
@@ -32,35 +45,60 @@ public class ReferenceParser {
             if (line.isEmpty()) continue;
 
             Matcher numMatcher = NUMBERED_PATTERN.matcher(line);
+            Matcher authMatcher = AUTHOR_YEAR_PATTERN.matcher(line);
+
+            boolean isNewRef = false;
+            String newId = null;
+            String newContent = null;
 
             if (numMatcher.find()) {
-                // --- 发现新条目 (数字驱动型) ---
+                // 命中数字格式 (2., [2], <sup>2</sup>)
+                isNewRef = true;
+                // 智能获取 ID
+                newId = getFirstNonNullGroup(numMatcher, 1, 2, 3);
+                newContent = numMatcher.group(4);
+            } else if (authMatcher.find()) {
+                isNewRef = true;
+                String authorPart = authMatcher.group(1);
+                String yearPart = authMatcher.group(2);
+                newId = generateAuthorYearId(authorPart, yearPart);
+                newContent = line;
+            }
+
+            if (isNewRef) {
+                // 保存上一条
                 if (currentId != null) {
                     saveCurrentRef(refs, paperId, currentId, buffer);
                 }
-
-                // 智能获取数字 ID (遍历 1, 2, 3 组，哪个不为空取哪个)
-                currentId = getFirstNonNullGroup(numMatcher, 1, 2, 3);
-                buffer = new StringBuilder(numMatcher.group(4)); // 第4组是剩余内容
-
+                // 开始新一条
+                currentId = newId;
+                buffer = new StringBuilder();
+                if (newContent != null) {
+                    buffer.append(newContent);
+                }
             } else {
-                // --- 检查是否是纯作者年份型 (无序号) ---
-                Matcher authMatcher = AUTHOR_YEAR_PATTERN.matcher(line);
-                if (authMatcher.find() && currentId == null) {
-                    // 只有在没找到数字 ID 的情况下才触发纯作者模式
-                    currentId = generateAuthorYearId(authMatcher.group(1), authMatcher.group(2));
-                    buffer = new StringBuilder(line);
-                } else if (currentId != null) {
-                    // --- 续行处理 ---
+                // 续行
+                if (currentId != null) {
                     buffer.append(" ").append(line);
                 }
             }
         }
-        // 最后一笔
+        // 保存最后一条
         if (currentId != null) {
             saveCurrentRef(refs, paperId, currentId, buffer);
         }
         return refs;
+    }
+
+    /**
+     * 【核心修复逻辑】
+     * 将 "...BF00250586 2. R. C. Budzinski..." 替换为 "...BF00250586\n2. R. C. Budzinski..."
+     */
+    private String normalizeContent(String content) {
+        if (content == null) return "";
+
+        Matcher matcher = INLINE_NUMBERED_REF.matcher(content);
+        return matcher.replaceAll("\n$0").trim();
     }
 
     private void saveCurrentRef(List<ReferenceItem> refs, Long paperId, String id, StringBuilder buf) {
@@ -79,7 +117,24 @@ public class ReferenceParser {
     }
 
     private String generateAuthorYearId(String authorPart, String year) {
-        String surname = authorPart.split("[,\\s]")[0].trim();
+        String surname;
+        if (authorPart.contains(",")) {
+            surname = authorPart.split(",")[0].trim(); // "Altafini, C." -> "Altafini"
+        } else {
+            // "J. T. Beale" -> split space -> last element -> "Beale"
+            String[] parts = authorPart.split("\\s+");
+            // 过滤掉 "et" "al."
+            int lastIdx = parts.length - 1;
+            while (lastIdx >= 0 && (parts[lastIdx].equalsIgnoreCase("al.") || parts[lastIdx].equalsIgnoreCase("et"))) {
+                lastIdx--;
+            }
+            if (lastIdx >= 0) {
+                surname = parts[lastIdx];
+            } else {
+                surname = authorPart; // fallback
+            }
+        }
+
         surname = surname.replaceAll("[^a-zA-Z\\-]", "");
         return surname + " " + year;
     }

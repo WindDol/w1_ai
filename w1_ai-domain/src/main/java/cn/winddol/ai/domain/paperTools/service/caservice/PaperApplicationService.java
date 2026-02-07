@@ -1,6 +1,6 @@
 package cn.winddol.ai.domain.paperTools.service.caservice;
 
-import cn.winddol.ai.domain.agent.service.Librarian;
+import cn.winddol.ai.domain.agent.service.bussiness.Librarian;
 import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
 import cn.winddol.ai.domain.paperTools.adapter.external.dto.RefMetadata;
 import cn.winddol.ai.domain.paperTools.adapter.parser.IPaperParser;import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;

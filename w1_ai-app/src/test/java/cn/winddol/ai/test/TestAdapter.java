@@ -1,8 +1,12 @@
 package cn.winddol.ai.test;
 
+import cn.winddol.ai.domain.agent.service.bussiness.LibrarianAuditService;
 import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
+import cn.winddol.ai.domain.paperTools.service.CitationEnrichmentService;
 import cn.winddol.ai.domain.paperTools.service.IPaperEnrichmentService;
+import cn.winddol.ai.infrastructure.embedding.EmbeddingProcessor;
 import dev.ai4j.openai4j.Json;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +23,14 @@ public class TestAdapter {
     private ISymbolExtractor extractor;
     @Resource
     private IPaperEnrichmentService enrichmentService;
+    @Resource
+    private CitationEnrichmentService citationService;
+    @Resource
+    private EmbeddingProcessor embeddingProcessor;
+    @Resource
+    private IPaperRepository paperRepository;
+    @Resource
+    private LibrarianAuditService auditService;
 
     @Test
     public void testAi() throws Exception {
@@ -63,8 +75,19 @@ public class TestAdapter {
 
     }
     @Test
-    public void testEnrichment() throws Exception {
-        enrichmentService.symbolExtractionAndStorage(11L);
+    public void testEnrichment()  {
+        enrichmentService.symbolExtractionAndStorage(15L);
+    }
+    @Test
+    public void testC()  {
+        log.info("2️⃣ 开始抓取引用...");
+        Long paperId = 15L;
+        citationService.enrichPaperReferences(paperId);
+        embeddingProcessor.embedReferences(paperId);
+        embeddingProcessor.embedSections(paperId);
+        // 4. (可选) 冲突检测
+        auditService.auditAgainstLibrary(paperId);
+        paperRepository.updateStatus(paperId, "COMPLETED");
     }
 
 
