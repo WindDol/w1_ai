@@ -2,23 +2,24 @@ import streamlit as st
 import requests
 import json
 import uuid
+import html  # 引入 html 库用于转义
 from sseclient import SSEClient
 
 # --- 1. 页面基础配置 ---
 st.set_page_config(
     page_title="ScholarBrain 2.0 - 深度科研",
-    page_icon="🎓",
+    page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- 2. CSS 深度美化 ---
+# --- 2. CSS 深度美化 (关键修复) ---
 st.markdown("""
     <style>
-    /* 全局字体优化 */
+    /* 全局字体 */
     .stApp { font-family: 'Inter', system-ui, sans-serif; }
     
-    /* 聊天气泡样式 */
+    /* 聊天气泡 */
     .stChatMessage { 
         border-radius: 12px; 
         padding: 1rem; 
@@ -26,36 +27,72 @@ st.markdown("""
         border: 1px solid #f0f2f6;
     }
     
-    /* 思维链日志样式 */
+    /* --- 核心修复：日志容器 --- */
+    /* 给日志加一个固定高度的滚动窗口，防止页面剧烈跳动 */
+    .log-scroll-container {
+        max-height: 500px; /* 固定高度 */
+        overflow-y: auto;  /* 内部滚动 */
+        padding-right: 10px; /* 给滚动条留位置 */
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #fafafa;
+    }
+
+    /* --- 卡片通用样式 (修复超出边框) --- */
+    .log-card {
+        margin-bottom: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 0.95em;
+        line-height: 1.5;
+        /* 关键：强制换行，防止撑爆容器 */
+        word-wrap: break-word;
+        overflow-wrap: anywhere; 
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    /* 思考卡片 */
     .thought-card {
-        background-color: #f8f9fa;
-        border-left: 3px solid #6c757d;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 0 5px 5px 0;
-        font-size: 0.9em;
+        background-color: #ffffff;
+        border-left: 4px solid #9e9e9e;
+        border: 1px solid #e0e0e0;
+        border-left-width: 4px;
     }
+
+    /* 行动卡片 */
     .action-card {
-        background-color: #e3f2fd;
-        border-left: 3px solid #2196f3;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 0 5px 5px 0;
-        font-size: 0.9em;
+        background-color: #f3f9ff;
+        border-left: 4px solid #2196f3;
+        border: 1px solid #bbdefb;
+        border-left-width: 4px;
     }
+
+    /* 观察卡片 */
     .obs-card {
-        background-color: #e8f5e9;
-        border-left: 3px solid #4caf50;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 0 5px 5px 0;
+        background-color: #f1f8e9;
+        border-left: 4px solid #4caf50;
+        border: 1px solid #c8e6c9;
+        border-left-width: 4px;
+        font-family: 'Menlo', 'Consolas', monospace;
         font-size: 0.85em;
-        font-family: monospace;
-        white-space: pre-wrap; /* 保持换行 */
     }
-    
-    /* 标题样式 */
-    h1, h2, h3 { color: #2c3e50; }
+
+    /* --- 步骤徽章 --- */
+    .step-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: bold;
+        color: white;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .badge-thought { background-color: #757575; }
+    .badge-action { background-color: #1976d2; }
+    .badge-obs { background-color: #388e3c; }
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -120,8 +157,6 @@ with st.sidebar:
             st.session_state.messages = []
             st.session_state.session_id = str(uuid.uuid4())
             st.rerun()
-    with col2:
-        st.link_button("🐞 报Bug", "https://github.com/your-repo/issues", use_container_width=True)
 
 # --- 5. 主聊天区域 ---
 st.markdown("#### 🔬 沉浸式科研工作台")
@@ -149,7 +184,7 @@ if prompt:
     # 3. 开始助手响应
     with st.chat_message("assistant"):
         # 动态状态面板
-        status_header = st.empty() # 用于动态更新 "第N步..."
+
         status_container = st.status("🚀 启动思维引擎...", expanded=True)
 
         # 在容器内部创建占位符，用于流式渲染日志
@@ -159,7 +194,7 @@ if prompt:
         answer_placeholder = st.empty()
 
         # 日志累加器
-        full_logs = ""
+        full_logs_html= ""
         final_answer = ""
 
         try:
@@ -186,50 +221,67 @@ if prompt:
                     step = event_data.get("step", 0) # 获取 Step
 
                     # --- 动态更新状态标题 ---
-                    if step > 0:
+                    if str(step).isdigit():
                         status_container.update(label=f"🔄 ScholarBrain 思考中... [第 {step} 步]", state="running")
+                    new_html = ""
 
-                    # --- 根据类型渲染美化后的 HTML ---
                     if msg_type == "THOUGHT":
-                        # 使用 HTML div 包装，实现自定义样式
-                        new_log = f"""
-                        <div class="thought-card">
-                            <b>🤔 Thought (Step {step}):</b><br>{content}
+                        # 转义内容，防止 HTML 注入破坏格式
+                        safe_content = html.escape(content).replace("\n", "<br>")
+                        new_html = f"""
+                        <div class="log-card thought-card">
+                            <div>
+                                <span class="step-badge badge-thought">STEP {step}</span>
+                                <b>Thought</b>
+                            </div>
+                            <div style="margin-top:5px; color:#333;">{safe_content}</div>
                         </div>
                         """
-                        full_logs += new_log
-                        log_placeholder.markdown(full_logs, unsafe_allow_html=True)
 
                     elif msg_type == "ACTION":
-                        action_input = event_data.get("data", "")
-                        new_log = f"""
-                        <div class="action-card">
-                            <b>🛠️ Action:</b> <code>{content}</code><br>
-                            <span style="color:#666;font-size:0.8em">Input: {action_input}</span>
+                        action_input = html.escape(str(event_data.get("data", "")))
+                        safe_content = html.escape(content)
+                        new_html = f"""
+                        <div class="log-card action-card">
+                            <div>
+                                <span class="step-badge badge-action">STEP {step}</span>
+                                <b>Action:</b> <code>{safe_content}</code>
+                            </div>
+                            <div style="margin-top:5px; font-size:0.9em; color:#555;">
+                                <b>Input:</b> <code>{action_input}</code>
+                            </div>
                         </div>
                         """
-                        full_logs += new_log
-                        log_placeholder.markdown(full_logs, unsafe_allow_html=True)
 
                     elif msg_type == "OBSERVATION":
-                        # 截断过长内容用于显示
+                        # 截断显示
                         display_content = content[:800] + "..." if len(content) > 800 else content
-                        # 转义 HTML 字符防止渲染破坏
-                        import html
-                        display_content = html.escape(display_content)
-
-                        new_log = f"""
-                        <div class="obs-card"><b>👁️ Observation:</b><br>{display_content}</div>
+                        safe_content = html.escape(display_content)
+                        new_html = f"""
+                        <div class="log-card obs-card">
+                            <div>
+                                <span class="step-badge badge-obs">STEP {step}</span>
+                                <b>Observation</b>
+                            </div>
+                            <div style="margin-top:5px;">{safe_content}</div>
+                        </div>
                         """
-                        full_logs += new_log
-                        log_placeholder.markdown(full_logs, unsafe_allow_html=True)
 
                     elif msg_type == "ANSWER" or msg_type == "FINAL_ANSWER_GENERATED":
-                        # 思考结束，收起面板
                         status_container.update(label="✅ 思考完成", state="complete", expanded=False)
                         final_answer = content
-                        # 流式输出最终答案效果（可选，这里直接显示）
                         answer_placeholder.markdown(final_answer)
+                        continue
+
+                    if new_html:
+                        full_logs_html += new_html
+                        # 每次更新都重新渲染整个容器，利用 CSS 实现内部滚动
+                        # 使用 JavaScript (scrollTo) 可选，但 CSS 的 flex-direction: column-reverse
+                        # 或者让用户自己滑体验可能更好。这里保持自然顺序。
+                        log_placeholder.markdown(
+                            f'<div class="log-scroll-container">{full_logs_html}</div>',
+                            unsafe_allow_html=True
+                        )
 
                 except json.JSONDecodeError:
                     pass
