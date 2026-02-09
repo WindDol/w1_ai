@@ -3,8 +3,8 @@ package cn.winddol.ai.domain.agent.service.bussiness;
 import cn.winddol.ai.domain.agent.adapter.repository.IAgentRepository;
 import cn.winddol.ai.domain.agent.event.ResearchEvent;
 import cn.winddol.ai.domain.agent.model.entity.AgentStep;
-import cn.winddol.ai.domain.agent.service.ResearchProcessListener;
-import cn.winddol.ai.domain.paperTools.adapter.tools.ScientificResearchTools;
+import cn.winddol.ai.domain.paperTools.service.IScientificResearchTools;
+import cn.winddol.ai.domain.paperTools.service.ScientificResearchTools;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import dev.langchain4j.data.message.AiMessage;
@@ -30,7 +30,7 @@ public class ResearchAgent {
     @Resource
     private ChatLanguageModel chatLanguageModel;
     @Resource
-    private ScientificResearchTools tools;
+    private IScientificResearchTools tools;
     @Resource
     private IAgentRepository repository;
 
@@ -128,7 +128,6 @@ public class ResearchAgent {
 
     private String executeReActLoop(String sessionId, List<ChatMessage> history, ResearchProcessListener listener){
         int maxSteps = 20;
-
         for (int i = 0; i < maxSteps; i++) {
             if (i == maxSteps - 2) {
                 history.add(SystemMessage.from(
@@ -152,6 +151,8 @@ public class ResearchAgent {
                             .content(step.getThought())
                             .step(i)
                             .build());
+
+
             if (step.getFinalAnswer() != null && !StringUtils.isBlank(step.getFinalAnswer())) {
                 log.info("🛑 Step {}: [Final Answer Ready] {}", i+1, step.getThought());
                 repository.logStep(sessionId, i + 1, step, "FINAL_ANSWER_GENERATED");
@@ -163,6 +164,27 @@ public class ResearchAgent {
                         .build());
                 return step.getFinalAnswer();
             }
+
+            if (StringUtils.isBlank(step.getAction()) || "null".equalsIgnoreCase(step.getAction())) {
+                log.warn("⚠️ Step {}: Missing Action and FinalAnswer. Asking LLM to correct.", i + 1);
+                String prompt;
+                if (step.getThought().toLowerCase().contains("final answer") ||
+                        step.getThought().toLowerCase().contains("answer in chinese")) {
+                    // 如果 Thought 里提到了要回答，但没给字段，直接把 JSON 模板甩给它
+                    prompt = "System Error: You indicated you are ready to provide the final answer, but the JSON field 'finalAnswer' is MISSING. " +
+                            "Please output the JSON again with the answer included. " +
+                            "Format: {\"thought\": \"...\", \"finalAnswer\": \"YOUR CHINESE ANSWER HERE\"}";
+                } else {
+                    // 普通的 Action 缺失
+                    prompt = "System Error: You provided a 'thought' but missed the 'action'. " +
+                            "If you want to use a tool, specify it in 'action'. " +
+                            "If you have the answer, use the 'finalAnswer' field.";
+                }
+
+                history.add(UserMessage.from(prompt));
+                continue; // 跳过本次 executeTool，直接进入下一轮循环
+            }
+
             listener.onStep(ResearchEvent.builder()
                     .sessionId(sessionId)
                     .type("ACTION")
@@ -196,8 +218,10 @@ public class ResearchAgent {
     }
 
 
-
     private String executeTool(String toolName, String inputRaw) {
+        if (toolName == null || "null".equalsIgnoreCase(toolName.trim())) {
+            return "System Error: No tool name provided (Action was null). Please specify a valid action or use 'finalAnswer'.";
+        }
         try {
             // 1. 统一预处理：确保 input 是个合法的 JSON 对象
             // 如果 LLM 偷懒直接传了字符串 "soliton"，我们帮它包装成 {"query": "soliton"}
@@ -289,25 +313,48 @@ public class ResearchAgent {
 
     private AgentStep parseOutput(String llmOutput) {
         try {
-            // 1. 清除 Markdown 格式块
-            String json = llmOutput.replaceAll("```json", "").replaceAll("```", "").trim();
-            AgentStep step = JSON.parseObject(json, AgentStep.class);
+            // 1. 提取 JSON 内容
+            String json = extractJson(llmOutput);
+            if (json == null) return null;
 
-            // 2. 处理 actionInput 中可能的二次转义问题
-            // 有时模型会输出 "actionInput": "{\"query\": \"Möbius\"}"
-            // FastJSON 有时会将其识别为双重转义字符串，这里确保其为纯 JSON 串
-            if (step.getActionInput() != null) {
-                String input = step.getActionInput().trim();
-                if (input.startsWith("\"") && input.endsWith("\"") && input.length() > 2) {
-                    input = input.substring(1, input.length() - 1).replace("\\\"", "\"");
-                    step.setActionInput(input);
-                }
+            // 2. 预处理非法转义 (保留你原本的逻辑，虽然简单粗暴但能防 LaTeX 报错)
+            String sanitizedJson = json
+                    .replace("\\n", "###NEWLINE###")  // 先把合法的 \n 藏起来
+                    .replace("\\\"", "###QUOTE###")   // 先把合法的 \" 藏起来
+                    .replace("\\", "\\\\")            // 剩下的反斜杠全是 LaTeX 的，统统转义
+                    .replace("###NEWLINE###", "\\n")  // 还原换行
+                    .replace("###QUOTE###", "\\\"");  // 还原引号
+
+            // 3. 解析 JSON
+            JSONObject jsonObject = JSON.parseObject(sanitizedJson);
+
+            AgentStep step = new AgentStep();
+            step.setThought(jsonObject.getString("thought"));
+            step.setAction(jsonObject.getString("action"));
+            step.setActionInput(jsonObject.getString("actionInput"));
+            step.setFinalAnswer(jsonObject.getString("finalAnswer"));
+
+            // 4. 处理 actionInput
+            Object inputObj = jsonObject.get("actionInput");
+            if (inputObj instanceof String) {
+                step.setActionInput((String) inputObj);
+            } else if (inputObj != null) {
+                step.setActionInput(JSON.toJSONString(inputObj));
             }
+
             return step;
         } catch (Exception e) {
-            log.error("JSON Parse Error. Output: {}", llmOutput);
+            log.error("JSON Parse Error. Raw Output: {}", llmOutput, e);
             return null;
         }
+    }
+    private String extractJson(String output) {
+        int start = output.indexOf("{");
+        int end = output.lastIndexOf("}");
+        if (start != -1 && end != -1 && end > start) {
+            return output.substring(start, end + 1);
+        }
+        return null;
     }
 
 

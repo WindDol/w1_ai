@@ -1,7 +1,9 @@
 package cn.winddol.ai.trigger.http;
 
-import cn.winddol.ai.domain.agent.event.NotificationService;
-import cn.winddol.ai.trigger.application.service.ResearchOrchestrator;
+import cn.winddol.ai.api.IResearchController;
+import cn.winddol.ai.domain.agent.adapter.event.NotificationService;
+import cn.winddol.ai.domain.agent.service.IResearchOrchestrator;
+import cn.winddol.ai.domain.agent.service.ResearchOrchestrator;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,12 +17,13 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @RequestMapping("/api/v1/agent")
 @RestController
-public class ResearchController {
+public class ResearchController implements IResearchController {
     @Resource
     private NotificationService notificationService;
     @Resource
-    private ResearchOrchestrator orchestrator;
+    private IResearchOrchestrator orchestrator;
 
+    @Override
     @GetMapping(value = "/ask-stream", produces = "text/event-stream;charset=UTF-8")
     public SseEmitter askStream(@RequestParam String sessionId, @RequestParam String question) {
         SseEmitter emitter = new SseEmitter(600_000L);

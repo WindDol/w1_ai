@@ -1,6 +1,6 @@
 package cn.winddol.ai.domain.paperTools.adapter.ai;
 
-import cn.winddol.ai.domain.paperTools.adapter.external.dto.RefMetadata;
+import cn.winddol.ai.domain.paperTools.model.entity.RefMetadata;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
 
 import java.util.List;

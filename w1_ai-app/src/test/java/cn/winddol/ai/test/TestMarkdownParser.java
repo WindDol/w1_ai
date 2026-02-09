@@ -1,11 +1,11 @@
 package cn.winddol.ai.test;
 
 import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
-import cn.winddol.ai.domain.paperTools.adapter.external.dto.RefMetadata;
+import cn.winddol.ai.domain.paperTools.model.entity.RefMetadata;
 import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
+import cn.winddol.ai.domain.paperTools.adapter.tools.IFingerprintUtils;
 import cn.winddol.ai.domain.paperTools.model.entity.SectionPO;
 import cn.winddol.ai.infrastructure.parser.MarkdownParser;
-import cn.winddol.ai.types.common.utils.FingerprintUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,8 @@ import java.util.List;
 public class TestMarkdownParser {
     @Resource
     private ISymbolExtractor extractor;
+    @Resource
+    private IFingerprintUtils fingerprintUtils;
 
     @Test
     public void test() throws Exception {
@@ -72,7 +74,7 @@ public class TestMarkdownParser {
             log.error("❌ Metadata extraction failed. Aborting ingestion to prevent library pollution.");
             return;
         }
-        String fingerprint = FingerprintUtils.generateRefFingerprint(
+        String fingerprint = fingerprintUtils.generateRefFingerprint(
                 paperMeta.getAuthorSurnames(),
                 paperMeta.getYear()
         );
@@ -113,7 +115,7 @@ public class TestMarkdownParser {
                 """;
         String headerContent = a + b;
         RefMetadata paperMeta = extractor.extractRefMetadata(headerContent);
-        String fingerprint = FingerprintUtils.generateRefFingerprint(
+        String fingerprint = fingerprintUtils.generateRefFingerprint(
                 paperMeta.getAuthorSurnames(),
                 paperMeta.getYear()
         );

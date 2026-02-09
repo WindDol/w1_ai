@@ -1,7 +1,7 @@
 package cn.winddol.ai.test;
 
 import cn.winddol.ai.domain.agent.service.bussiness.Librarian;
-import cn.winddol.ai.trigger.application.service.ResearchOrchestrator;
+import cn.winddol.ai.domain.agent.service.ResearchOrchestrator;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

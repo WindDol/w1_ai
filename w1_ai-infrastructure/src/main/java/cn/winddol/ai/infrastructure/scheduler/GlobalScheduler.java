@@ -1,7 +1,7 @@
 package cn.winddol.ai.infrastructure.scheduler;
 
 
-import cn.winddol.ai.domain.paperTools.service.CitationEnrichmentService;
+import cn.winddol.ai.domain.paperTools.service.librarianTools.CitationEnrichmentService;
 import cn.winddol.ai.infrastructure.embedding.EmbeddingProcessor;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

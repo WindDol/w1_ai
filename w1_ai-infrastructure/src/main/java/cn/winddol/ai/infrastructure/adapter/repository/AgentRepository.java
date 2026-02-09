@@ -3,7 +3,7 @@ package cn.winddol.ai.infrastructure.adapter.repository;
 import cn.winddol.ai.domain.agent.adapter.repository.IAgentRepository;
 import cn.winddol.ai.domain.agent.model.entity.AgentStep;
 import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
-import cn.winddol.ai.domain.agent.model.entity.PaperEntity;
+import cn.winddol.ai.domain.agent.model.entity.AgentPaperEntity;
 import cn.winddol.ai.infrastructure.dao.AgentThoughtTraceMapper;
 import cn.winddol.ai.infrastructure.dao.PaperKnowledgeRelationMapper;
 import cn.winddol.ai.infrastructure.dao.PaperMapper;
@@ -62,13 +62,13 @@ public class AgentRepository implements IAgentRepository {
     }
 
     @Override
-    public PaperEntity getPaperById(Long id) {
+    public AgentPaperEntity getPaperById(Long id) {
         if(id == null){
             return null;
         }
         Paper paper = paperMapper.selectById(id);
 
-        return PaperEntity.builder()
+        return AgentPaperEntity.builder()
                 .id(id)
                 .outline(paper.getOutline())
                 .abstractText(paper.getAbstractText())
@@ -78,7 +78,7 @@ public class AgentRepository implements IAgentRepository {
     }
 
     @Override
-    public List<PaperEntity> searchSimilarPapers(float[] vector, int i, Long newPaperId) {
+    public List<AgentPaperEntity> searchSimilarPapers(float[] vector, int i, Long newPaperId) {
         String vectorStr = Arrays.toString(vector);
 
         // 2. 执行数据库查询
@@ -86,7 +86,7 @@ public class AgentRepository implements IAgentRepository {
 
         // 3. 将 Map 转换为 Entity
         return results.stream().map(map -> {
-            PaperEntity entity = new PaperEntity();
+            AgentPaperEntity entity = new AgentPaperEntity();
             entity.setId((Long) map.get("id"));
             entity.setTitle((String) map.get("title"));
             entity.setAbstractText((String)map.get("abstracttext"));

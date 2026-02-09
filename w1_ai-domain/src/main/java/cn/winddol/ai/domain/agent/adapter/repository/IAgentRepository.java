@@ -2,7 +2,7 @@ package cn.winddol.ai.domain.agent.adapter.repository;
 
 import cn.winddol.ai.domain.agent.model.entity.AgentStep;
 import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
-import cn.winddol.ai.domain.agent.model.entity.PaperEntity;
+import cn.winddol.ai.domain.agent.model.entity.AgentPaperEntity;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public interface IAgentRepository {
     void saveRelation(Long sourceId, Long targetId, String type, String reason);
     List<KnowledgeRelationEntity> findRelationsByPaperId(Long paperId);
 
-    PaperEntity getPaperById(Long newPaperId);
+    AgentPaperEntity getPaperById(Long newPaperId);
 
-    List<PaperEntity> searchSimilarPapers(float[] vector, int i, Long newPaperId);
+    List<AgentPaperEntity> searchSimilarPapers(float[] vector, int i, Long newPaperId);
 }

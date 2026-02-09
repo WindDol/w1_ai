@@ -4,6 +4,7 @@ import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
 import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.entity.*;
+import cn.winddol.ai.domain.paperTools.model.valobj.PaperVO;
 import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceEnum;
 import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
@@ -151,6 +152,20 @@ public class PaperRepository implements IPaperRepository {
                 .title(paper.getTitle())
                 .build();
     }
+    @Override
+    public PaperEntity getPaperDetailsById(Long paperId) {
+        if(paperId == null){
+            return null;
+        }
+        Paper paper = paperMapper.selectById(paperId);
+
+        return PaperEntity.builder()
+                .id(paperId)
+                .title(paper.getTitle())
+                .abstractText(paper.getAbstractText())
+                .build();
+    }
+
     @Transactional
     @Override
     public void saveEnrichmentData(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection, Map<String, Set<String>> citationLinks) {
@@ -325,6 +340,20 @@ public class PaperRepository implements IPaperRepository {
     }
 
     @Override
+    public List<ReferenceItem> selectReferencesByPaperId(Long paperId) {
+        List<Reference> referenceList = referenceMapper.selectList(
+                new LambdaQueryWrapper<Reference>()
+                        .eq(Reference::getPaperId, paperId)
+        );
+        return referenceList.stream().map(s-> ReferenceItem.builder()
+                .id(s.getId())
+                .paperId(s.getPaperId())
+                .refId(s.getRefIndex())
+                .rawText(s.getRawText())
+                .build()).toList();
+    }
+
+    @Override
     public void updateStatus(Long paperId, String status) {
         Paper po = new Paper();
         po.setId(paperId);
@@ -372,6 +401,27 @@ public class PaperRepository implements IPaperRepository {
         List<GlobalReference> globalReferenceEntities = globalReferenceMapper.getTopFrequentReferences(limit);
         return globalReferenceEntities.stream().map(this::GRPoToEntity).toList();
     }
+
+    @Override
+    public List<PaperVO> listAllPapers() {
+        LambdaQueryWrapper<Paper> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(
+                Paper::getId,
+                Paper::getTitle,
+                Paper::getFingerprint,
+                Paper::getStatus,
+                Paper::getCreatedAt
+        );
+        wrapper.orderByDesc(Paper::getCreatedAt);
+        List<Paper> paperPOs = paperMapper.selectList(wrapper);
+        return paperPOs.stream().map(s-> PaperVO.builder().id(s.getId())
+                .title(s.getTitle())
+                .status(s.getStatus())
+                .fingerprint(s.getFingerprint())
+                .createdAt(s.getCreatedAt()).build()).toList();
+    }
+
+
 
     private GlobalReferenceEntity GRPoToEntity(GlobalReference po) {
         if (po == null) return null;
@@ -432,6 +482,25 @@ public class PaperRepository implements IPaperRepository {
                     .latex(s.getLatex()).description(s.getDescription())
                     .definitionFormula(s.getDefinitionFormula()).isGlobal(s.getIsGlobal())
                     .sourceIds(s.getSourceIds()).build()).toList();
+        }
+        return List.of();
+    }
+
+    @Override
+    public List<SymbolEntity> findByPaperId(Long paperId) {
+        List<Symbol> symbols = symbolMapper.selectList(new QueryWrapper<Symbol>()
+                .and(wrapper -> wrapper
+                        .eq("paper_id", paperId)
+                        .or()
+                        .eq("is_global", true)
+                ));
+        if(symbols != null && !symbols.isEmpty()) {
+            return symbols.stream().map(s -> SymbolEntity.builder()
+                    .id(s.getId()).paperId(s.getPaperId()).symbol(s.getSymbol())
+                    .latex(s.getLatex())
+                    .description(s.getDescription())
+                    .definitionFormula(s.getDefinitionFormula())
+                    .build()).toList();
         }
         return List.of();
     }

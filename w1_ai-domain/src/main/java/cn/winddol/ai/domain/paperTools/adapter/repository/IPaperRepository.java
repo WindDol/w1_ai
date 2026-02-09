@@ -3,6 +3,7 @@ package cn.winddol.ai.domain.paperTools.adapter.repository;
 import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
 import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.domain.paperTools.model.entity.*;
+import cn.winddol.ai.domain.paperTools.model.valobj.PaperVO;
 import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
 
@@ -29,6 +30,8 @@ public interface IPaperRepository {
 
     List<SymbolEntity> selectSymbolsByUuids(String sectionUuid);
 
+    List<SymbolEntity> findByPaperId(Long paperId);
+
     SectionEntity getSectionSibling(Long paperId, int offset, int i);
 
     List<SearchResultDTO.SymbolDTO> searchSymbolsByKeyword(String query, Long paperId);
@@ -38,7 +41,9 @@ public interface IPaperRepository {
     void updateReferences(ReferenceItem ref);
 
     List<SectionReferenceLinkEntity> selectReferenceLinks(Long paperId, String refId);
+
     List<SectionReferenceLinkEntity> selectLinksBySectionId(String sectionId);
+
     ReferenceItem selectReferenceByIndex(Long paperId, String refIndex);
 
     List<SearchResultDTO.ReferenceDTO> searchReferencesByVector(Long paperId, String vector, int topK);
@@ -57,12 +62,20 @@ public interface IPaperRepository {
 
     List<ReferenceItem> selectPendingReferencesByPaperId(Long paperId);
 
+    List<ReferenceItem> selectReferencesByPaperId(Long paperId);
+
     void updateStatus(Long paperId, String status);
 
     void updateStatusWithError(Long paperId, String status, String errorMessage);
+
     List<KnowledgeRelationEntity> findRelationsByPaperId(Long paperId);
 
     List<PaperEntity> searchPapers(String query, Double threshold);
 
     List<GlobalReferenceEntity> getTopFrequentReferences(Integer limit);
+
+    List<PaperVO> listAllPapers();
+
+    PaperEntity getPaperDetailsById(Long paperId);
+
 }

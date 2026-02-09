@@ -5,7 +5,7 @@ import uuid
 import html  # 引入 html 库用于转义
 from sseclient import SSEClient
 import textwrap
-
+import pandas as pd
 # --- 1. 页面基础配置 ---
 st.set_page_config(
     page_title="ScholarBrain 2.0 - 深度科研",
@@ -119,200 +119,332 @@ def format_to_html(text):
     text = text.replace("\n", "<br>")
 
     return text
+
+if "page" not in st.session_state:
+    st.session_state.page = "Research Chat"
 # --- 4. 侧边栏逻辑 ---
 with st.sidebar:
     st.title("🎓 ScholarBrain")
-    st.caption("v2.0.1 | Powered by ReAct Agent")
-    st.markdown("---")
+    st.caption("v1.0.0 | 沉浸式科研助手")
 
-    st.subheader("📄 知识库")
-
-    # 状态指示器
-    if st.session_state.current_paper_id:
-        st.success(f"📚 已加载论文 ID: **{st.session_state.current_paper_id}**")
-    else:
-        st.info("👋 请先上传一篇 PDF")
-
-    uploaded_file = st.file_uploader("上传新论文", type="pdf", disabled=st.session_state.processing)
-
-    if uploaded_file:
-        # 避免重复上传的简单逻辑：如果是同一个文件对象就不重复请求（Streamlit特性）
-        # 这里为了演示，每次上传都触发
-        with st.status("🔄 Librarian 正在入库...", expanded=True) as status:
-            try:
-                files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "application/pdf")}
-                # 使用 spinner 增加动效
-                response = requests.post(f"{BASE_URL}/api/v1/paper/upload", files=files)
-
-                if response.status_code == 200:
-                    result = response.json()
-                    paper_info = result.get("data", "")
-                    # 提取 Paper ID
-                    if "paperId为:" in paper_info:
-                        pid = paper_info.split(":")[-1].strip()
-                        st.session_state.current_paper_id = pid
-                        status.update(label=f"✅ 入库成功! ID: {pid}", state="complete", expanded=False)
-                        st.rerun() # 刷新以更新状态指示器
-                else:
-                    status.update(label="❌ 上传失败", state="error")
-                    st.error("后端服务未响应")
-            except Exception as e:
-                status.update(label="❌ 连接错误", state="error")
-                st.error(str(e))
+    st.markdown("### 🛠️ 核心功能")
+    selection = st.radio(
+        "选择操作模式",
+        ["🔍 Research Chat", "📤 Upload & Management"],
+        index=0 if st.session_state.page == "Research Chat" else 1,
+        label_visibility="collapsed"
+    )
+    st.session_state.page = selection
 
     st.markdown("---")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🧹 新对话", use_container_width=True, disabled=st.session_state.processing):
-            st.session_state.messages = []
-            st.session_state.session_id = str(uuid.uuid4())
+    # 保留原来的清理对话等按钮
+    if st.button("🧹 清空当前对话", width='stretch'):
+        st.session_state.messages = []
+        st.session_state.session_id = str(uuid.uuid4())
+        st.rerun()
+
+if st.session_state.page == "📤 Upload & Management":
+    st.header("📚 知识库管理")
+    if "uploader_key" not in st.session_state:
+        st.session_state.uploader_key = str(uuid.uuid4())
+    # 选项卡：上传 vs 列表
+    tab1, tab2 = st.tabs(["📤 上传新文档", "📑 文档列表与状态"])
+
+    with tab1:
+        st.subheader("上传 PDF")
+        uploaded_file = st.file_uploader(
+            "拖拽文件至此",
+            type="pdf",
+            key=st.session_state.uploader_key  # <--- 关键点：绑定 Key
+        )
+        if uploaded_file:
+            # 复用你之前的上传逻辑
+            with st.status("🔄 Librarian 正在入库...", expanded=True) as status:
+                try:
+                    files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "application/pdf")}
+                    response = requests.post(f"{BASE_URL}/api/v1/paper/upload", files=files)
+                    if response.status_code == 200:
+                        status.update(label="✅ 上传并解析成功", state="complete")
+                        st.balloons()
+                        st.session_state.uploader_key = str(uuid.uuid4())
+                        import time
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        status.update(label="❌ 失败", state="error")
+                except Exception as e:
+                    st.error(f"连接失败: {e}")
+
+    with tab2:
+        st.subheader("📑 知识库全景")
+        # 刷新按钮
+        if st.button("🔄 刷新列表"):
             st.rerun()
-
-# --- 5. 主聊天区域 ---
-st.markdown("#### 🔬 沉浸式科研工作台")
-
-# 渲染历史消息
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-# --- 6. 处理新输入 (核心逻辑改造) ---
-
-# 使用回调函数处理输入，或者直接判断
-# 这里的 disabled=st.session_state.processing 实现了“提问时锁住输入框”
-prompt = st.chat_input("输入你的问题 (例如: 这篇论文的核心创新点是什么?)", disabled=st.session_state.processing)
-
-if prompt:
-    # 1. 立即锁定界面
-    st.session_state.processing = True
-
-    # 2. 记录用户问题
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    # 3. 开始助手响应
-    with st.chat_message("assistant"):
-        # 动态状态面板
-
-        status_container = st.status("🚀 启动思维引擎...", expanded=True)
-
-        # 在容器内部创建占位符，用于流式渲染日志
-        log_placeholder = status_container.empty()
-
-        # 答案占位符
-        answer_placeholder = st.empty()
-
-        # 日志累加器
-        full_logs_html= ""
-        final_answer = ""
 
         try:
-            url = f"{BASE_URL}/api/v1/agent/ask-stream"
-            params = {
-                "sessionId": st.session_state.session_id,
-                "question": prompt
-            }
+            # 调用后端 list 接口
+            res = requests.get(f"{BASE_URL}/api/v1/paper/list")
+            if res.status_code == 200:
+                papers = res.json().get("data", [])
+                if papers:
+                    df = pd.DataFrame(papers)
+                    # 美化列名
+                    df.columns = ["id", "title", "status", "fingerprint", "createdAt"]
 
-            response = requests.get(url, params=params, stream=True, timeout=600) # 长超时
-            response.encoding = 'utf-8'
+                    # 使用 streamlit 的 dataframe 展示，支持搜索和排序
+                    status_colors = {
+                        "COMPLETED": "✅",
+                        "AUDITING": "⏳",
+                        "PARSED": "📄",
+                        "ERROR": "❌",
+                    }
 
-            client = SSEClient(response)
+                    # 2. 应用映射，生成一个新的包含 Markdown 语法的列
+                    df["状态"] = df["status"].apply(
+                        lambda x: f"{status_colors.get(x, 'gray')}{x}"
+                    )
 
-            for event in client.events():
-                if not event.data: continue
+                    # 3. 在 st.dataframe 中展示新列
+                    event = st.dataframe(
+                        df[["状态", "title", "createdAt","id"]], # 把“状态”放在第一列
+                        width='stretch',
+                        on_select="rerun",
+                        selection_mode="single-row",
+                        column_config={
+                            "状态": st.column_config.TextColumn(
+                                "状态",
+                            ),
+                            "title": st.column_config.TextColumn("标题"),
+                            "createdAt": st.column_config.DatetimeColumn(
+                                "入库时间",
+                                format="YYYY-MM-DD HH:mm:ss" # 格式化时间
+                            ),
+                            "id": st.column_config.NumberColumn("ID", format="%d")
+                        }
+                    )
+                    if event.selection.rows:
+                        selected_index = event.selection.rows[0]
+                        selected_paper_id = df.iloc[selected_index]["id"] # 假设后端返回字段叫 id
 
-                try:
-                    event_data = json.loads(event.data)
+                        st.divider()
+                        # ⏳ 加载动画
+                        with st.spinner(f"正在调取 Paper #{selected_paper_id} 的详细档案..."):
+                            try:
+                                # 调用你刚写的接口
+                                detail_res = requests.get(f"{BASE_URL}/api/v1/paper/{selected_paper_id}/details")
 
-                    # --- 提取字段 ---
-                    msg_type = event_data.get("type")
-                    content = event_data.get("content", "")
-                    step = event_data.get("step", 0) # 获取 Step
+                                if detail_res.status_code == 200:
+                                    # 提取 VO 数据
+                                    data = detail_res.json().get("data", {})
 
-                    # --- 动态更新状态标题 ---
-                    if str(step).isdigit():
-                        status_container.update(label=f"🔄 ScholarBrain 思考中... [第 {step} 步]", state="running")
-                    new_html = ""
+                                    # --- 第一部分：宏观指标 (Metrics) ---
+                                    st.markdown(f"### 📄 {data.get('title', 'Untitled')}")
 
-                    if msg_type == "THOUGHT":
-                        # 转义内容，防止 HTML 注入破坏格式
-                        safe_content = html.escape(content).replace("\n", "<br>")
-                        new_html =  textwrap.dedent( f"""
-                            <div class="log-card thought-card">
-                                <div>
-                                    <span class="step-badge badge-thought">STEP {step}</span>
-                                    <b>Thought</b>
-                                </div>
-                                <div style="margin-top:5px; color:#333;">{safe_content}</div>
-                            </div>
-                        """)
+                                    c1, c2, c3 = st.columns(3)
+                                    c1.metric("📚 引用文献数", data.get('referenceCount', 0))
+                                    c2.metric("🔣 提取符号数", data.get('symbolCount', 0))
 
-                    elif msg_type == "ACTION":
-                        raw_data = event_data.get("data", "")
-                        action_input = html.escape(json.dumps(raw_data, ensure_ascii=False) if isinstance(raw_data, (dict, list)) else str(raw_data))
-                        safe_content = html.escape(content)
 
-                        new_html = textwrap.dedent(f"""
-                            <div class="log-card action-card">
-                                <div>
-                                    <span class="step-badge badge-action">STEP {step}</span>
-                                    <b>Action:</b> <code>{safe_content}</code>
-                                </div>
-                                <div style="margin-top:5px; font-size:0.9em; color:#555;">
-                                    <b>Input:</b> <code>{action_input}</code>
-                                </div>
-                            </div>
-                        """)
+                                    st.markdown("---")
 
-                    elif msg_type == "OBSERVATION":
-                        display_content = content[:3000] + "..." if len(content) > 3000 else content
-                        safe_content = format_to_html(display_content)
+                                    # --- 第二部分：Librarian 审计报告 (核心亮点) ---
+                                    col_audit, col_abstract = st.columns([1, 1])
 
-                        new_html = textwrap.dedent(f"""
-                            <div class="log-card obs-card">
-                                <div>
-                                    <span class="step-badge badge-obs">STEP {step}</span>
-                                    <b>Observation</b>
-                                </div>
-                                <div style="margin-top:5px; white-space: pre-wrap;">{safe_content}</div>
-                            </div>
-                        """)
+                                    with col_audit:
+                                        st.subheader("🦉 Librarian 审计报告")
+                                        # 使用 info 或 warning 框展示关系
+                                        audit_text = data.get('noveltyAssessment', '')
+                                        if "CONFLICT" in audit_text.upper():
+                                            st.error(audit_text) # 红色警告
+                                        elif "EXTEND" in audit_text.upper() or "SUPPORT" in audit_text.upper():
+                                            st.success(audit_text) # 绿色正面
+                                        else:
+                                            st.info(audit_text) # 蓝色中性
 
-                    elif msg_type == "ANSWER" or msg_type == "FINAL_ANSWER_GENERATED":
-                        status_container.update(label="✅ 思考完成", state="complete", expanded=False)
-                        final_answer = content
-                        answer_placeholder.markdown(final_answer)
-                        continue
+                                    with col_abstract:
+                                        st.subheader("📝 摘要")
+                                        abstract = data.get('abstractText', '暂无摘要')
+                                        # 摘要过长折叠
+                                        with st.container(height=200):
+                                            st.markdown(abstract)
 
-                    if new_html:
-                        full_logs_html += new_html
+                                    st.markdown("---")
 
-                        log_placeholder.markdown(
-                            f"""
-                            <div class="log-scroll-container">
-                                {full_logs_html}
-                            </div>
-                            """,
-                            unsafe_allow_html=True
-                        )
+                                    # --- 第三部分：核心符号预览 (Key Symbols) ---
+                                    st.subheader("🔣 核心数学定义 (Top 5)")
 
-                except json.JSONDecodeError:
-                    pass
+                                    key_symbols = data.get('keySymbols', [])
+                                    if key_symbols:
+                                        # 使用 Markdown 表格展示，支持 LaTeX
+                                        md_table = "| 符号 (Symbol) | 含义 (Description) | 定义公式 (Formula) |\n|---|---|---|\n"
+                                        for sym in key_symbols:
+                                            # 处理 null
+                                            latex = sym.get('latex') or sym.get('symbol')
+                                            desc = sym.get('description', '-')
+                                            formula = sym.get('definitionFormula')
+                                            formula_str = f"${formula}$" if formula else "-"
 
-            # --- 4. 请求结束处理 ---
-            if final_answer:
-                st.session_state.messages.append({"role": "assistant", "content": final_answer})
-            else:
-                # 如果没有最终答案（比如超时或报错），给个提示
-                if not final_answer:
-                    st.error("未收到最终回复，请检查后台日志。")
+                                            md_table += f"| ${latex}$ | {desc} | {formula_str} |\n"
 
+                                        st.markdown(md_table)
+                                    else:
+                                        st.caption("该论文未提取到数学符号，或尚未完成解析。")
+
+                                else:
+                                    st.error(f"获取详情失败: {detail_res.text}")
+
+                            except Exception as e:
+                                st.error(f"连接错误: {str(e)}")
         except Exception as e:
-            st.error(f"连接中断: {str(e)}")
+            st.error(f"无法获取列表: {e}")
 
-        finally:
-            # --- 5. 解锁输入框 ---
-            st.session_state.processing = False
-            # 强制刷新以使 disabled=False 生效
-            st.rerun()
+
+elif st.session_state.page == "🔍 Research Chat":
+    # --- 5. 主聊天区域 ---
+    st.markdown("#### 🔬 沉浸式科研工作台")
+
+    # 渲染历史消息
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # --- 6. 处理新输入 (核心逻辑改造) ---
+
+    # 使用回调函数处理输入，或者直接判断
+    # 这里的 disabled=st.session_state.processing 实现了“提问时锁住输入框”
+    prompt = st.chat_input("输入你的问题 (例如: 这篇论文的核心创新点是什么?)", disabled=st.session_state.processing)
+
+    if prompt:
+        # 1. 立即锁定界面
+        st.session_state.processing = True
+
+        # 2. 记录用户问题
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        # 3. 开始助手响应
+        with st.chat_message("assistant"):
+            # 动态状态面板
+
+            status_container = st.status("🚀 启动思维引擎...", expanded=True)
+
+            # 在容器内部创建占位符，用于流式渲染日志
+            log_placeholder = status_container.empty()
+
+            # 答案占位符
+            answer_placeholder = st.empty()
+
+            # 日志累加器
+            full_logs_html= ""
+            final_answer = ""
+
+            try:
+                url = f"{BASE_URL}/api/v1/agent/ask-stream"
+                params = {
+                    "sessionId": st.session_state.session_id,
+                    "question": prompt
+                }
+
+                response = requests.get(url, params=params, stream=True, timeout=600) # 长超时
+                response.encoding = 'utf-8'
+
+                client = SSEClient(response)
+
+                for event in client.events():
+                    if not event.data: continue
+
+                    try:
+                        event_data = json.loads(event.data)
+
+                        # --- 提取字段 ---
+                        msg_type = event_data.get("type")
+                        content = event_data.get("content", "")
+                        step = event_data.get("step", 0) # 获取 Step
+
+                        # --- 动态更新状态标题 ---
+                        if str(step).isdigit():
+                            status_container.update(label=f"🔄 ScholarBrain 思考中... [第 {step} 步]", state="running")
+                        new_html = ""
+
+                        if msg_type == "THOUGHT":
+                            # 转义内容，防止 HTML 注入破坏格式
+                            safe_content = html.escape(content).replace("\n", "<br>")
+                            new_html =  textwrap.dedent( f"""
+                                <div class="log-card thought-card">
+                                    <div>
+                                        <span class="step-badge badge-thought">STEP {step}</span>
+                                        <b>Thought</b>
+                                    </div>
+                                    <div style="margin-top:5px; color:#333;">{safe_content}</div>
+                                </div>
+                            """)
+
+                        elif msg_type == "ACTION":
+                            raw_data = event_data.get("data", "")
+                            action_input = html.escape(json.dumps(raw_data, ensure_ascii=False) if isinstance(raw_data, (dict, list)) else str(raw_data))
+                            safe_content = html.escape(content)
+
+                            new_html = textwrap.dedent(f"""
+                                <div class="log-card action-card">
+                                    <div>
+                                        <span class="step-badge badge-action">STEP {step}</span>
+                                        <b>Action:</b> <code>{safe_content}</code>
+                                    </div>
+                                    <div style="margin-top:5px; font-size:0.9em; color:#555;">
+                                        <b>Input:</b> <code>{action_input}</code>
+                                    </div>
+                                </div>
+                            """)
+
+                        elif msg_type == "OBSERVATION":
+                            display_content = content[:3000] + "..." if len(content) > 3000 else content
+                            safe_content = format_to_html(display_content)
+
+                            new_html = textwrap.dedent(f"""
+                                <div class="log-card obs-card">
+                                    <div>
+                                        <span class="step-badge badge-obs">STEP {step}</span>
+                                        <b>Observation</b>
+                                    </div>
+                                    <div style="margin-top:5px; white-space: pre-wrap;">{safe_content}</div>
+                                </div>
+                            """)
+
+                        elif msg_type == "ANSWER" or msg_type == "FINAL_ANSWER_GENERATED":
+                            status_container.update(label="✅ 思考完成", state="complete", expanded=False)
+                            final_answer = content
+                            answer_placeholder.markdown(final_answer)
+                            continue
+
+                        if new_html:
+                            full_logs_html += new_html
+
+                            log_placeholder.markdown(
+                                f"""
+                                <div class="log-scroll-container">
+                                    {full_logs_html}
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+
+                    except json.JSONDecodeError:
+                        pass
+
+                # --- 4. 请求结束处理 ---
+                if final_answer:
+                    st.session_state.messages.append({"role": "assistant", "content": final_answer})
+                else:
+                    # 如果没有最终答案（比如超时或报错），给个提示
+                    if not final_answer:
+                        st.error("未收到最终回复，请检查后台日志。")
+
+            except Exception as e:
+                st.error(f"连接中断: {str(e)}")
+
+            finally:
+                # --- 5. 解锁输入框 ---
+                st.session_state.processing = False
+                # 强制刷新以使 disabled=False 生效
+                st.rerun()

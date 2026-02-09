@@ -1,6 +1,6 @@
 package cn.winddol.ai.infrastructure.event;
 
-import cn.winddol.ai.domain.agent.event.NotificationService;
+import cn.winddol.ai.domain.agent.adapter.event.NotificationService;
 import com.alibaba.fastjson.JSON;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;

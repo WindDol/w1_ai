@@ -1,5 +1,6 @@
 package cn.winddol.ai.infrastructure.embedding;
 
+import cn.winddol.ai.domain.agent.adapter.embedding.IEmbeddingProcessor;
 import cn.winddol.ai.infrastructure.dao.SectionMapper;
 import cn.winddol.ai.infrastructure.dao.SymbolMapper;
 import cn.winddol.ai.infrastructure.dao.po.Section;
@@ -16,14 +17,14 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class EmbeddingProcessor {
+public class EmbeddingProcessor implements IEmbeddingProcessor {
     @Resource
     private EmbeddingModel embeddingModel;
     @Resource
     private SymbolMapper symbolMapper;
     @Resource
     private SectionMapper sectionMapper;
-
+    @Override
     public void embedReferences(Long paperId) {
         List<Symbol> symbols = symbolMapper.selectList(
                 new LambdaQueryWrapper<Symbol>()
@@ -53,6 +54,7 @@ public class EmbeddingProcessor {
         log.info("🧹 [Global Cleanup] Processing {} leftover sections...", sections.size());
         processSections(sections);
     }
+    @Override
     public void embedSections(Long paperId) {
         List<Section> sections = sectionMapper.selectList(
                 new LambdaQueryWrapper<Section>()

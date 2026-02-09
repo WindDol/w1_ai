@@ -2,10 +2,9 @@ package cn.winddol.ai.infrastructure.adapter.ai;
 
 import cn.winddol.ai.domain.agent.adapter.ai.IAiAdapter;
 import cn.winddol.ai.domain.agent.model.entity.PaperAuditResult;
-import cn.winddol.ai.domain.agent.model.entity.PaperEntity;
-import cn.winddol.ai.domain.agent.model.valobj.KnowledgeAuditReport;
+import cn.winddol.ai.domain.agent.model.entity.AgentPaperEntity;
 import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
-import cn.winddol.ai.domain.paperTools.adapter.external.dto.RefMetadata;
+import cn.winddol.ai.domain.paperTools.model.entity.RefMetadata;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
 import com.alibaba.fastjson.JSON;
 
@@ -228,7 +227,7 @@ public class DeepSeekAdapter implements ISymbolExtractor, IAiAdapter {
     }
 
     @Override
-    public PaperAuditResult analyzeRelation(PaperEntity newPaper, PaperEntity oldPaper, String newAbstract) {
+    public PaperAuditResult analyzeRelation(AgentPaperEntity newPaper, AgentPaperEntity oldPaper, String newAbstract) {
         String prompt = """
             You are a senior peer reviewer. 
             Compare the NEW PAPER with the EXISTING PAPER from our library.
