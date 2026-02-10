@@ -309,7 +309,7 @@ if st.session_state.page == "📤 Upload & Management":
                                                 rel_upper = full_text.upper()
 
                                                 # 🟢 绿色类：支持、扩展、基石
-                                                if any(k in rel_upper for k in ["EXTEND", "SUPPORT", "FOUNDATIONAL", "BASIS"]):
+                                                if any(k in rel_upper for k in ["EXTEND", "SUPPORT", "FOUNDATION", "BASIS"]):
                                                     st.success(full_text, icon="✅")
 
                                                 # 🔴 红色类：冲突、反驳
