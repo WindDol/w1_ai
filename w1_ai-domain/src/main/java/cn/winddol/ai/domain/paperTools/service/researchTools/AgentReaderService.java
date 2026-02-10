@@ -36,18 +36,23 @@ public class AgentReaderService {
 
         StringBuilder sb = new StringBuilder("Inter-paper relations from the Librarian's audit:\n");
         for (KnowledgeRelationEntity rel : relations) {
+            String type = rel.getType(); // FOUNDATIONAL, EXTENDS, CONTRADICTS...
+            String otherPaperInfo = String.format("Paper [%d] (%s)", rel.getRelatedId(), rel.getRelatedTitle());
+            String reason = rel.getDescription();
+
             if ("OUTGOING".equals(rel.getDirection())) {
-                // 当前论文 -> 评价 -> 别人
-                sb.append(String.format("- This paper [%s] %s Paper [%d] (%s). Reason: %s\n",
-                        rel.getType(), rel.getType(), rel.getRelatedId(), rel.getRelatedTitle(), rel.getDescription()));
+                String action = getActivePhrasing(type);
+                sb.append(String.format("- This paper **%s** %s.\n  *Reason: %s*\n",
+                        action, otherPaperInfo, reason));
             } else {
-                // 别人 -> 评价 -> 当前论文
-                sb.append(String.format("- This paper IS %s BY Paper [%d] (%s). Note: %s\n",
-                        rel.getType(), rel.getRelatedId(), rel.getRelatedTitle(), rel.getDescription()));
+                String passiveAction = getPassivePhrasing(type);
+                sb.append(String.format("- This paper **%s** %s.\n  *Note: %s*\n",
+                        passiveAction, otherPaperInfo, reason));
             }
         }
         return sb.toString();
     }
+
 
     /**
      * 工具 智能阅读 (Smart Read)
@@ -190,5 +195,30 @@ public class AgentReaderService {
         return sb.toString();
     }
 
+
+    // 辅助方法：获取主动语态描述 (Source -> Target)
+    private String getActivePhrasing(String type) {
+        return switch (type.toUpperCase()) {
+            case "FOUNDATIONAL" -> "serves as a FOUNDATIONAL BASIS for"; // 作为基石
+            case "EXTENDS"      -> "EXTENDS the work of";               // 扩展了
+            case "CONTRADICTS"  -> "CONTRADICTS or REFUTES";            // 反驳了
+            case "SUPPORT"      -> "SUPPORTS the findings of";          // 支持了
+            case "ALTERNATIVE"  -> "presents an ALTERNATIVE approach to"; // 替代方案
+            default             -> "has a relation (" + type + ") with";
+        };
+    }
+
+    // 辅助方法：获取被动语态描述 (Target <- Source)
+// "This paper [return value] Other Paper"
+    private String getPassivePhrasing(String type) {
+        return switch (type.toUpperCase()) {
+            case "FOUNDATIONAL" -> "is BUILT UPON the foundation of";
+            case "EXTENDS"      -> "is EXTENDED by";                    // 被...扩展
+            case "CONTRADICTS"  -> "is CONTRADICTED by";                // 被...反驳
+            case "SUPPORT"      -> "is SUPPORTED by";                   // 被...支持
+            case "ALTERNATIVE"  -> "is considered an ALTERNATIVE to";
+            default             -> "is referenced (" + type + ") by";
+        };
+    }
 
 }

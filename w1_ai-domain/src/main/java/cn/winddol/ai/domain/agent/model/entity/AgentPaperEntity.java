@@ -21,7 +21,7 @@ public class AgentPaperEntity {
     private List<OutlineNode>  outline;
 
     private Map<String, Object> metadata;
-
+    private Integer years;
     private String abstractText;
     private float[] embedding;
 }

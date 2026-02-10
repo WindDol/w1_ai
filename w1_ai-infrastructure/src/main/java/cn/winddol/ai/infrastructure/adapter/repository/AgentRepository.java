@@ -74,6 +74,7 @@ public class AgentRepository implements IAgentRepository {
                 .abstractText(paper.getAbstractText())
                 .embedding(paper.getEmbedding())
                 .title(paper.getTitle())
+                .years(paper.getYears())
                 .build();
     }
 
@@ -90,6 +91,7 @@ public class AgentRepository implements IAgentRepository {
             entity.setId((Long) map.get("id"));
             entity.setTitle((String) map.get("title"));
             entity.setAbstractText((String)map.get("abstracttext"));
+            entity.setYears((Integer) map.get("years"));
             return entity;
         }).collect(Collectors.toList());
     }

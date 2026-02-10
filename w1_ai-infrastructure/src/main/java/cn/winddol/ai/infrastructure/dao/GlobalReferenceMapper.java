@@ -12,7 +12,7 @@ import java.util.List;
 public interface GlobalReferenceMapper extends BaseMapper<GlobalReference> {
     @Select("""
     SELECT id, title, abstract as abstractText, linked_paper_id as linkedPaperId, source_type
-    FROM global_references 
+    FROM global_references
     WHERE id = #{id}
 """)
     GlobalReference selectGlobalById(@Param("id") Long id);

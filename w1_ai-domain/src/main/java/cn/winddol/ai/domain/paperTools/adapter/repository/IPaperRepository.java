@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface IPaperRepository {
-    Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint, String abstractText);
+    Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint, String abstractText, Integer year);
 
     List<SectionEntity> getSectionByUuid(List<String> uuid);
 

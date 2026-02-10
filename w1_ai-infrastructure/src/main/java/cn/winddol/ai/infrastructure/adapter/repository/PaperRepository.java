@@ -15,6 +15,7 @@ import cn.winddol.ai.infrastructure.dao.impl.SymbolServiceImpl;
 import cn.winddol.ai.infrastructure.dao.po.*;
 import cn.winddol.ai.infrastructure.parser.ReferenceParser;
 import cn.winddol.ai.infrastructure.utils.TreeBuilderUtil;
+import cn.winddol.ai.types.exception.AppException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -66,17 +67,18 @@ public class PaperRepository implements IPaperRepository {
 
     @Override
     @Transactional
-    public Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint, String abstractText) {
+    public Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint, String abstractText, Integer year) {
         Paper existingPaper = paperMapper.selectOne(
                 new LambdaQueryWrapper<Paper>().eq(Paper::getFingerprint, fingerprint)
         );
         if (existingPaper != null) {
             log.warn("⚠️ Paper already exists in library: {}", title);
-            return existingPaper.getId(); // 或者返回已有的 ID
+            throw new AppException("1001","当前已存在该篇论文");
         }
         // 1. 构建并保存 Paper 主表
         Paper paper = getPaper(title, sectionPOs);
         paper.setAbstractText(abstractText);
+        paper.setYears(year);
         String textToEmbed = title + "\n" + abstractText;
         float[] vector = embeddingModel.embed(textToEmbed).content().vector();
         paper.setEmbedding(vector);

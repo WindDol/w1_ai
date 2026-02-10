@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface IAiAdapter {
     String rewriteQueryIfNecessary(String userQuestion, List<ChatMessage> messages);
+
     PaperAuditResult analyzeRelation(AgentPaperEntity newPaper, AgentPaperEntity oldPaper, String newAbstract);
 }

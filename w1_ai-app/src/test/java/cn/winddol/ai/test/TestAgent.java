@@ -60,9 +60,5 @@ public class TestAgent {
         log.info(answer);
     }
 
-    @Test
-    public void testL(){
-        librarian.initiateAudit(15L,"On Kuramoto-Sakaguchi-type Fokker-Planck equation with delay");
-    }
 
 }

@@ -43,4 +43,5 @@ public class Paper {
 
     @TableField("abstract")
     private String abstractText;
+    private Integer years;
 }

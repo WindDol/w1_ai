@@ -10,6 +10,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 @Component
 @Slf4j
 public class PaperAuditListener{
@@ -23,6 +25,8 @@ public class PaperAuditListener{
     private IPaperRepository paperRepository;
     @Resource
     private LibrarianAuditService auditService;
+    @Resource
+    private ThreadPoolExecutor threadPoolExecutor;
     @Async
     @EventListener
     public void onAuditCommand(cn.winddol.ai.domain.paperTools.event.PaperIngestedEvent event) {
@@ -39,8 +43,7 @@ public class PaperAuditListener{
 
             // 2. 引用抓取 (针对当前 Paper)
             log.info("2️⃣ 开始抓取引用...");
-            citationService.enrichPaperReferences(paperId);
-
+            threadPoolExecutor.execute(()-> citationService.enrichPaperReferences(paperId));
             // 3. 补全向量
             log.info("3️⃣ 开始向量化...");
             embeddingProcessor.embedReferences(paperId);

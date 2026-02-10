@@ -34,7 +34,7 @@ public class PaperController implements IPaperController {
                     .info(ResponseCode.SUCCESS.getInfo())
                     .data("文件已接收，Librarian 正在后台处理...,paperId为: %d".formatted(paperId))
                     .build();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("上传文件失败", e);
             return Response.<String>builder()
                     .code(ResponseCode.UN_ERROR.getCode())
@@ -76,7 +76,7 @@ public class PaperController implements IPaperController {
                             .latex(s.getLatex()).description(s.getDescription()).definitionFormula(s.getDefinitionFormula()).build()
             ).toList();
             PaperDetailDTO paperDetailDTO = PaperDetailDTO.builder().id(paperDetail.getId())
-                    .title(paperDetail.getTitle()).abstractText(paperDetail.getTitle())
+                    .title(paperDetail.getTitle()).abstractText(paperDetail.getAbstractText())
                     .noveltyAssessment(paperDetail.getNoveltyAssessment())
                     .symbolCount(paperDetail.getSymbolCount()).referenceCount(paperDetail.getReferenceCount())
                     .keySymbols(list).relatedPaperTitles(paperDetail.getRelatedPaperTitles()).build();

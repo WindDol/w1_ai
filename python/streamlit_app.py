@@ -8,7 +8,7 @@ import textwrap
 import pandas as pd
 # --- 1. 页面基础配置 ---
 st.set_page_config(
-    page_title="ScholarBrain 2.0 - 深度科研",
+    page_title="ScholarBrain 1.0 - 深度科研",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -93,9 +93,35 @@ st.markdown("""
     .badge-thought { background-color: #757575; }
     .badge-action { background-color: #1976d2; }
     .badge-obs { background-color: #388e3c; }
-
+    .katex-display { margin: 0.5em 0 !important; overflow-x: auto; overflow-y: hidden; }
     </style>
     """, unsafe_allow_html=True)
+
+def process_latex(text):
+    """
+    专门修复 LLM 输出的 LaTeX 在 Streamlit 中不渲染的问题
+    """
+    if not text: return ""
+    # 1. 修复 \[ \] 和 \( \) 为 $ 格式，Streamlit 对 $ 支持更好
+    text = text.replace(r"\(", "$").replace(r"\)", "$")
+    text = text.replace(r"\[", "$$").replace(r"\]", "$$")
+
+    # 2. 关键修复：确保 $$ 块公式前后有换行，否则 KaTeX 可能不触发
+    text = re.sub(r'([^\n])\s*\$\$', r'\1\n\n$$', text)
+    text = re.sub(r'\$\$\s*([^\n])', r'$$\n\n\1', text)
+
+    # 3. 关键修复：在行内公式 $ 前后增加空格，防止被识别为普通文本
+    # 注意：使用正则避免匹配到 $$
+    text = re.sub(r'(?<!\$)\$([^\$\n]+)\$(?!\$)', r' $\1$ ', text)
+
+    # 4. 移除 \tag{x} 里的多余反斜杠，或者将 \tag 转换为 KaTeX 兼容格式
+    # 如果 \tag 导致渲染失败，可以尝试简单的替换逻辑
+    return text
+
+def format_obs_to_html(text):
+    # 仅针对 Observation 部分做 HTML 格式化
+    text = re.sub(r'###\s*(.*)', r'<b style="color:#1976d2;">\1</b>', text)
+    return text.replace("\n", "<br>")
 
 # --- 3. 状态管理初始化 ---
 if "messages" not in st.session_state:
@@ -121,7 +147,7 @@ def format_to_html(text):
     return text
 
 if "page" not in st.session_state:
-    st.session_state.page = "Research Chat"
+    st.session_state.page = "🔍 Research Chat"
 # --- 4. 侧边栏逻辑 ---
 with st.sidebar:
     st.title("🎓 ScholarBrain")
@@ -131,7 +157,7 @@ with st.sidebar:
     selection = st.radio(
         "选择操作模式",
         ["🔍 Research Chat", "📤 Upload & Management"],
-        index=0 if st.session_state.page == "Research Chat" else 1,
+        index=0 if st.session_state.page == "🔍 Research Chat" else 1,
         label_visibility="collapsed"
     )
     st.session_state.page = selection
@@ -252,14 +278,47 @@ if st.session_state.page == "📤 Upload & Management":
 
                                     with col_audit:
                                         st.subheader("🦉 Librarian 审计报告")
-                                        # 使用 info 或 warning 框展示关系
-                                        audit_text = data.get('noveltyAssessment', '')
-                                        if "CONFLICT" in audit_text.upper():
-                                            st.error(audit_text) # 红色警告
-                                        elif "EXTEND" in audit_text.upper() or "SUPPORT" in audit_text.upper():
-                                            st.success(audit_text) # 绿色正面
+
+                                        raw_text = data.get('noveltyAssessment', '')
+
+                                        # --- 1. 处理空状态或无关系 ---
+                                        if "found no direct" in raw_text or not raw_text:
+                                            st.info("🦉 Librarian 尚未发现与其他论文的直接关联。", icon="ℹ️")
+
                                         else:
-                                            st.info(audit_text) # 蓝色中性
+                                            # --- 2. 解析 Markdown 文本 ---
+                                            # 后端格式是： "**标题**\n\n- This paper ...\n- This paper ..."
+                                            # 我们先去掉标题，然后按 "- This paper" 拆分
+
+                                            # 渲染标题
+                                            st.markdown("**🔗 知识图谱关联分析:**")
+
+                                            # 简单的文本拆分逻辑 (根据你的 Java 格式)
+                                            # 使用 split 切割成独立的条目
+                                            # "Filter" 去掉空字符串
+                                            relations = [r for r in raw_text.split("- This paper") if r.strip() and "**🔗" not in r]
+
+                                            if not relations:
+                                                # 如果切分失败（可能是格式变了），就兜底显示原文
+                                                st.markdown(raw_text)
+
+                                            # --- 3. 逐条渲染颜色 ---
+                                            for rel in relations:
+                                                # 补全被切掉的开头，组成完整的句子
+                                                full_text = f"**This paper** {rel.strip()}"
+                                                rel_upper = full_text.upper()
+
+                                                # 🟢 绿色类：支持、扩展、基石
+                                                if any(k in rel_upper for k in ["EXTEND", "SUPPORT", "FOUNDATIONAL", "BASIS"]):
+                                                    st.success(full_text, icon="✅")
+
+                                                # 🔴 红色类：冲突、反驳
+                                                elif any(k in rel_upper for k in ["CONFLICT", "CONTRADICT", "REFUTE"]):
+                                                    st.error(full_text, icon="⚠️")
+
+                                                # 🔵 蓝色类：其他/替代
+                                                else:
+                                                    st.info(full_text, icon="ℹ️")
 
                                     with col_abstract:
                                         st.subheader("📝 摘要")
@@ -306,7 +365,7 @@ elif st.session_state.page == "🔍 Research Chat":
     # 渲染历史消息
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+            st.markdown(process_latex(message["content"]))
 
     # --- 6. 处理新输入 (核心逻辑改造) ---
 
@@ -413,7 +472,7 @@ elif st.session_state.page == "🔍 Research Chat":
 
                         elif msg_type == "ANSWER" or msg_type == "FINAL_ANSWER_GENERATED":
                             status_container.update(label="✅ 思考完成", state="complete", expanded=False)
-                            final_answer = content
+                            final_answer = process_latex(content)
                             answer_placeholder.markdown(final_answer)
                             continue
 

@@ -62,7 +62,7 @@ public class TestAgentTools {
     @Test
     public void testLookupReferenceTool() {
         // 假设 Paper ID 是 7, 参考文献索引是 "24"
-        auditService.auditAgainstLibrary(14L);
+        auditService.auditAgainstLibrary(19L);
 
 
     }

@@ -8,8 +8,8 @@ from llama_parse import LlamaParse
 nest_asyncio.apply()
 
 # 建议将 API KEY 设为环境变量，或者由 Java 传入
-API_KEY = os.getenv("LLAMA_PARSE_API_KEY", "llx-TiRUfv7t6zaGqY5txqYG6dQ5zPZguQVSUlsAE1DaVFPTQdgF")
-
+API_KEY = os.getenv("LLAMA_PARSE_API_KEY", "llx-TKyeAEOnyR1csKmSeXXjZZgKboZ54jLagQVWPU8GJP2llj7Z")
+#llx-TKyeAEOnyR1csKmSeXXjZZgKboZ54jLagQVWPU8GJP2llj7Z
 def parse_pdf(pdf_path):
     instruction = """
     You are a precision content extractor. Your absolute priority is creating clean, continuous Markdown from a PDF that contains severe layout interruptions.

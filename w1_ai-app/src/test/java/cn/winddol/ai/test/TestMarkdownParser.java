@@ -80,7 +80,7 @@ public class TestMarkdownParser {
         );
         // 2. 调用 Service 入库
 
-        repository.saveFullPaper(title, pos,fingerprint, abstractText);
+        repository.saveFullPaper(title, pos,fingerprint, abstractText, paperMeta.getYear());
 
         System.out.println("入库成功！请在 DBeaver 中查看数据。");
     }

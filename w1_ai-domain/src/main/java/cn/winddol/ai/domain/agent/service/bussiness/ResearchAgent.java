@@ -48,6 +48,7 @@ public class ResearchAgent {
             - LIBRARY CONTEXT: Before concluding your analysis, ALWAYS use 'checkPaperRelations' to see if the private database contains existing critiques or extensions of the current paper.
             - NOVELTY ASSESSMENT: If a paper 'EXTENDS' another, highlight what was added (e.g., higher dimensions, new parameters).
             - MACRO vs MICRO: For broad questions like "what papers do we have?", use 'findPapers'. For deep reading, use 'readSection'.
+            
             [LANGUAGE PROTOCOL]
             1. INTERNAL REASONING: All your 'thought' fields MUST be written in ENGLISH.
             2. TOOL CALLS: All search queries and tool parameters MUST be in ENGLISH.
@@ -313,49 +314,25 @@ public class ResearchAgent {
 
     private AgentStep parseOutput(String llmOutput) {
         try {
-            // 1. 提取 JSON 内容
-            String json = extractJson(llmOutput);
-            if (json == null) return null;
+            // 1. 清除 Markdown 格式块
+            String json = llmOutput.replaceAll("```json", "").replaceAll("```", "").trim();
+            AgentStep step = JSON.parseObject(json, AgentStep.class);
 
-            // 2. 预处理非法转义 (保留你原本的逻辑，虽然简单粗暴但能防 LaTeX 报错)
-            String sanitizedJson = json
-                    .replace("\\n", "###NEWLINE###")  // 先把合法的 \n 藏起来
-                    .replace("\\\"", "###QUOTE###")   // 先把合法的 \" 藏起来
-                    .replace("\\", "\\\\")            // 剩下的反斜杠全是 LaTeX 的，统统转义
-                    .replace("###NEWLINE###", "\\n")  // 还原换行
-                    .replace("###QUOTE###", "\\\"");  // 还原引号
-
-            // 3. 解析 JSON
-            JSONObject jsonObject = JSON.parseObject(sanitizedJson);
-
-            AgentStep step = new AgentStep();
-            step.setThought(jsonObject.getString("thought"));
-            step.setAction(jsonObject.getString("action"));
-            step.setActionInput(jsonObject.getString("actionInput"));
-            step.setFinalAnswer(jsonObject.getString("finalAnswer"));
-
-            // 4. 处理 actionInput
-            Object inputObj = jsonObject.get("actionInput");
-            if (inputObj instanceof String) {
-                step.setActionInput((String) inputObj);
-            } else if (inputObj != null) {
-                step.setActionInput(JSON.toJSONString(inputObj));
+            // 2. 处理 actionInput 中可能的二次转义问题
+            // 有时模型会输出 "actionInput": "{\"query\": \"Möbius\"}"
+            // FastJSON 有时会将其识别为双重转义字符串，这里确保其为纯 JSON 串
+            if (step.getActionInput() != null) {
+                String input = step.getActionInput().trim();
+                if (input.startsWith("\"") && input.endsWith("\"") && input.length() > 2) {
+                    input = input.substring(1, input.length() - 1).replace("\\\"", "\"");
+                    step.setActionInput(input);
+                }
             }
-
             return step;
         } catch (Exception e) {
-            log.error("JSON Parse Error. Raw Output: {}", llmOutput, e);
+            log.error("JSON Parse Error. Output: {}", llmOutput);
             return null;
         }
     }
-    private String extractJson(String output) {
-        int start = output.indexOf("{");
-        int end = output.lastIndexOf("}");
-        if (start != -1 && end != -1 && end > start) {
-            return output.substring(start, end + 1);
-        }
-        return null;
-    }
-
 
 }

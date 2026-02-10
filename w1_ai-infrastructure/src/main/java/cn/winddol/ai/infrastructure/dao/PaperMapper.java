@@ -13,12 +13,12 @@ import java.util.Map;
 @Mapper
 public interface PaperMapper extends BaseMapper<Paper> {
     @Select("""
-        SELECT id, title, metadata, abstract as abstractText,
+        SELECT id, title, metadata, abstract as abstractText, years,
                1 - (embedding <=> #{vectorStr}::vector) as score
         FROM papers
         WHERE id != #{excludeId}
           AND embedding IS NOT NULL
-          AND (1 - (embedding <=> #{vectorStr}::vector)) > 0.5 -- 仅返回相关度高的
+          AND (1 - (embedding <=> #{vectorStr}::vector)) > 0.4 -- 仅返回相关度高的
         ORDER BY embedding <=> #{vectorStr}::vector
         LIMIT #{limit}
     """)

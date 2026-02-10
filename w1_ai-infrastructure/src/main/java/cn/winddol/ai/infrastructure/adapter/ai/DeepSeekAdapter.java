@@ -229,24 +229,55 @@ public class DeepSeekAdapter implements ISymbolExtractor, IAiAdapter {
     @Override
     public PaperAuditResult analyzeRelation(AgentPaperEntity newPaper, AgentPaperEntity oldPaper, String newAbstract) {
         String prompt = """
-            You are a senior peer reviewer. 
-            Compare the NEW PAPER with the EXISTING PAPER from our library.
+            You are a Senior Bibliometric Analyst. 
+            Analyze the relationship between the [UPLOADED PAPER] and the [EXISTING PAPER] in our library.
             
-            [NEW PAPER: %s]
+            ⚠️ CRITICAL: Pay attention to the PUBLICATION YEAR. The flow of influence must respect time.
+            
+            [UPLOADED PAPER] (The one currently being processed)
+            Title: %s
+            Year: %d
             Abstract: %s
             
-            [EXISTING PAPER: %s]
+            [EXISTING PAPER] (Already in database)
+            Title: %s
+            Year: %d
             Abstract: %s
             
-            [TASK]
-            1. Identify the relationship: Does the NEW paper SUPPORT, CONTRADICT, or EXTEND the EXISTING paper?
-            2. Write a 2-sentence technical summary of this relationship.
-            3. If there is a direct mathematical conflict (e.g., different values for the same parameter), highlight it.
+            [RELATIONSHIP LOGIC RULES]
+            1. IF Uploaded Year (%d) < Existing Year (%d):
+               - The Uploaded paper CANNOT "EXTEND" the Existing one.
+               - Check if the Uploaded paper is **FOUNDATIONAL** (the basis/origin) for the Existing one.
+               - Or if it is a **PRECURSOR** (an earlier approach).
+               
+            2. IF Uploaded Year (%d) > Existing Year (%d):
+               - The Uploaded paper might **EXTEND**, **SUPPORT**, or **CONTRADICT** the Existing one.
+               
+            3. IF Years are close/same:
+               - They might be **ALTERNATIVE** approaches or concurrent work.
             
-            Output JSON format: {"type": "SUPPORT/CONTRADICT/EXTEND", "reason": "..."}
-            """.formatted(newPaper.getTitle(), newAbstract, oldPaper.getTitle(), oldPaper.getAbstractText());
-
-        // 1. 获取 LLM 返回的字符串
+            [CLASSIFICATION TAGS]
+            - **FOUNDATIONAL**: The Uploaded paper provides the theoretical basis used by the Existing paper (Older -> Newer).
+            - **EXTENDS**: The Uploaded paper improves or generalizes the Existing paper (Newer -> Older).
+            - **ALTERNATIVE**: Different methods for the same problem.
+            - **CONTRADICTS**: Explicit refutation.
+            - **SUPPORT**: Provides evidence confirming results.
+        
+            [OUTPUT]
+            Return ONLY a JSON object:
+            {
+              "type": "Select one tag from above", 
+              "reason": "Technical explanation (max 2 sentences). Explicitly state the chronological direction (e.g., 'As an earlier work...')."
+            }
+            """.formatted(
+                        // 填充数据
+                newPaper.getTitle(), newPaper.getYears(), newAbstract,
+                        oldPaper.getTitle(), oldPaper.getYears(), oldPaper.getAbstractText(),
+                        // 填充规则里的年份对比，强化 LLM 的注意力
+                newPaper.getYears(), oldPaper.getYears(),
+                newPaper.getYears(), oldPaper.getYears()
+        );
+            // 1. 获取 LLM 返回的字符串
         String response = chatLanguageModel.generate(prompt);
         log.info("🦉 Librarian Audit Response: {}", response);
 

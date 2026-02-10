@@ -6,7 +6,6 @@
         <id column="id" property="id"/>
         <result column="symbol" property="symbol"/>
         <result column="description" property="description"/>
-        <result column="parent_id" property="parentId"/>
         <result column="definition_formula" property="definitionFormula"/>
         <result column="score" property="score"/>
     </resultMap>
@@ -20,7 +19,7 @@
         sym.symbol,
         sym.description,
         sym.definition_formula AS definitionFormula,
-        p.title AS sourcePaperTitle, -- 【关键】
+        p.title AS sourcePaperTitle,
         1 - (sym.embedding &lt;=&gt; cast(#{vectorStr} as vector)) AS score
         FROM paper_symbols sym
         LEFT JOIN papers p ON sym.paper_id = p.id
