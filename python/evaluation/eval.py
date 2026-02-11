@@ -23,8 +23,8 @@ os.environ["https_proxy"] = proxy_url
 # ⚙️ 2. 配置 Google Gemini 作为裁判
 # ==========================================
 # 填入你的 Google API Key
-os.environ["GOOGLE_API_KEY"] = "AIzaSyDI77keIz8-X7mP6zEHa_SK3OfMuQLPG2c"
-os.environ["DEEPSEEK_API_KEY"] = "sk-1e2d1a2adcae42e482f57ebcbca2e497"
+os.environ["GOOGLE_API_KEY"] = "AIzaSyDI77keIzxxxxxxxxxxxxQLPG2c"
+os.environ["DEEPSEEK_API_KEY"] = "sk-1e2d1a2axxxxxxxxxxxxxca2e497"
 
 # 配置 LLM (用于打分)
 # 使用 1.5-flash 速度快且免费额度高
