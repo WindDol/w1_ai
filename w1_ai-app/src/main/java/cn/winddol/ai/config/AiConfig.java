@@ -34,12 +34,12 @@ public class AiConfig {
     public ChatLanguageModel chatLanguageModel(){
         return  OpenAiChatModel.builder()
                 .apiKey(limApiKey)
-                .baseUrl("https://api.deepseek.com") // 关键点！
-                .modelName("deepseek-chat")          // DeepSeek V3 模型名
-                .temperature(0.0)                    // 设为 0 让提取更稳定
+                .baseUrl("https://api.deepseek.com") 
+                .modelName("deepseek-chat")          
+                .temperature(0.0)                   
                 .timeout(java.time.Duration.ofSeconds(500))
                 .maxRetries(1)
-                .logRequests(true)                   // 调试时打印请求
+                .logRequests(true)                   
                 .logResponses(true)
                 .build();
     }
