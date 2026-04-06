@@ -1,0 +1,241 @@
+26-03-13.16:17:59.717 [main            ] WARN  DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/E:/develop/apache-maven-3.9.6/mvn_repo/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/E:/develop/apache-maven-3.9.6/mvn_repo/org/json/json/20231013/json-20231013.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+26-03-13.16:17:59.754 [main            ] INFO  TestAgent              - Starting TestAgent using Java 17.0.15 with PID 14428 (started by Mr Ding in C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app)
+26-03-13.16:17:59.755 [main            ] INFO  TestAgent              - The following 1 profile is active: "dev"
+26-03-13.16:18:05.899 [main            ] INFO  TestAgent              - Started TestAgent in 6.798 seconds (process running for 8.255)
+26-03-13.16:18:06.903 [main            ] INFO  ResearchOrchestrator   - 🚀 Starting new research agent for session: session_10
+26-03-13.16:18:11.372 [main            ] INFO  ResearchOrchestrator   - 📝 Original: '在论文的第七章（Relation to previous research）中，作者比较了本文方法与 Tanaka [30] 以及 Lohe [35] 的工作。请结合 [30] 和 [35] 这两篇文献的背景，具体指出本文作者认为 Tanaka 的方程和 Lohe 的映射映射存在哪些‘令人困惑（puzzling）’或‘不完全一致’的数学细节？本文的方法是如何解决或超越这些局限的？' -> Rewritten: 'In the paper's Chapter 7 (Relation to previous research), what specific puzzling mathematical details or inconsistencies does the author identify in Tanaka's [30] equations and Lohe's [35] mapping, and how does the paper's proposed method resolve or surpass these limitations?'
+26-03-13.16:18:11.374 [main            ] INFO  ResearchAgent          - 🤖 Agent started. Question: In the paper's Chapter 7 (Relation to previous research), what specific puzzling mathematical details or inconsistencies does the author identify in Tanaka's [30] equations and Lohe's [35] mapping, and how does the paper's proposed method resolve or surpass these limitations?
+26-03-13.16:18:16.497 [main            ] INFO  ResearchAgent          - 🔄 Step 1: [Thought] I need to first find the paper that contains Chapter 7 titled 'Relation to previous research'. I should search for papers with that chapter title or similar. I'll use findPapers with a broad query. -> [Action] findPapers({"query": "Relation to previous research", "threshold": 0.5})
+26-03-13.16:18:16.923 [main            ] INFO  HikariDataSource       - HikariPool-1 - Starting...
+26-03-13.16:18:17.196 [main            ] INFO  HikariPool             - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6c89a18a
+26-03-13.16:18:17.200 [main            ] INFO  HikariDataSource       - HikariPool-1 - Start completed.
+26-03-13.16:18:22.875 [main            ] INFO  ResearchAgent          - 🔄 Step 2: [Thought] The query might be too specific. Perhaps the chapter title is slightly different, or the paper is about something else. Let me search for 'Tanaka [30]' and 'Lohe [35]' within the library to locate the paper that cites them. -> [Action] searchLibrary({"query": "Tanaka [30]", "threshold": 0.5})
+26-03-13.16:18:22.875 [main            ] INFO  HybridRetrieverService - 🔍 Searching with threshold: 0.5
+26-03-13.16:18:28.424 [main            ] INFO  ResearchAgent          - 🔄 Step 3: [Thought] Maybe the citation format is different, like 'Tanaka (2007)' or just 'Tanaka'. Let me search for 'Lohe' as well. Also, I should lower the threshold to be more inclusive. -> [Action] searchLibrary({"query": "Lohe", "threshold": 0.35})
+26-03-13.16:18:28.425 [main            ] INFO  HybridRetrieverService - 🔍 Searching with threshold: 0.35
+26-03-13.16:18:34.514 [main            ] INFO  ResearchAgent          - 🔄 Step 4: [Thought] Great! I found papers mentioning Lohe. The search result shows a paper titled 'The Kuramoto model on a sphere: Explaining its low-dimensional dynamics with group theory and hyperbolic geometry'. This seems promising as it likely discusses Lohe's work and might have a 'Relation to previous research' chapter. Let me get its outline to see the structure. -> [Action] getPaperOutline({"paperId": 7})
+26-03-13.16:18:41.300 [main            ] INFO  ResearchAgent          - 🔄 Step 5: [Thought] The outline shows Chapter IV is 'CONNECTIONS TO PREVIOUS RESULTS', which likely corresponds to 'Relation to previous research'. It has subsections A and B. I need to read this chapter to find discussions about Tanaka [30] and Lohe [35]. Let me read section IV. -> [Action] readSection({"sectionUuid": "1e84ecf9-4405-4539-b4ff-cf7a835bbbcf"})
+26-03-13.16:18:46.683 [main            ] INFO  ResearchAgent          - 🔄 Step 6: [Thought] The section content is empty. Perhaps the content is in the subsections. Let me read subsection IV.A: 'Relation to the Watanabe–Strogatz transformation'. -> [Action] readSection({"sectionUuid": "a6511c95-86a4-4b5d-824c-39490d1f9781"})
+26-03-13.16:18:51.480 [main            ] INFO  ResearchAgent          - 🔄 Step 7: [Thought] This subsection discusses Watanabe-Strogatz, not Tanaka or Lohe. Let me read subsection IV.B: 'Invariant manifold of Poisson kernels'. -> [Action] readSection({"sectionUuid": "e693874d-a117-486d-8332-1a36c31d4ead"})
+26-03-13.16:18:59.547 [main            ] INFO  ResearchAgent          - 🔄 Step 8: [Thought] This subsection also doesn't mention Tanaka or Lohe. Perhaps the paper I'm looking at (Paper ID 7) is not the one with Chapter 7. The user's question mentions 'Chapter 7 (Relation to previous research)'. That suggests a different paper. Let me search for 'Tanaka' and 'Lohe' together within the library to find the correct paper. -> [Action] searchLibrary({"query": "Tanaka Lohe", "threshold": 0.35})
+26-03-13.16:18:59.547 [main            ] INFO  HybridRetrieverService - 🔍 Searching with threshold: 0.35
+26-03-13.16:19:06.504 [main            ] INFO  ResearchAgent          - 🔄 Step 9: [Thought] Perfect! I found the correct section: 'VII. RELATION TO PREVIOUS RESEARCH' in the paper 'The Kuramoto model on a sphere: Explaining its low-dimensional dynamics with group theory and hyperbolic geometry'. The preview mentions Tanaka [30] and likely Lohe [35]. Let me read this section. -> [Action] readSection({"sectionUuid": "15f02cc5-89bb-48e5-a458-aadfb31b5a1c"})
+26-03-13.16:19:38.656 [main            ] INFO  ResearchAgent          - 🔄 Step 10: [Thought] Excellent! I have found the relevant section. Now I need to understand the specific puzzling details and inconsistencies the author identifies in Tanaka's [30] equations and Lohe's [35] mapping. Let me read the section again carefully and extract the points.
+
+For Tanaka [30]:
+1. Tanaka's equation (10b) looks similar to our $\dot{z}$ equation (4), except without the $|z|^2$ term, which is puzzling.
+2. He does not mention the reduction down to dimension $d$ in the finite-$N$ case that we get with the $\dot{w}$ equation (5).
+3. Tanaka's equation (15) is similar to our equation (10), though we were not able to show that the two expressions are equivalent.
+
+For Lohe [35]:
+1. His transformation (30) on $S^{d-1}$ is our $M_w$ (with $v = w$) and his Eq. (31) is the same as our $\dot{z}$ equation (4).
+2. He also has something that looks like the $\dot{w}$ equation (5), but he says it is independent of the rest of the reduced system for an order parameter function of a specific form. However, the author argues that such a $Z$ does not satisfy the identity $\zeta Z(p) = Z(\zeta p)$ for all rotations $\zeta$ unless $Q_i = \pm I$; therefore, they do not see how the $\zeta$ term cancels.
+3. Lohe's map $M$ in his Eq. (55) (ignoring the $R$ factor) agrees with our map $M_{-v}$ on the sphere $S^{d-1}$, but not on the ball $B^d$. Therefore, it is not a Möbius transformation of the type we are using. For example, $M(-v) = v$, whereas $M_{-v}(-v) = 0$. The author is not sure why Lohe prefers these maps over the boosts; he claims that $M$ preserves cross-ratios, but the author does not see why this is advantageous.
+4. Lohe's map $F$ in Eq. (63) (again ignoring the $R$ factor) is exactly our $M_{-v}$.
+
+Now, to answer the question fully, I need to understand what the paper's proposed method is and how it resolves or surpasses these limitations. The paper's method is based on group theory and hyperbolic geometry, using Möbius transformations that fix the unit ball. They derive reduced equations (4) and (5) for $\dot{z}$ and $\dot{w}$. They emphasize the reduction to dimension $d$ in the finite-$N$ case, which Tanaka did not mention. They also clarify the correct Möbius transformations on the ball, not just the sphere, and show the consistency with hyperbolic geometry.
+
+I should also check the references [30] and [35] to get more context, but the section already provides the critical points. Let me use lookupReference to see the abstracts of [30] and [35] to confirm their background. -> [Action] lookupReference({"paperId": 7, "refIndex": "30"})
+26-03-13.16:19:45.513 [main            ] INFO  ResearchAgent          - 🔄 Step 11: [Thought] That abstract doesn't seem to match Tanaka's 2014 paper on Möbius transformations. Perhaps the reference index is different in this paper. The paper ID might be different. Let me check the paper ID for 'The Kuramoto model on a sphere...'. I need to find its paper ID. I can use findPapers with its title. -> [Action] findPapers({"query": "The Kuramoto model on a sphere: Explaining its low-dimensional dynamics with group theory and hyperbolic geometry", "threshold": 0.5})
+26-03-13.16:19:50.204 [main            ] INFO  ResearchAgent          - 🔄 Step 12: [Thought] Great. The paper ID is 14. Now I need to lookup reference [30] and [35] within paper ID 14. -> [Action] lookupReference({"paperId": 14, "refIndex": "30"})
+26-03-13.16:19:54.111 [main            ] INFO  ResearchAgent          - 🔄 Step 13: [Thought] That's Tanaka's 2014 paper. Good. Now reference [35]. -> [Action] lookupReference({"paperId": 14, "refIndex": "35"})
+26-03-13.16:19:58.535 [main            ] INFO  ResearchAgent          - 🔄 Step 14: [Thought] Now I have the context. Let me also check the paper relations for paper ID 14 to see if there are any critiques or extensions in the library. -> [Action] checkPaperRelations({"paperId": 14})
+26-03-13.16:19:58.548 [main            ] WARN  ResearchAgent          - 🧹 Context window getting too large, evicted oldest intermediate steps.
+26-03-13.16:20:00.015 [scheduling-1    ] INFO  GlobalScheduler        - ⏰ Starting nightly sections cleanup...
+26-03-13.16:20:00.020 [scheduling-1    ] INFO  EmbeddingProcessor     - 🧹 [Global Cleanup] Processing 0 leftover sections...
+26-03-13.16:21:03.608 [main            ] INFO  ResearchAgent          - 🛑 Step 15: [Final Answer Ready] Interesting. The paper is foundational for several others. Now I have all the information needed to answer the user's question. I need to synthesize the puzzling details and how the paper's method resolves them.
+
+Let me structure the answer:
+1. Background of Tanaka [30] and Lohe [35].
+2. Puzzling details in Tanaka's equations: missing |z|^2 term, lack of finite-N dimension reduction, and unproven equivalence of equation (15).
+3. Inconsistencies in Lohe's mapping: issue with order parameter identity, map M not being a proper Möbius transformation on the ball, and unclear advantage of preserving cross-ratios.
+4. How the paper's method (group theory & hyperbolic geometry, Möbius transformations fixing the unit ball, derived equations (4) and (5)) resolves these: corrects the missing term, explicitly shows reduction to dimension d, clarifies the correct Möbius transformations on the ball, and provides a geometric interpretation.
+
+I will write the final answer in Chinese as required.
+26-03-13.16:21:03.622 [main            ] INFO  ResearchOrchestrator   - 🏁 Agent finished and lock released for session: session_10
+26-03-13.16:21:03.622 [main            ] INFO  TestAgent              - ================ FINAL ANSWER ================
+26-03-13.16:21:03.622 [main            ] INFO  TestAgent              - 在论文《The Kuramoto model on a sphere: Explaining its low-dimensional dynamics with group theory and hyperbolic geometry》的第七章（Relation to previous research）中，作者详细比较了本文方法与 Tanaka [30] 和 Lohe [35] 的工作。以下是作者指出的具体问题以及本文方法如何解决或超越这些局限：
+
+### 一、对 Tanaka [30] 工作的评价
+**背景**：Tanaka (2014) 研究了球面上相互作用的粒子系统，利用保持单位球的 Möbius 变换进行降维，并推广了 Ott–Antonsen 约化方法。
+
+**作者指出的“令人困惑”或“不一致”的细节**：
+1. **方程中缺失 |z|² 项**：Tanaka 的方程 (10b) 与本文的 $\dot{z}$ 方程 (4) 相似，但缺少 $|z|^2$ 项，这令人困惑，因为该项在几何推导中本应出现。
+2. **未提及有限 N 情况下的维度约化**：Tanaka 没有提到在有限 N 情况下系统可以降维到 d 维，而本文通过 $\dot{w}$ 方程 (5) 明确实现了这一约化。
+3. **方程等价性未证明**：Tanaka 的方程 (15) 与本文的方程 (10) 相似，但作者未能证明两者等价。
+
+### 二、对 Lohe [35] 工作的评价
+**背景**：Lohe 同样研究了球面上的系统，并利用 Möbius 变换进行了降维。
+
+**作者指出的“令人困惑”或“不一致”的细节**：
+1. **序参量形式的问题**：Lohe 给出了一个形如 $Z = \frac{1}{N} \sum_{i=1}^{N} \lambda_i Q_i x_i$ 的序参量，并声称 $\dot{w}$ 方程独立于其他约化系统。但作者指出，除非 $Q_i = \pm I$，否则该序参量不满足恒等式 $\zeta Z(p) = Z(\zeta p)$（对所有旋转 $\zeta$），因此无法理解 $\zeta$ 项如何消去。
+2. **映射 M 不是真正的 Möbius 变换**：Lohe 的映射 $M$（其方程 (55)，忽略 $R$ 因子）在球面 $S^{d-1}$ 上与本文的 $M_{-v}$ 一致，但在单位球 $B^d$ 上不一致。例如，$M(-v) = v$，而 $M_{-v}(-v) = 0$。因此，该映射不是本文所使用的保持单位球的 Möbius 变换类型。
+3. **保留交比的优势不明确**：Lohe 声称其映射 $M$ 保留交比，但作者认为这并无明显优势。
+4. **映射 F 的一致性**：Lohe 的映射 $F$（方程 (63)）与本文的 $M_{-v}$ 完全相同。
+
+### 三、本文方法如何解决或超越这些局限
+本文采用**群论和双曲几何**框架，系统性地推导了降维方程，并澄清了上述问题：
+
+1. **纠正缺失项并明确降维**：
+   - 本文推导出的 $\dot{z}$ 方程 (4) 包含了正确的 $|z|^2$ 项，确保了与几何结构的一致性。
+   - 通过引入 $\dot{w}$ 方程 (5)，明确展示了在有限 N 情况下系统可降维到 d 维，这是 Tanaka 未提及的。
+
+2. **澄清 Möbius 变换的正确形式**：
+   - 本文严格定义了保持单位球 $B^d$ 的 Möbius 变换 $M_w$，并指出 Lohe 的映射 $M$ 仅在球面上一致，在球内部则不同。这确保了变换在整个球体上的几何一致性。
+   - 通过双曲几何解释，说明了 Möbius 变换如何对应于双曲空间中的等距映射，提供了更清晰的几何图像。
+
+3. **统一序参量处理**：
+   - 本文的序参量定义基于群作用下的不变性，避免了 Lohe 序参量中出现的旋转不变性问题。
+   - 在无限 N 极限下，本文的方程 (10) 与 Chandra 等人的结果一致，验证了其普适性。
+
+4. **提供更深刻的几何见解**：
+   - 本文将动力学解释为 Möbius 群在双曲空间上的作用，揭示了低维动力学的几何根源，超越了 Tanaka 和 Lohe 的纯代数推导。
+   - 通过双曲 Poisson 核密度推广了 Ott–Antonsen 流形，为连续极限提供了自然的几何框架。
+
+**总结**：本文通过群论和双曲几何的统一框架，纠正了前人工作中存在的数学不一致性，明确了 Möbius 变换的正确形式，并提供了更深刻、更几何化的降维解释，从而在数学严谨性和物理洞察力上超越了 Tanaka 和 Lohe 的工作。
+26-03-13.16:21:03.643 [SpringApplicationShutdownHook] INFO  HikariDataSource       - HikariPool-1 - Shutdown initiated...
+26-03-13.16:21:03.648 [SpringApplicationShutdownHook] INFO  HikariDataSource       - HikariPool-1 - Shutdown completed.
+26-03-13.16:32:15.607 [main            ] WARN  DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/E:/develop/apache-maven-3.9.6/mvn_repo/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/E:/develop/apache-maven-3.9.6/mvn_repo/org/json/json/20231013/json-20231013.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+26-03-13.16:32:15.640 [main            ] INFO  TestAgent              - Starting TestAgent using Java 17.0.15 with PID 3308 (started by Mr Ding in C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app)
+26-03-13.16:32:15.641 [main            ] INFO  TestAgent              - The following 1 profile is active: "dev"
+26-03-13.16:32:23.617 [main            ] INFO  TestAgent              - Started TestAgent in 8.596 seconds (process running for 10.164)
+26-03-13.16:32:24.692 [main            ] INFO  ResearchOrchestrator   - 🚀 Starting new research agent for session: session_10
+26-03-13.16:32:31.919 [main            ] INFO  ResearchOrchestrator   - 📝 Original: '论文在推导连续极限（Continuum limit，第五章）时，其核心是方程 (8) 
+Z
+(
+z
+)
+=
+K
+∫
+S
+d
+−
+1
+M
+−
+z
+(
+x
+)
+d
+σ
+(
+x
+)
+Z(z)=K∫ 
+S 
+d−1
+ 
+​
+ M 
+−z
+​
+ (x)dσ(x)
+。请追溯到第二章（Preliminaries），解释公式 (8) 中的 
+M
+−
+z
+(
+x
+)
+M 
+−z
+​
+ (x)
+ 在几何上代表什么变换？为什么在 
+d
+≥
+3
+d≥3
+ 的高维情况下，这个积分的结果不再像 
+d
+=
+2
+d=2
+ 那样简单等于 
+K
+z
+Kz
+，而是需要引入双曲 Poisson 核（hyperbolic Poisson kernel）和超几何函数（hypergeometric function）' -> Rewritten: 'In the derivation of the continuum limit in Chapter 5, the core is equation (8): Z(z) = K ∫_{S^{d-1}} M_{-z}(x) dσ(x). Referring to Chapter 2 (Preliminaries), what geometric transformation does M_{-z}(x) represent in formula (8)? Why, in the higher-dimensional case of d ≥ 3, does the result of this integral no longer simplify to Kz as it does for d=2, necessitating the introduction of the hyperbolic Poisson kernel and hypergeometric functions?'
+26-03-13.16:32:31.923 [main            ] INFO  ResearchAgent          - 🤖 Agent started. Question: In the derivation of the continuum limit in Chapter 5, the core is equation (8): Z(z) = K ∫_{S^{d-1}} M_{-z}(x) dσ(x). Referring to Chapter 2 (Preliminaries), what geometric transformation does M_{-z}(x) represent in formula (8)? Why, in the higher-dimensional case of d ≥ 3, does the result of this integral no longer simplify to Kz as it does for d=2, necessitating the introduction of the hyperbolic Poisson kernel and hypergeometric functions?
+26-03-13.16:32:41.095 [main            ] INFO  ResearchAgent          - 🔄 Step 1: [Thought] The user asks about the geometric meaning of M_{-z}(x) in equation (8) of Chapter 5, and why the integral simplifies for d=2 but not for d≥3. I need to first locate the relevant sections. The user mentions Chapter 2 (Preliminaries) and Chapter 5 (Continuum limit). I should start by searching for 'M_{-z}' and 'Poisson kernel' in the paper. I'll use searchLibrary with a broad query to find relevant sections. -> [Action] searchLibrary({"query": "M_{-z}", "threshold": 0.5})
+26-03-13.16:32:41.096 [main            ] INFO  HybridRetrieverService - 🔍 Searching with threshold: 0.5
+26-03-13.16:32:41.211 [main            ] INFO  HikariDataSource       - HikariPool-1 - Starting...
+26-03-13.16:32:41.464 [main            ] INFO  HikariPool             - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@72376456
+26-03-13.16:32:41.467 [main            ] INFO  HikariDataSource       - HikariPool-1 - Start completed.
+26-03-13.16:32:48.243 [main            ] INFO  ResearchAgent          - 🔄 Step 2: [Thought] I found a section mentioning M_{-z} but it's in Chapter IV, not Chapter 2 or 5. I need to find the definition of M_{-z} in Chapter 2 (Preliminaries). Let me search for 'Preliminaries' and 'Möbius transformation' to locate Chapter 2. -> [Action] searchLibrary({"query": "Preliminaries Möbius transformation", "threshold": 0.5})
+26-03-13.16:32:48.243 [main            ] INFO  HybridRetrieverService - 🔍 Searching with threshold: 0.5
+26-03-13.16:32:56.556 [main            ] INFO  ResearchAgent          - 🔄 Step 3: [Thought] Great! I found the section 'C. Hyperbolic geometry and Möbius transformations' which is likely part of Chapter 2 (Preliminaries). I should read that section to understand the definition of M_w(x). Let me read the section with ID fa610b3c-db2e-4625-87ca-073a642f98e9. -> [Action] readSection({"sectionUuid": "fa610b3c-db2e-4625-87ca-073a642f98e9"})
+26-03-13.16:33:04.279 [main            ] INFO  ResearchAgent          - 🔄 Step 4: [Thought] I have read the beginning of section C, which defines Möbius transformations in this paper. Now I need to read the next subsection '1. Möbius transformations in higher dimensions' to get the explicit formula for M_w(x) in higher dimensions. Then I need to understand equation (8) in Chapter 5. Let me read subsection 1. -> [Action] readSection({"sectionUuid": "797c0ba4-80b5-46d7-a67e-a5c77b253c79"})
+26-03-13.16:33:14.507 [main            ] INFO  ResearchAgent          - 🔄 Step 5: [Thought] Now I have the definition of M_w(x) in higher dimensions. Specifically, M_{-z}(x) is given by the formula with w = -z. This is a boost transformation in hyperbolic geometry, mapping the unit ball to itself. It represents a hyperbolic translation (boost) along the geodesic from 0 to -z (or z). Geometrically, it's an isometry of the hyperbolic unit ball that sends the point -z to the origin (since M_w(w)=0). Now I need to understand equation (8) in Chapter 5. Let me search for 'equation (8)' and 'Continuum limit' to find Chapter 5. -> [Action] searchLibrary({"query": "equation (8) Z(z) = K", "threshold": 0.5})
+26-03-13.16:33:14.507 [main            ] INFO  HybridRetrieverService - 🔍 Searching with threshold: 0.5
+26-03-13.16:33:19.250 [main            ] INFO  ResearchAgent          - 🔄 Step 6: [Thought] The search didn't directly find equation (8). Let me search for 'Continuum limit' to locate Chapter 5. -> [Action] searchLibrary({"query": "Continuum limit", "threshold": 0.5})
+26-03-13.16:33:19.250 [main            ] INFO  HybridRetrieverService - 🔍 Searching with threshold: 0.5
+26-03-13.16:33:24.605 [main            ] INFO  ResearchAgent          - 🔄 Step 7: [Thought] Great! I found Chapter V (Continuum limit). Let me read that section to find equation (8). -> [Action] readSection({"sectionUuid": "1d3429b9-c77d-4d48-a449-caf8dc586976"})
+26-03-13.16:33:35.183 [main            ] INFO  ResearchAgent          - 🔄 Step 8: [Thought] Perfect! I have now read the Continuum limit section. It contains equation (8) and explains why for d=2 the integral simplifies to Kz, but for d≥3 it does not. I need to answer the user's question: 1) What geometric transformation does M_{-z}(x) represent? 2) Why does the integral not simplify for d≥3? I have the information from Chapter 2 and Chapter 5. Now I should also check if there are any other relevant sections or references. But first, let me formulate the answer based on what I've read. I'll also check the paper relations to see if there are any critiques or extensions of this paper in the library. -> [Action] checkPaperRelations({"paperId": 7})
+26-03-13.16:35:01.414 [main            ] INFO  ResearchAgent          - 🛑 Step 9: [Final Answer Ready] The library has no direct conflicts or relations. Now I have all the information needed. Let me summarize the answer in Chinese as required.
+
+1. Geometric meaning of M_{-z}(x): From Chapter 2, M_w(x) is a boost transformation (hyperbolic translation) in the unit ball B^d, representing an orientation-preserving isometry of hyperbolic geometry. Specifically, M_{-z}(x) maps the point -z to the origin (since M_w(w)=0) and preserves the unit ball. It can be expressed as M_{-z}(x) = ((1-|z|^2)x - (1-2⟨-z,x⟩+|x|^2)(-z)) / (1-2⟨-z,x⟩+|z|^2|x|^2). Geometrically, it's a hyperbolic translation along the geodesic from 0 to -z.
+
+2. Why integral simplifies for d=2 but not for d≥3: In d=2, the integral reduces to a Cauchy integral on the unit circle, which evaluates to Kz via residue theorem. For d≥3, the hyperbolic Poisson kernel P_hyp(z,x) = ((1-|z|^2)/|z-x|^2)^{d-1} appears, and the integral of M_{-z}(x) over the sphere is not simply proportional to z. Instead, the solution involves hypergeometric functions because the harmonic extension of the linear function Kx under the hyperbolic Laplacian yields a nontrivial radial factor F(1,1-d/2;1+d/2;|z|^2)/F(1,1-d/2;1+d/2;1). This reflects the difference between Euclidean and hyperbolic harmonic functions in higher dimensions.
+
+Now I will provide the final answer in Chinese.
+26-03-13.16:35:01.425 [main            ] INFO  ResearchOrchestrator   - 🏁 Agent finished and lock released for session: session_10
+26-03-13.16:35:01.425 [main            ] INFO  TestAgent              - ================ FINAL ANSWER ================
+26-03-13.16:35:01.425 [main            ] INFO  TestAgent              - 在论文《The Kuramoto model on a sphere》中，公式 (8) 中的 $M_{-z}(x)$ 以及高维情况下积分不再简化的原因如下：
+
+### 一、$M_{-z}(x)$ 的几何意义
+根据第二章（Preliminaries）的阐述，$M_w(x)$ 是定义在单位球 $B^d$ 上的 **Möbius 变换（boost transformation）**。具体形式为：
+$$ M_w(x) = \frac{(1 - |w|^2)x - (1 - 2\langle w, x\rangle + |x|^2)w}{1 - 2\langle w, x\rangle + |w|^2|x|^2} $$
+其中 $w \in B^d$，$x \in B^d$ 或 $S^{d-1}$。
+
+- **几何解释**：$M_w$ 是双曲单位球 $B^d$（赋予度量 $ds = \frac{2|dx|}{1-|x|^2}$）的一个**保向等距变换**。它对应于双曲几何中的“推进”（boost），即沿连接原点与点 $w$ 的测地线进行“平移”。
+- **关键性质**：$M_w(w)=0$，即该变换将参数点 $w$ 映射到原点；$M_0$ 是恒等变换；$M_w^{-1} = M_{-w}$。
+
+因此，$M_{-z}(x)$ 表示以 $-z$ 为参数的推进变换，它将点 $-z$ 移至原点，同时保持单位球的边界 $S^{d-1}$ 不变。
+
+### 二、为何 $d=2$ 时积分简化为 $Kz$，而 $d\geq 3$ 时则不能
+在连续极限（第五章）中，序参量定义为：
+$$ Z(z) = K \int_{S^{d-1}} M_{-z}(x) \, d\sigma(x) $$
+其中 $\sigma$ 是 $S^{d-1}$ 上的均匀概率测度。
+
+#### 1. **二维情况（$d=2$）**
+- 此时 $S^1$ 是单位圆周，$M_{-z}(x)$ 可写为复形式：$M_{-z}(\zeta) = \frac{\zeta + z}{1 + z\zeta}$（其中 $\zeta \in S^1$）。
+- 积分变为：
+  $$ Z(z) = \frac{K}{2\pi i} \int_{S^1} \frac{\zeta + z}{1 + z\zeta} \cdot \frac{d\zeta}{\zeta} $$
+- **利用柯西积分公式**：被积函数在 $\zeta=0$ 处有单极点，留数为 $z$，因此积分值恰为 $Kz$。
+- 几何上，这是因为二维双曲 Poisson 核与欧氏 Poisson 核重合，且线性函数 $Kx$ 的双曲调和延拓仍是线性的。
+
+#### 2. **高维情况（$d\geq 3$）**
+- 此时 $M_{-z}(x)$ 的积分不再能通过留数定理简化。原因在于：
+  - **双曲 Poisson 核出现**：推前测度 $(M_{-z})_*\sigma$ 具有显式表达式：
+    $$ d((M_{-z})_*\sigma)(x) = P_{\text{hyp}}(z,x) \, d\sigma(x), \quad P_{\text{hyp}}(z,x) = \left(\frac{1 - |z|^2}{|z - x|^2}\right)^{d-1} $$
+    这是双曲 Dirichlet 问题的核，与欧氏 Poisson 核 $P_{\text{euc}}(z,x) = \frac{1-|z|^2}{|z-x|^d}$ 不同（仅当 $d=2$ 时两者一致）。
+  - **双曲调和延拓的非平凡性**：$Z(z)$ 实际上是边界函数 $Kx$（$x \in S^{d-1}$）的双曲调和延拓。对于 $d\geq 3$，双曲 Laplace–Beltrami 算符为：
+    $$ \Delta_{\text{hyp}} = (1-|x|^2)^2 \Delta_{\text{euc}} + 2(d-2)(1-|x|^2) \sum_i x_i \frac{\partial}{\partial x_i} $$
+    在此算子下，线性函数 $Kx$ 的调和延拓不再保持线性，而是产生一个与 $|z|^2$ 相关的径向因子。
+- **超几何函数的引入**：通过求解双曲 Dirichlet 问题，得到：
+  $$ Z(z) = K \frac{F(1, \, 1-d/2; \, 1+d/2; \, |z|^2)}{F(1, \, 1-d/2; \, 1+d/2; \, 1)} \, z $$
+  其中 $F$ 是超几何函数。当 $d=2$ 时，参数 $1-d/2=0$，超几何函数恒为 1，故 $Z(z)=Kz$；但当 $d\geq 3$ 时，该系数不再是常数，而是 $|z|^2$ 的函数，因此积分结果不再正比于 $z$。
+
+### 总结
+$M_{-z}(x)$ 是双曲单位球中的推进变换，实现沿测地线的“平移”。在 $d=2$ 时，复分析技巧（柯西积分）使积分简化为 $Kz$；而在 $d\geq 3$ 时，双曲几何与欧氏几何的差异导致 Poisson 核变化，且线性函数的双曲调和延拓需通过超几何函数表示，从而使得 $Z(z)$ 具有更复杂的形式。这反映了高维球面上 Kuramoto 模型动力学与二维圆环情形的本质区别。
+26-03-13.16:35:01.448 [SpringApplicationShutdownHook] INFO  HikariDataSource       - HikariPool-1 - Shutdown initiated...
+26-03-13.16:35:01.451 [SpringApplicationShutdownHook] INFO  HikariDataSource       - HikariPool-1 - Shutdown completed.
