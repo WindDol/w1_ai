@@ -1,10 +1,1 @@
-# xfg-frame-archetype - DDD 脚手架 - @小傅哥 v2.2
-
-- docker 使用文档：[https://bugstack.cn/md/road-map/docker.html](https://bugstack.cn/md/road-map/docker.html)
-- DDD 教程；
-  - [DDD 概念理论](https://bugstack.cn/md/road-map/ddd-guide-01.html)
-  - [DDD 建模方法](https://bugstack.cn/md/road-map/ddd-guide-02.html)
-  - [DDD 工程模型](https://bugstack.cn/md/road-map/ddd-guide-03.html)
-  - [DDD 架构设计](https://bugstack.cn/md/road-map/ddd.html)
-  - [DDD 建模案例](https://bugstack.cn/md/road-map/ddd-model.html)
-
+针对传统 RAG 在处理长篇科研论文时存在的“切片逻辑断裂”、“数学符号语义丢失”及“引用溯源困难”的问题，构建了一款 基于Agent-First 的思想的双 Agent 的深度阅读系统。不同于传统切片式检索，该系统模拟人类研究员的“检索-目录定位-深度阅读-引用溯源”思维链。经 RAGAS 框架实测，系统实现了 97\%的忠实度(Faithfulness) 、86\%的精确度(Answer Relevancy) 和95\%的上下文召回率(Context Recall)

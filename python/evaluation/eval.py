@@ -83,7 +83,7 @@ def load_and_process_data(file_path):
 
 def run_evaluation():
     # 确保 test_results.json 路径正确
-    dataset = load_and_process_data("test_ragr.json")
+    dataset = load_and_process_data("test_results.json")
 
     print("🤖 Starting RAGAS evaluation with Google Gemini via Proxy...")
 
