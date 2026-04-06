@@ -46,7 +46,64 @@ public class TestAgent {
     @Test
     public void testSession1() {
 
-        String answer = agent.startResearch("session_3", "“根据 Seth Marvel (2009) 的论文，他的方法与 Watanabe (1994) [Ref 21] 提出的方法在处理 N 个振子时的维度缩减结果有什么具体不同？”");
+        String answer = agent.startResearch("session_10", "论文在推导连续极限（Continuum limit，第五章）时，其核心是方程 (8) \n" +
+                "Z\n" +
+                "(\n" +
+                "z\n" +
+                ")\n" +
+                "=\n" +
+                "K\n" +
+                "∫\n" +
+                "S\n" +
+                "d\n" +
+                "−\n" +
+                "1\n" +
+                "M\n" +
+                "−\n" +
+                "z\n" +
+                "(\n" +
+                "x\n" +
+                ")\n" +
+                "d\n" +
+                "σ\n" +
+                "(\n" +
+                "x\n" +
+                ")\n" +
+                "Z(z)=K∫ \n" +
+                "S \n" +
+                "d−1\n" +
+                " \n" +
+                "\u200B\n" +
+                " M \n" +
+                "−z\n" +
+                "\u200B\n" +
+                " (x)dσ(x)\n" +
+                "。请追溯到第二章（Preliminaries），解释公式 (8) 中的 \n" +
+                "M\n" +
+                "−\n" +
+                "z\n" +
+                "(\n" +
+                "x\n" +
+                ")\n" +
+                "M \n" +
+                "−z\n" +
+                "\u200B\n" +
+                " (x)\n" +
+                " 在几何上代表什么变换？为什么在 \n" +
+                "d\n" +
+                "≥\n" +
+                "3\n" +
+                "d≥3\n" +
+                " 的高维情况下，这个积分的结果不再像 \n" +
+                "d\n" +
+                "=\n" +
+                "2\n" +
+                "d=2\n" +
+                " 那样简单等于 \n" +
+                "K\n" +
+                "z\n" +
+                "Kz\n" +
+                "，而是需要引入双曲 Poisson 核（hyperbolic Poisson kernel）和超几何函数（hypergeometric function）");
 
         log.info("================ FINAL ANSWER ================");
         log.info(answer);

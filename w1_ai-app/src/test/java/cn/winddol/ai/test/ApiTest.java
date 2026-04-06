@@ -10,6 +10,8 @@ import org.springframework.web.client.RestClient;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -38,4 +40,13 @@ public class ApiTest {
 
         System.out.println("网络连通成功，返回长度：" + result.length());
     }
+
+    public void testThreadPool(){
+        Supplier<Integer> a = ()-> {
+            return 1;
+        };
+
+        CompletableFuture.supplyAsync(a).exceptionally(ex -> {return null;});
+    }
+
 }

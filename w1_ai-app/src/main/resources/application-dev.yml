@@ -31,7 +31,7 @@ mybatis-plus:
     map-underscore-to-camel-case: true # 开启驼峰命名转换
 ai:
   llm:
-    api-key: sk-1e2d1a2adcae42e482f57ebcbca2e497
+    api-key: sk-4e6a9a95491a408b9b816c708c338d56
   embedding:
     api-key: sk-924a8ed2e50b43a188b7660aa2c1f93d
     base-url: https://dashscope.aliyuncs.com/compatible-mode/v1

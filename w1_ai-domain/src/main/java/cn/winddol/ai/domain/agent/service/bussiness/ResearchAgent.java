@@ -115,11 +115,16 @@ public class ResearchAgent {
             """;
     public String doResearch(String sessionId, String taskDescription, ChatMemory memory, ResearchProcessListener listener) {
         List<ChatMessage> context = new ArrayList<>();
-        context.add(SystemMessage.from(SYSTEM_PROMPT));
+        String dynamicSystemPrompt = SYSTEM_PROMPT + "\n\n" +
+                "=========================================\n" +
+                "[YOUR CURRENT MISSION]\n" +
+                "You must solve the following specific task:\n" +
+                taskDescription + "\n" +
+                "=========================================\n";
+
+        context.add(SystemMessage.from(dynamicSystemPrompt));
         context.addAll(memory.messages());
-        context.add(UserMessage.from(
-                "The user's request (resolved and translated): " + taskDescription
-        ));
+        context.add(UserMessage.from("Please begin your research process to solve the mission defined in the system prompt."));
         log.info("🤖 Agent started. Question: {}", taskDescription);
         String finalAnswer = executeReActLoop(sessionId,context,listener);
         memory.add(AiMessage.from(finalAnswer));
@@ -129,7 +134,13 @@ public class ResearchAgent {
 
     private String executeReActLoop(String sessionId, List<ChatMessage> history, ResearchProcessListener listener){
         int maxSteps = 20;
+        int maxSafeMessages = 30;
         for (int i = 0; i < maxSteps; i++) {
+            if (history.size() > maxSafeMessages) {
+                history.remove(3);
+                history.remove(3);
+                log.warn("🧹 Context window getting too large, evicted oldest intermediate steps.");
+            }
             if (i == maxSteps - 2) {
                 history.add(SystemMessage.from(
                         "WARNING: You have almost reached the step limit. " +
@@ -202,9 +213,9 @@ public class ResearchAgent {
             }
             String observation = executeTool(step.getAction(), step.getActionInput());
             String preview = observation;
-            if (observation.length() > 1000) {
+            if (observation.length() > 5000) {
                 // 截取前 1000 字，并加上省略号和统计信息，增加透明度
-                preview = observation.substring(0, 1000) + "\n\n...(Total " + observation.length() + " chars, truncated for display)";
+                preview = observation.substring(0, 5000) + "\n\n...(Total " + observation.length() + " chars, truncated for display)";
             }
             listener.onStep(ResearchEvent.builder()
                     .sessionId(sessionId)
@@ -225,16 +236,13 @@ public class ResearchAgent {
         }
         try {
             // 1. 统一预处理：确保 input 是个合法的 JSON 对象
-            // 如果 LLM 偷懒直接传了字符串 "soliton"，我们帮它包装成 {"query": "soliton"}
             JSONObject params = smartParseInput(inputRaw);
 
             switch (toolName) {
                 case "searchLibrary":
                     String query = params.getString("query");
-                    // 默认值处理
-                    Long pId = params.getLong("paperId"); // fastjson 若无key返回 null
+                    Long pId = params.getLong("paperId");
                     Double threshold = params.getDouble("threshold");
-                    // 智能兜底：如果没传 query 但传了 raw string
                     if (query == null && !params.isEmpty()) query = inputRaw;
 
                     return tools.searchLibrary(query, pId, threshold);
@@ -280,7 +288,6 @@ public class ResearchAgent {
         if (input == null || input.isBlank()) return new JSONObject();
         String trimmed = input.trim();
 
-        // 如果看起来像 JSON
         if (trimmed.startsWith("{")) {
             try {
                 return JSON.parseObject(trimmed);

@@ -57,9 +57,9 @@ public class ResearchOrchestrator implements IResearchOrchestrator{
     }
     private ChatMemory getMemory(String sessionId) {
         return MessageWindowChatMemory.builder()
-                .id(sessionId)              // 关键：ID 对应 Redis 中的 Key
-                .maxMessages(20)            // 保留最近 20 条消息
-                .chatMemoryStore(chatMemoryStore) // 关键：数据持久化到 Redis
+                .id(sessionId)
+                .maxMessages(20)
+                .chatMemoryStore(chatMemoryStore)
                 .build();
     }
 }

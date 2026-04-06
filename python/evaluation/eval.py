@@ -23,8 +23,8 @@ os.environ["https_proxy"] = proxy_url
 # ⚙️ 2. 配置 Google Gemini 作为裁判
 # ==========================================
 # 填入你的 Google API Key
-os.environ["GOOGLE_API_KEY"] = "AIzaSyDI77keIz8-X7mP6zEHa_SK3OfMuQLPG2c"
-os.environ["DEEPSEEK_API_KEY"] = "sk-1e2d1a2adcae42e482f57ebcbca2e497"
+os.environ["GOOGLE_API_KEY"] = "AIzaSyC2cywgWs5SPJBDnNx0JJc3etiZwYb7nyU"
+os.environ["DEEPSEEK_API_KEY"] = "sk-4e6a9a95491a408b9b816c708c338d56"
 
 # 配置 LLM (用于打分)
 # 使用 1.5-flash 速度快且免费额度高
@@ -83,7 +83,7 @@ def load_and_process_data(file_path):
 
 def run_evaluation():
     # 确保 test_results.json 路径正确
-    dataset = load_and_process_data("test_results.json")
+    dataset = load_and_process_data("test_ragr.json")
 
     print("🤖 Starting RAGAS evaluation with Google Gemini via Proxy...")
 
