@@ -1,8 +1,8 @@
 package cn.winddol.ai.infrastructure.adapter.ai;
 
 import cn.winddol.ai.domain.agent.adapter.ai.IAiAdapter;
-import cn.winddol.ai.domain.agent.model.entity.PaperAuditResult;
 import cn.winddol.ai.domain.agent.model.entity.AgentPaperEntity;
+import cn.winddol.ai.domain.agent.model.entity.PaperAuditResult;
 import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
 import cn.winddol.ai.domain.paperTools.model.entity.RefMetadata;
 import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
@@ -23,7 +23,8 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-public class DeepSeekAdapter implements ISymbolExtractor, IAiAdapter {
+public class DeepSeekAdapter implements ISymbolExtractor, IAiAdapter,
+        cn.winddol.ai.agent.research.api.IAiAdapter {
 
     @Resource
     private ChatLanguageModel chatLanguageModel;

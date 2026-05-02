@@ -2,8 +2,7 @@ package cn.winddol.ai.trigger.http;
 
 import cn.winddol.ai.api.IResearchController;
 import cn.winddol.ai.domain.agent.adapter.event.NotificationService;
-import cn.winddol.ai.domain.agent.service.IResearchOrchestrator;
-import cn.winddol.ai.domain.agent.service.ResearchOrchestrator;
+import cn.winddol.ai.agent.research.api.IResearchOrchestrator;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;

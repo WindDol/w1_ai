@@ -8,7 +8,7 @@ import cn.winddol.ai.api.response.Response;
 import cn.winddol.ai.domain.paperTools.model.entity.SymbolEntity;
 import cn.winddol.ai.domain.paperTools.model.valobj.PaperDetailVO;
 import cn.winddol.ai.domain.paperTools.model.valobj.PaperVO;
-import cn.winddol.ai.domain.paperTools.service.IPaperApplication;
+import cn.winddol.ai.paper.api.IPaperApplication;
 import cn.winddol.ai.types.enums.ResponseCode;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

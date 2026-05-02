@@ -11,7 +11,8 @@ import redis.clients.jedis.params.SetParams;
 import java.time.Duration;
 
 @Service
-public class SessionLockService implements ISessionLockService {
+public class SessionLockService implements ISessionLockService,
+        cn.winddol.ai.agent.research.api.ISessionLockService {
 
     @Resource
     private JedisPooled jedisPooled; // 自动注入 RedisConfig 中定义的那个对象

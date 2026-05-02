@@ -19,7 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 @Slf4j
+@Service
 public class ResearchAgentImpl implements IResearchAgent {
 
     private final ChatLanguageModel chatLanguageModel;

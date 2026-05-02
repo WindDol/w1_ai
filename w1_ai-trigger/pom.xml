@@ -40,6 +40,14 @@
             <groupId>cn.winddol.ai</groupId>
             <artifactId>w1_ai-domain</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.winddol.ai</groupId>
+            <artifactId>w1_ai-agent-research</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.winddol.ai</groupId>
+            <artifactId>w1_ai-paper</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
