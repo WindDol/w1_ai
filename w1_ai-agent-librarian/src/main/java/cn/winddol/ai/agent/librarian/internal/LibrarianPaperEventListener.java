@@ -3,10 +3,10 @@ package cn.winddol.ai.agent.librarian.internal;
 import cn.winddol.ai.agent.librarian.api.ILibrarianAgent;
 import cn.winddol.ai.agent.librarian.api.ILibrarianRepository;
 import cn.winddol.ai.domain.agent.adapter.embedding.IEmbeddingProcessor;
-import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
-import cn.winddol.ai.domain.paperTools.service.librarianTools.CitationEnrichmentService;
-import cn.winddol.ai.domain.paperTools.service.librarianTools.PaperEnrichmentService;
+import cn.winddol.ai.paper.api.IPaperRepository;
 import cn.winddol.ai.paper.event.PaperIngestedEvent;
+import cn.winddol.ai.shared.api.ICitationEnrichmentService;
+import cn.winddol.ai.shared.api.IPaperEnrichmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -16,14 +16,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class LibrarianPaperEventListener {
 
-    private final PaperEnrichmentService symbolService;
-    private final CitationEnrichmentService citationService;
+    private final IPaperEnrichmentService symbolService;
+    private final ICitationEnrichmentService citationService;
     private final IEmbeddingProcessor embeddingProcessor;
     private final IPaperRepository paperRepository;
     private final ILibrarianAgent librarianAgent;
 
-    public LibrarianPaperEventListener(PaperEnrichmentService symbolService,
-                                       CitationEnrichmentService citationService,
+    public LibrarianPaperEventListener(IPaperEnrichmentService symbolService,
+                                       ICitationEnrichmentService citationService,
                                        IEmbeddingProcessor embeddingProcessor,
                                        IPaperRepository paperRepository,
                                        ILibrarianAgent librarianAgent) {

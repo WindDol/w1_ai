@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 //负责编排
-@Service
+
 @Slf4j
 public class PaperApplicationService implements IPaperApplication {
     @Resource

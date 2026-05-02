@@ -12,8 +12,8 @@ import jakarta.annotation.Resource;
 
 import java.util.List;
 
-@Component
-public class ScientificResearchTools implements IScientificResearchTools {
+
+public class ScientificResearchTools implements IScientificResearchTools{
 
     @Resource
     private HybridRetrieverService retrieverService;

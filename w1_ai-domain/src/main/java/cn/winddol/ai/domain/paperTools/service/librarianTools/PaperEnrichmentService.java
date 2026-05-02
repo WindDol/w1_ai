@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class PaperEnrichmentService {
+public class PaperEnrichmentService implements cn.winddol.ai.shared.api.IPaperEnrichmentService {
     @Resource
     private IPaperRepository repository;
     @Resource

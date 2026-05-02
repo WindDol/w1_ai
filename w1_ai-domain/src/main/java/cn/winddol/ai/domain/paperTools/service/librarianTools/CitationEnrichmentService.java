@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-public class CitationEnrichmentService {
+public class CitationEnrichmentService implements cn.winddol.ai.shared.api.ICitationEnrichmentService {
     @Resource
     private ISemanticScholar s2Client;
     @Resource

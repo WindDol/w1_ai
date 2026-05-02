@@ -1,8 +1,8 @@
 package cn.winddol.ai.infrastructure.scheduler;
 
 
-import cn.winddol.ai.domain.paperTools.service.librarianTools.CitationEnrichmentService;
 import cn.winddol.ai.infrastructure.embedding.EmbeddingProcessor;
+import cn.winddol.ai.shared.api.ICitationEnrichmentService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class GlobalScheduler {
     @Resource
-    private CitationEnrichmentService citationService;
+    private ICitationEnrichmentService citationService;
     @Resource
     private EmbeddingProcessor embeddingProcessor;
 

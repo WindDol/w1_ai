@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-@Service
+
 @Slf4j
 public class ResearchOrchestrator implements IResearchOrchestrator{
     @Resource
