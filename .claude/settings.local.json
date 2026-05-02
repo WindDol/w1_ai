@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -d /d/apache-maven*)",
+      "Bash(ls -d /d/maven*)",
+      "Bash(ls -d /c/apache-maven*)",
+      "Read(//d//**)",
+      "Bash(ls /d/java*)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Users/Mr Ding.LAPTOP-H54HCE12/AppData/Local/Programs/**)"
+    ]
+  }
+}

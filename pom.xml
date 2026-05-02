@@ -8,6 +8,14 @@
     <packaging>pom</packaging>
 
     <modules>
+        <!-- New framework modules -->
+        <module>w1_ai-shared</module>
+        <module>w1_ai-agent-framework</module>
+        <module>w1_ai-agent-research</module>
+        <module>w1_ai-agent-librarian</module>
+        <module>w1_ai-agent-writer</module>
+        <module>w1_ai-paper</module>
+        <!-- Existing modules -->
         <module>w1_ai-api</module>
         <module>w1_ai-app</module>
         <module>w1_ai-domain</module>
@@ -162,6 +170,38 @@
             </dependency>
 
             <!-- 6. 本项目模块管理 -->
+            <!-- New framework modules -->
+            <dependency>
+                <groupId>cn.winddol.ai</groupId>
+                <artifactId>w1_ai-shared</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.winddol.ai</groupId>
+                <artifactId>w1_ai-agent-framework</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.winddol.ai</groupId>
+                <artifactId>w1_ai-agent-research</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.winddol.ai</groupId>
+                <artifactId>w1_ai-agent-librarian</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.winddol.ai</groupId>
+                <artifactId>w1_ai-agent-writer</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.winddol.ai</groupId>
+                <artifactId>w1_ai-paper</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <!-- Existing modules -->
             <dependency>
                 <groupId>cn.winddol.ai</groupId>
                 <artifactId>w1_ai-api</artifactId>

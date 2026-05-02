@@ -82,6 +82,23 @@
             <version>2.9.0</version>
         </dependency>
 
+        <!-- New framework modules -->
+        <dependency>
+            <groupId>cn.winddol.ai</groupId>
+            <artifactId>w1_ai-agent-research</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.winddol.ai</groupId>
+            <artifactId>w1_ai-agent-librarian</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.winddol.ai</groupId>
+            <artifactId>w1_ai-agent-writer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.winddol.ai</groupId>
+            <artifactId>w1_ai-paper</artifactId>
+        </dependency>
         <!-- 工程模块；启动依赖 trigger->domain, infrastructure-->
         <dependency>
             <groupId>cn.winddol.ai</groupId>

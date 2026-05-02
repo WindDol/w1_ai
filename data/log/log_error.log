@@ -1,37 +1,4 @@
-26-03-31.19:20:11.913 [ForkJoinPool.commonPool-worker-1] ERROR ResearchAgent          - Tool Execution Error: findPapers | Input: {"query": "", "threshold": 0.1}
-java.lang.IllegalArgumentException: text cannot be null or blank
-	at dev.langchain4j.internal.Exceptions.illegalArgument(Exceptions.java:19)
-	at dev.langchain4j.internal.ValidationUtils.ensureNotBlank(ValidationUtils.java:98)
-	at dev.langchain4j.data.segment.TextSegment.<init>(TextSegment.java:29)
-	at dev.langchain4j.data.segment.TextSegment.from(TextSegment.java:94)
-	at dev.langchain4j.model.embedding.EmbeddingModel.embed(EmbeddingModel.java:24)
-	at cn.winddol.ai.infrastructure.adapter.repository.PaperRepository.searchPapers(PaperRepository.java:394)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:352)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765)
-	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:137)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
-	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:765)
-	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:717)
-	at cn.winddol.ai.infrastructure.adapter.repository.PaperRepository$$SpringCGLIB$$0.searchPapers(<generated>)
-	at cn.winddol.ai.domain.paperTools.service.researchTools.AgentCommonTools.findPapers(AgentCommonTools.java:17)
-	at cn.winddol.ai.domain.paperTools.service.ScientificResearchTools.findPapers(ScientificResearchTools.java:73)
-	at cn.winddol.ai.domain.agent.service.bussiness.ResearchAgent.executeTool(ResearchAgent.java:278)
-	at cn.winddol.ai.domain.agent.service.bussiness.ResearchAgent.executeReActLoop(ResearchAgent.java:214)
-	at cn.winddol.ai.domain.agent.service.bussiness.ResearchAgent.doResearch(ResearchAgent.java:129)
-	at cn.winddol.ai.domain.agent.service.ResearchOrchestrator.startResearch(ResearchOrchestrator.java:46)
-	at cn.winddol.ai.trigger.http.ResearchController.lambda$askStream$0(ResearchController.java:37)
-	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.run(CompletableFuture.java:1804)
-	at java.base/java.util.concurrent.CompletableFuture$AsyncRun.exec(CompletableFuture.java:1796)
-	at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
-	at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
-	at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
-	at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
-	at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
-26-03-31.19:29:45.030 [http-nio-8091-exec-2] WARN  DefaultHandlerExceptionResolver - Ignoring exception, response committed. : org.springframework.web.context.request.async.AsyncRequestTimeoutException
-26-03-31.19:29:45.030 [http-nio-8091-exec-2] WARN  DefaultHandlerExceptionResolver - Resolved [org.springframework.web.context.request.async.AsyncRequestTimeoutException]
+26-04-10.15:47:43.797 [http-nio-8091-exec-4] WARN  DefaultHandlerExceptionResolver - Ignoring exception, response committed. : org.springframework.web.context.request.async.AsyncRequestTimeoutException
+26-04-10.15:47:43.797 [http-nio-8091-exec-4] WARN  DefaultHandlerExceptionResolver - Resolved [org.springframework.web.context.request.async.AsyncRequestTimeoutException]
+26-04-10.15:50:01.791 [http-nio-8091-exec-5] WARN  DefaultHandlerExceptionResolver - Ignoring exception, response committed. : org.springframework.web.context.request.async.AsyncRequestTimeoutException
+26-04-10.15:50:01.791 [http-nio-8091-exec-5] WARN  DefaultHandlerExceptionResolver - Resolved [org.springframework.web.context.request.async.AsyncRequestTimeoutException]
