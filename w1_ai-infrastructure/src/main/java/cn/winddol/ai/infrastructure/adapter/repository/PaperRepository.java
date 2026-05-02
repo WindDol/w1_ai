@@ -35,7 +35,8 @@ import java.util.function.Predicate;
 
 @Slf4j
 @Repository
-public class PaperRepository implements IPaperRepository {
+public class PaperRepository implements IPaperRepository,
+        cn.winddol.ai.paper.api.IPaperRepository {
     @Autowired
     private PaperMapper paperMapper;
 

@@ -1,4 +1,32 @@
-26-04-10.15:47:43.797 [http-nio-8091-exec-4] WARN  DefaultHandlerExceptionResolver - Ignoring exception, response committed. : org.springframework.web.context.request.async.AsyncRequestTimeoutException
-26-04-10.15:47:43.797 [http-nio-8091-exec-4] WARN  DefaultHandlerExceptionResolver - Resolved [org.springframework.web.context.request.async.AsyncRequestTimeoutException]
-26-04-10.15:50:01.791 [http-nio-8091-exec-5] WARN  DefaultHandlerExceptionResolver - Ignoring exception, response committed. : org.springframework.web.context.request.async.AsyncRequestTimeoutException
-26-04-10.15:50:01.791 [http-nio-8091-exec-5] WARN  DefaultHandlerExceptionResolver - Resolved [org.springframework.web.context.request.async.AsyncRequestTimeoutException]
+26-05-02.18:00:09.916 [main            ] WARN  AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'researchAgentImpl' defined in file [C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-agent-research\target\classes\cn\winddol\ai\agent\research\internal\ResearchAgentImpl.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'researchToolProvider' defined in class path resource [cn/winddol/ai/config/AgentFrameworkConfig.class]: Unsatisfied dependency expressed through method 'researchToolProvider' parameter 0: Error creating bean with name 'scientificResearchToolsImpl' defined in file [C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-paper\target\classes\cn\winddol\ai\paper\internal\ScientificResearchToolsImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'hybridRetrieverServiceImpl' defined in file [C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-paper\target\classes\cn\winddol\ai\paper\internal\HybridRetrieverServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'cn.winddol.ai.paper.api.IPaperRepository' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+26-05-02.18:00:09.970 [main            ] ERROR LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in cn.winddol.ai.paper.internal.HybridRetrieverServiceImpl required a bean of type 'cn.winddol.ai.paper.api.IPaperRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'cn.winddol.ai.paper.api.IPaperRepository' in your configuration.
+
+26-05-02.18:05:05.609 [main            ] WARN  AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'researchAgentImpl' defined in file [C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-agent-research\target\classes\cn\winddol\ai\agent\research\internal\ResearchAgentImpl.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'researchToolProvider' defined in class path resource [cn/winddol/ai/config/AgentFrameworkConfig.class]: Unsatisfied dependency expressed through method 'researchToolProvider' parameter 0: Error creating bean with name 'scientificResearchToolsImpl' defined in file [C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-paper\target\classes\cn\winddol\ai\paper\internal\ScientificResearchToolsImpl.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'hybridRetrieverServiceImpl' defined in file [C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-paper\target\classes\cn\winddol\ai\paper\internal\HybridRetrieverServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 1: No qualifying bean of type 'cn.winddol.ai.paper.api.IEmbeddingService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+26-05-02.18:05:05.654 [main            ] ERROR LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 1 of constructor in cn.winddol.ai.paper.internal.HybridRetrieverServiceImpl required a bean of type 'cn.winddol.ai.paper.api.IEmbeddingService' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'cn.winddol.ai.paper.api.IEmbeddingService' in your configuration.
+
