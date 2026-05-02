@@ -7,7 +7,9 @@
       "Read(//d//**)",
       "Bash(ls /d/java*)",
       "Read(//c/Program Files/**)",
-      "Read(//c/Users/Mr Ding.LAPTOP-H54HCE12/AppData/Local/Programs/**)"
+      "Read(//c/Users/Mr Ding.LAPTOP-H54HCE12/AppData/Local/Programs/**)",
+      "Bash(export JAVA_HOME=\"/d/java17\")",
+      "Bash(\"E:/develop/apache-maven-3.9.6/bin/mvn\" -f \"C:/Users/Mr Ding.LAPTOP-H54HCE12/Desktop/ai_pdf/w1_ai/pom.xml\" clean compile)"
     ]
   }
 }

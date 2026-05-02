@@ -1,8 +1,8 @@
 package cn.winddol.ai.paper.internal;
 
+import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.paper.api.IEmbeddingService;
 import cn.winddol.ai.paper.api.IPaperRepository;
-import cn.winddol.ai.paper.domain.SearchResultDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,52 +18,28 @@ public class HybridRetrieverServiceImpl {
 
     private static final double DEFAULT_THRESHOLD = 0.40;
     private static final double MIN_THRESHOLD = 0.35;
-    private static final double MAX_THRESHOLD = 0.70;
+    private static final int TOP_K = 5;
 
-    public HybridRetrieverServiceImpl(IPaperRepository repository,
-                                      IEmbeddingService embeddingService) {
+    public HybridRetrieverServiceImpl(IPaperRepository repository, IEmbeddingService embeddingService) {
         this.repository = repository;
         this.embeddingService = embeddingService;
     }
 
-    public SearchResultDTO searchLibrary(String query, Long paperId, Double customThreshold) {
-        SearchResultDTO resultDTO = new SearchResultDTO();
+    public SearchResultDTO searchLibrary(String query, Long paperId, Double threshold) {
+        double actualThreshold = (threshold != null) ? threshold : DEFAULT_THRESHOLD;
+        if (actualThreshold < MIN_THRESHOLD) actualThreshold = MIN_THRESHOLD;
 
-        double threshold = DEFAULT_THRESHOLD;
-        if (customThreshold != null) {
-            threshold = Math.max(MIN_THRESHOLD, Math.min(MAX_THRESHOLD, customThreshold));
-        }
-        log.info("Searching with threshold: {}", threshold);
+        float[] vector = embeddingService.embed(query);
+        String vectorStr = Arrays.toString(vector);
 
-        if (query.length() < 10 && !query.contains(" ")) {
-            List<SearchResultDTO.SymbolDTO> exactMatches = repository.searchSymbolsByKeyword(query, paperId);
-            if (!exactMatches.isEmpty()) {
-                log.info("Exact keyword match found for: {}", query);
-                resultDTO.setSymbols(exactMatches);
-            }
-        }
-        float[] queryVector = embeddingService.embed(query);
-        String vector = Arrays.toString(queryVector);
-        double finalThreshold = threshold;
-        List<SearchResultDTO.SectionDTO> sections = repository.searchSectionsByVector(paperId, vector, 5)
-                .stream().filter(s -> s.getScore() != null && s.getScore() > finalThreshold)
-                .toList();
-        resultDTO.setSections(sections);
-        if (resultDTO.getSymbols() == null || resultDTO.getSymbols().isEmpty()) {
-            List<SearchResultDTO.SymbolDTO> symbols = repository.searchSymbolsByVector(paperId, vector, 5)
-                    .stream().filter(s -> s.getScore() != null && s.getScore() > finalThreshold)
-                    .toList();
-            resultDTO.setSymbols(symbols);
-        }
-        List<SearchResultDTO.ReferenceDTO> references = repository.searchReferencesByVector(paperId, vector, 3)
-                .stream()
-                .filter(r -> r.getScore() != null && r.getScore() > finalThreshold)
-                .toList();
-        resultDTO.setReferences(references);
-        return resultDTO;
-    }
+        List<SearchResultDTO.SectionDTO> sections = repository.searchSectionsByVector(paperId, vectorStr, TOP_K);
+        List<SearchResultDTO.SymbolDTO> symbols = repository.searchSymbolsByVector(paperId, vectorStr, TOP_K);
+        List<SearchResultDTO.ReferenceDTO> references = repository.searchReferencesByVector(paperId, vectorStr, TOP_K);
 
-    public SearchResultDTO searchLibrary(String query, Double customThreshold) {
-        return searchLibrary(query, null, customThreshold);
+        SearchResultDTO result = new SearchResultDTO();
+        result.setSections(sections);
+        result.setSymbols(symbols);
+        result.setReferences(references);
+        return result;
     }
 }

@@ -1,17 +1,22 @@
 package cn.winddol.ai.paper.internal;
 
+import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
 import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
 import cn.winddol.ai.domain.paperTools.adapter.parser.IPaperParser;
 import cn.winddol.ai.domain.paperTools.adapter.tools.IFingerprintUtils;
+import cn.winddol.ai.domain.paperTools.model.entity.*;
+import cn.winddol.ai.domain.paperTools.model.valobj.PaperDetailVO;
+import cn.winddol.ai.domain.paperTools.model.valobj.PaperVO;
+import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
 import cn.winddol.ai.paper.api.IFileStorageService;
 import cn.winddol.ai.paper.api.IPaperApplication;
 import cn.winddol.ai.paper.api.IPaperRepository;
-import cn.winddol.ai.paper.domain.*;
 import cn.winddol.ai.paper.event.PaperIngestedEvent;
 import cn.winddol.ai.types.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,7 +99,7 @@ public class PaperApplicationServiceImpl implements IPaperApplication {
     public PaperDetailVO getPaperDetails(Long paperId) {
         PaperEntity paper = paperRepository.getPaperDetailsById(paperId);
         List<SymbolEntity> symbols = paperRepository.findByPaperId(paperId);
-        List<PaperRelationDTO> relations = paperRepository.findRelationsByPaperId(paperId);
+        List<KnowledgeRelationEntity> relations = paperRepository.findRelationsByPaperId(paperId);
         List<ReferenceItem> referenceItemList = paperRepository.selectReferencesByPaperId(paperId);
 
         StringBuilder novelty = new StringBuilder();
@@ -102,7 +107,7 @@ public class PaperApplicationServiceImpl implements IPaperApplication {
         if (!relations.isEmpty()) {
             novelty.append("**Inter-paper relations from the Librarian's audit:**\n\n");
 
-            for (PaperRelationDTO rel : relations) {
+            for (KnowledgeRelationEntity rel : relations) {
                 String type = rel.getType();
                 String otherPaperInfo = String.format("Paper [%d] (%s)", rel.getRelatedId(), rel.getRelatedTitle());
 
