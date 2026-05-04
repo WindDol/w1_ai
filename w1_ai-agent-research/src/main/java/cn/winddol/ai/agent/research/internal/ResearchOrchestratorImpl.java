@@ -47,7 +47,10 @@ public class ResearchOrchestratorImpl implements IResearchOrchestrator {
                 ResearchEventListener listener = event -> eventSink.accept(event);
                 String result = researchAgent.doResearch(sessionId, taskDescription, memory, listener);
                 return result;
-            } finally {
+            }catch (Exception e) {
+                log.info(e.getMessage());
+            }
+            finally {
                 sessionLockService.unlock(sessionId);
                 log.info("🏁 Agent finished and lock released for session: {}", sessionId);
             }

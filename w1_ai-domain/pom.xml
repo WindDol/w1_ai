@@ -45,6 +45,10 @@
         <!-- 系统模块 -->
         <dependency>
             <groupId>cn.winddol.ai</groupId>
+            <artifactId>w1_ai-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.winddol.ai</groupId>
             <artifactId>w1_ai-types</artifactId>
         </dependency>
         <dependency>
