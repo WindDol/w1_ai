@@ -1,0 +1,70 @@
+三个规矩，每次写代码前检查一遍
+规矩 1：依赖倒过来想
+写一个类之前，先问"它需要别人做什么"，而不是"它要怎么调用别人"。
+
+
+// ❌ 直接想"我要调谁"
+public class ResearchAgent {
+    @Resource
+    private ScientificResearchTools tools;  // 写死了，换不了
+}
+
+// ✅ 先想"我需要别人能做什么"
+public class ResearchAgentImpl {
+    private final ToolProvider toolProvider;  // 接口，什么实现都行
+
+    public ResearchAgentImpl(ToolProvider toolProvider) { ... }
+}
+规矩 2：一个方法只做一件事，做完了通知一声
+
+// ❌ 上传 PDF 的同时还要管 Librarian 干什么
+public Long uploadAndParse(File file) {
+    saveToDatabase(...);
+    librarian.initiateAudit(...);   // 耦合了
+}
+
+// ✅ 做完了，发个事件，不管谁在听
+public Long uploadAndParse(File file) {
+    saveToDatabase(...);
+    eventPublisher.publishEvent(new PaperIngestedEvent(id, title));  // 发完不管
+}
+规矩 3：写之前先写接口
+不是让你设计完美接口再动手。就一个习惯：写实现类的时候，把所有 public 方法 copy 到一个 interface 文件里。
+
+
+// 第一步：先写 interface
+public interface IResearchAgent {
+    String doResearch(String sessionId, String taskDescription,
+                      ChatMemory memory, ResearchEventListener listener);
+}
+
+// 第二步：再写实现
+@Service
+public class ResearchAgentImpl implements IResearchAgent { ... }
+在 AI 时代，这种能力还重要吗？
+更重要了，但重心变了。
+
+以前你需要手写所有这些抽象。现在你只要跟 AI 说：
+
+"帮我把这个类拆成接口和实现，用构造器注入，让它不直接依赖具体类"
+
+AI 就能生成跟我写的一模一样的代码。
+
+你的能力不再是"写出完美的抽象"，而是"一眼看出哪里耦合了"。
+
+比如我刚才是怎么发现你的代码有问题的？就是这几秒的判断：
+
+
+看到 @Resource private ResearchAgent  → 具体类注入 → 耦合
+看到 NotificationService 里有 SseEmitter → 框架类型入侵领域层
+看到 PaperApplicationService import Librarian → 跨域依赖
+这种读代码 + 发现坏味道的能力，AI 替代不了，因为它不知道你的项目以后要往哪走。
+
+你可以怎么练
+从今天起，写任何新功能之前加一步：
+
+
+1. 先写一个 interface（5 行）
+2. 实现类放 internal/ 包，构造器注入所有依赖
+3. 写完检查：这个类有没有 import 其他模块的具体类？有就改掉
+坚持 3 个功能点，就成肌肉记忆了。
