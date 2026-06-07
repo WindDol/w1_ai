@@ -1,10 +1,10 @@
 package cn.winddol.ai.test;
 
-import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
-import cn.winddol.ai.domain.paperTools.model.entity.RefMetadata;
-import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
-import cn.winddol.ai.domain.paperTools.adapter.tools.IFingerprintUtils;
-import cn.winddol.ai.domain.paperTools.model.entity.SectionPO;
+import cn.winddol.ai.paper.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.paper.model.entity.RefMetadata;
+import cn.winddol.ai.paper.api.IPaperRepository;
+import cn.winddol.ai.paper.adapter.tools.IFingerprintUtils;
+import cn.winddol.ai.paper.model.entity.SectionPO;
 import cn.winddol.ai.infrastructure.parser.MarkdownParser;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

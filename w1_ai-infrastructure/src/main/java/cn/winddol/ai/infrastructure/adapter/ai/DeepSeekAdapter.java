@@ -3,9 +3,9 @@ package cn.winddol.ai.infrastructure.adapter.ai;
 import cn.winddol.ai.domain.agent.adapter.ai.IAiAdapter;
 import cn.winddol.ai.domain.agent.model.entity.AgentPaperEntity;
 import cn.winddol.ai.domain.agent.model.entity.PaperAuditResult;
-import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
-import cn.winddol.ai.domain.paperTools.model.entity.RefMetadata;
-import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
+import cn.winddol.ai.paper.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.paper.model.entity.RefMetadata;
+import cn.winddol.ai.paper.model.valobj.SymbolDefinition;
 import com.alibaba.fastjson.JSON;
 
 import dev.langchain4j.data.message.ChatMessage;

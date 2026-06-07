@@ -1,7 +1,7 @@
 package cn.winddol.ai.infrastructure.utils;
 
-import cn.winddol.ai.domain.paperTools.model.entity.OutlineNode;
-import cn.winddol.ai.domain.paperTools.model.entity.SectionPO;
+import cn.winddol.ai.paper.model.entity.OutlineNode;
+import cn.winddol.ai.paper.model.entity.SectionPO;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

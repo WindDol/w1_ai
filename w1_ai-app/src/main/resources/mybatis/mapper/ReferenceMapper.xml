@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.winddol.ai.infrastructure.dao.ReferenceMapper">
-    <select id="searchReferencesByVector" resultType="cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO$ReferenceDTO">
+    <select id="searchReferencesByVector" resultType="cn.winddol.ai.paper.model.aggregate.SearchResultDTO$ReferenceDTO">
         SELECT
         pr.id,
         pr.paper_id AS paperId,
@@ -24,7 +24,7 @@
         LIMIT #{topK}
     </select>
 
-    <select id="selectJoinedReference" resultType="cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem">
+    <select id="selectJoinedReference" resultType="cn.winddol.ai.paper.model.valobj.ReferenceItem">
         SELECT
             pr.ref_index as refId,
             pr.raw_text as rawText,

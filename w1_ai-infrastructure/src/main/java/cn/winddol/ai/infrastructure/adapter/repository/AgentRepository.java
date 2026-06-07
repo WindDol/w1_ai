@@ -70,7 +70,7 @@ public class AgentRepository implements IAgentRepository {
 
         return AgentPaperEntity.builder()
                 .id(id)
-                .outline(paper.getOutline())
+                .outline(toLegacyOutline(paper.getOutline()))
                 .abstractText(paper.getAbstractText())
                 .embedding(paper.getEmbedding())
                 .title(paper.getTitle())
@@ -94,5 +94,18 @@ public class AgentRepository implements IAgentRepository {
             entity.setYears((Integer) map.get("years"));
             return entity;
         }).collect(Collectors.toList());
+    }
+
+    private List<cn.winddol.ai.domain.paperTools.model.entity.OutlineNode> toLegacyOutline(
+            List<cn.winddol.ai.paper.model.entity.OutlineNode> outline) {
+        if (outline == null) {
+            return null;
+        }
+        return outline.stream().map(node -> cn.winddol.ai.domain.paperTools.model.entity.OutlineNode.builder()
+                .id(node.getId())
+                .title(node.getTitle())
+                .level(node.getLevel())
+                .children(toLegacyOutline(node.getChildren()))
+                .build()).collect(Collectors.toList());
     }
 }

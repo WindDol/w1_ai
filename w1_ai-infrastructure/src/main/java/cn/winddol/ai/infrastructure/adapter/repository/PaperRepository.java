@@ -1,13 +1,12 @@
 package cn.winddol.ai.infrastructure.adapter.repository;
 
-import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
-import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
-import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
-import cn.winddol.ai.domain.paperTools.model.entity.*;
-import cn.winddol.ai.domain.paperTools.model.valobj.PaperVO;
-import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceEnum;
-import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
-import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
+import cn.winddol.ai.paper.api.IPaperRepository;
+import cn.winddol.ai.paper.model.aggregate.SearchResultDTO;
+import cn.winddol.ai.paper.model.entity.*;
+import cn.winddol.ai.paper.model.valobj.PaperVO;
+import cn.winddol.ai.paper.model.valobj.ReferenceEnum;
+import cn.winddol.ai.paper.model.valobj.ReferenceItem;
+import cn.winddol.ai.paper.model.valobj.SymbolDefinition;
 import cn.winddol.ai.infrastructure.dao.*;
 import cn.winddol.ai.infrastructure.dao.impl.ReferenceSeriveceImpl;
 import cn.winddol.ai.infrastructure.dao.impl.SectionReferenceLinkService;
@@ -15,7 +14,7 @@ import cn.winddol.ai.infrastructure.dao.impl.SymbolServiceImpl;
 import cn.winddol.ai.infrastructure.dao.po.*;
 import cn.winddol.ai.infrastructure.parser.ReferenceParser;
 import cn.winddol.ai.infrastructure.utils.TreeBuilderUtil;
-import cn.winddol.ai.types.exception.AppException;
+import cn.winddol.ai.shared.exception.AppException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -35,8 +34,7 @@ import java.util.function.Predicate;
 
 @Slf4j
 @Repository
-public class PaperRepository implements IPaperRepository,
-        cn.winddol.ai.paper.api.IPaperRepository {
+public class PaperRepository implements IPaperRepository {
     @Autowired
     private PaperMapper paperMapper;
 

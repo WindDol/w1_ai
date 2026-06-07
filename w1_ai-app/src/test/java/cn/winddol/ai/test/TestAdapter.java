@@ -1,12 +1,12 @@
 package cn.winddol.ai.test;
 
 import cn.winddol.ai.domain.agent.service.bussiness.LibrarianAuditService;
-import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
-import cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository;
-import cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition;
-import cn.winddol.ai.domain.paperTools.service.librarianTools.CitationEnrichmentService;
-import cn.winddol.ai.domain.paperTools.service.librarianTools.PaperEnrichmentService;
 import cn.winddol.ai.infrastructure.embedding.EmbeddingProcessor;
+import cn.winddol.ai.paper.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.paper.api.IPaperRepository;
+import cn.winddol.ai.paper.model.valobj.SymbolDefinition;
+import cn.winddol.ai.shared.api.ICitationEnrichmentService;
+import cn.winddol.ai.shared.api.IPaperEnrichmentService;
 import dev.ai4j.openai4j.Json;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +22,9 @@ public class TestAdapter {
     @Resource
     private ISymbolExtractor extractor;
     @Resource
-    private PaperEnrichmentService enrichmentService;
+    private IPaperEnrichmentService enrichmentService;
     @Resource
-    private CitationEnrichmentService citationService;
+    private ICitationEnrichmentService citationService;
     @Resource
     private EmbeddingProcessor embeddingProcessor;
     @Resource

@@ -1,6 +1,6 @@
 package cn.winddol.ai.paper.internal;
 
-import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
+import cn.winddol.ai.paper.model.aggregate.SearchResultDTO;
 import cn.winddol.ai.paper.api.IEmbeddingService;
 import cn.winddol.ai.paper.api.IPaperRepository;
 import lombok.extern.slf4j.Slf4j;

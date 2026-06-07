@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Service
 @Slf4j
 public class CitationEnrichmentService implements cn.winddol.ai.shared.api.ICitationEnrichmentService {
     @Resource

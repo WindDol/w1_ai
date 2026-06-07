@@ -2,7 +2,7 @@ package cn.winddol.ai.infrastructure.dao.handler;
 
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
-import cn.winddol.ai.domain.paperTools.model.entity.OutlineNode;
+import cn.winddol.ai.paper.model.entity.OutlineNode;
 import java.util.List;
 
 /**

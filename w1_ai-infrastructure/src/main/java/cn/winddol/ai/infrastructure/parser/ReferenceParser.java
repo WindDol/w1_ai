@@ -1,6 +1,6 @@
 package cn.winddol.ai.infrastructure.parser;
 
-import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
+import cn.winddol.ai.paper.model.valobj.ReferenceItem;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ public class ReferenceParser {
     // --- 模式 A: 数字引用 ---
     // 匹配 [1], 1., <sup>1</sup>
     private static final Pattern NUMBERED_PATTERN = Pattern.compile(
-            "^(?:<sup>(\\d+)</sup>|\\[(\\d+)]|(\\d+)\\.?)\\s*(.*)$"
+            "^(?:<sup>(\\d+)</sup>|\\[(\\d+)]|\\$\\^\\{?(\\d+)\\}?\\$|(\\d+)\\.?)\\s*(.*)$"
     );
 
     // --- 模式 B: 作者-年份引用 ---
@@ -55,8 +55,8 @@ public class ReferenceParser {
                 // 命中数字格式 (2., [2], <sup>2</sup>)
                 isNewRef = true;
                 // 智能获取 ID
-                newId = getFirstNonNullGroup(numMatcher, 1, 2, 3);
-                newContent = numMatcher.group(4);
+                newId = getFirstNonNullGroup(numMatcher, 1, 2, 3, 4);
+                newContent = numMatcher.group(5);
             } else if (authMatcher.find()) {
                 isNewRef = true;
                 String authorPart = authMatcher.group(1);

@@ -9,7 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
-@Component
 public class CitationLinkExtractor {
     // 匹配 [1], [1, 2], [1-3], [1, 2, 5-7]
     private static final Pattern NUMBERED_CITATION_PATTERN  = Pattern.compile(

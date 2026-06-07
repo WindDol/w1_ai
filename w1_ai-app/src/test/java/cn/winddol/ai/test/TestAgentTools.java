@@ -2,10 +2,10 @@ package cn.winddol.ai.test;
 
 
 import cn.winddol.ai.domain.agent.service.bussiness.LibrarianAuditService;
-import cn.winddol.ai.domain.paperTools.service.ScientificResearchTools;
-import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
-import cn.winddol.ai.domain.paperTools.service.researchTools.AgentReaderService;
-import cn.winddol.ai.domain.paperTools.service.researchTools.HybridRetrieverService;
+import cn.winddol.ai.paper.api.IScientificResearchTools;
+import cn.winddol.ai.paper.model.aggregate.SearchResultDTO;
+import cn.winddol.ai.paper.internal.AgentReaderServiceImpl;
+import cn.winddol.ai.paper.internal.HybridRetrieverServiceImpl;
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class TestAgentTools {
 
     @Resource
-    private HybridRetrieverService retriever;
+    private HybridRetrieverServiceImpl retriever;
     @Resource
-    private AgentReaderService reader;
+    private AgentReaderServiceImpl reader;
     @Resource
-    private ScientificResearchTools scientificResearchTools;
+    private IScientificResearchTools scientificResearchTools;
     @Resource
     private LibrarianAuditService auditService;
 
@@ -30,7 +30,7 @@ public class TestAgentTools {
     public void test1_SearchLibrary() {
         // 测试雷达
         System.out.println("--- Test Search: 'Möbius transformation' ---");
-        SearchResultDTO result = retriever.searchLibrary("Möbius transformation",null);
+        SearchResultDTO result = retriever.searchLibrary("Möbius transformation",null,0.3);
 
         // 断言：应该能找到 Header 包含 Möbius 的章节
        log.info(JSON.toJSONString(result));

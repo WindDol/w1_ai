@@ -1,5 +1,5 @@
 package cn.winddol.ai.infrastructure.parser;
-import cn.winddol.ai.domain.paperTools.model.entity.SectionPO;
+import cn.winddol.ai.paper.model.entity.SectionPO;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

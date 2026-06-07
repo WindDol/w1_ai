@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-@Component
 @Slf4j
 public class PaperAuditListener{
     @Resource

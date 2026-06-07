@@ -1,10 +1,9 @@
 package cn.winddol.ai.paper.api;
 
-import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
-import cn.winddol.ai.domain.paperTools.model.aggregate.SearchResultDTO;
-import cn.winddol.ai.domain.paperTools.model.entity.*;
-import cn.winddol.ai.domain.paperTools.model.valobj.PaperVO;
-import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
+import cn.winddol.ai.paper.model.aggregate.SearchResultDTO;
+import cn.winddol.ai.paper.model.entity.*;
+import cn.winddol.ai.paper.model.valobj.PaperVO;
+import cn.winddol.ai.paper.model.valobj.ReferenceItem;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +26,28 @@ public interface IPaperRepository {
     List<KnowledgeRelationEntity> findRelationsByPaperId(Long paperId);
 
     List<ReferenceItem> selectReferencesByPaperId(Long paperId);
+
+    List<SectionEntity> getSectionByUuid(List<String> uuid);
+
+    PaperEntity getPaperById(Long id);
+
+    List<ReferenceItem> selectReferences();
+
+    void updateReferences(ReferenceItem ref);
+
+    List<SectionReferenceLinkEntity> selectReferenceLinks(Long paperId, String refId);
+
+    GlobalReferenceEntity selectGlobalReferenceByS2Id(String s2Id);
+
+    GlobalReferenceEntity selectGlobalReferenceByFingerprint(String fingerprint);
+
+    Long insertGlobalReference(GlobalReferenceEntity globalNode);
+
+    Long updateGlobalReference(GlobalReferenceEntity globalNode);
+
+    Long findPaperIdByFingerprint(String fingerprint);
+
+    List<ReferenceItem> selectPendingReferencesByPaperId(Long paperId);
 
     List<SearchResultDTO.SectionDTO> searchSectionsByVector(Long paperId, String vector, int topK);
 
@@ -54,5 +75,5 @@ public interface IPaperRepository {
 
     List<GlobalReferenceEntity> getTopFrequentReferences(Integer limit);
 
-    void saveEnrichmentData(Long paperId, List<cn.winddol.ai.domain.paperTools.model.valobj.SymbolDefinition> finalSymbols, SectionEntity refSection, Map<String, Set<String>> citationLinks);
+    void saveEnrichmentData(Long paperId, List<cn.winddol.ai.paper.model.valobj.SymbolDefinition> finalSymbols, SectionEntity refSection, Map<String, Set<String>> citationLinks);
 }

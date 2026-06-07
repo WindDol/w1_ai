@@ -1,18 +1,17 @@
 package cn.winddol.ai.paper.internal;
 
-import cn.winddol.ai.domain.agent.model.entity.KnowledgeRelationEntity;
-import cn.winddol.ai.domain.paperTools.adapter.ai.ISymbolExtractor;
-import cn.winddol.ai.domain.paperTools.adapter.parser.IPaperParser;
-import cn.winddol.ai.domain.paperTools.adapter.tools.IFingerprintUtils;
-import cn.winddol.ai.domain.paperTools.model.entity.*;
-import cn.winddol.ai.domain.paperTools.model.valobj.PaperDetailVO;
-import cn.winddol.ai.domain.paperTools.model.valobj.PaperVO;
-import cn.winddol.ai.domain.paperTools.model.valobj.ReferenceItem;
+import cn.winddol.ai.paper.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.paper.adapter.parser.IPaperParser;
+import cn.winddol.ai.paper.adapter.tools.IFingerprintUtils;
+import cn.winddol.ai.paper.model.entity.*;
+import cn.winddol.ai.paper.model.valobj.PaperDetailVO;
+import cn.winddol.ai.paper.model.valobj.PaperVO;
+import cn.winddol.ai.paper.model.valobj.ReferenceItem;
 import cn.winddol.ai.paper.api.IFileStorageService;
 import cn.winddol.ai.paper.api.IPaperApplication;
 import cn.winddol.ai.paper.api.IPaperRepository;
 import cn.winddol.ai.paper.event.PaperIngestedEvent;
-import cn.winddol.ai.types.exception.AppException;
+import cn.winddol.ai.shared.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -33,26 +32,29 @@ public class PaperApplicationServiceImpl implements IPaperApplication {
     private final IPaperRepository paperRepository;
     private final IFingerprintUtils fingerprintUtils;
     private final ApplicationEventPublisher eventPublisher;
+    private final PaperStructureNormalizer structureNormalizer;
 
     public PaperApplicationServiceImpl(IFileStorageService fileStorageService,
                                        IPaperParser parser,
                                        ISymbolExtractor symbolExtractor,
                                        IPaperRepository paperRepository,
                                        IFingerprintUtils fingerprintUtils,
-                                       ApplicationEventPublisher eventPublisher) {
+                                       ApplicationEventPublisher eventPublisher,
+                                       PaperStructureNormalizer structureNormalizer) {
         this.fileStorageService = fileStorageService;
         this.parser = parser;
         this.symbolExtractor = symbolExtractor;
         this.paperRepository = paperRepository;
         this.fingerprintUtils = fingerprintUtils;
         this.eventPublisher = eventPublisher;
+        this.structureNormalizer = structureNormalizer;
     }
 
     @Override
     public Long uploadAndParse(MultipartFile file) throws IOException {
         File tempFile = fileStorageService.saveTempFile(file);
         try {
-            String markdown = parser.parsePdfToMarkdown(tempFile.getAbsolutePath());
+            String markdown = structureNormalizer.normalize(parser.parsePdfToMarkdown(tempFile.getAbsolutePath()));
             List<SectionPO> pos = parser.parse(markdown);
             String title = parser.extractTitle(markdown);
             String abstractText = parser.extractAbstract(pos);

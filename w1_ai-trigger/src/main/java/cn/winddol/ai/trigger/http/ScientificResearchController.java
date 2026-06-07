@@ -3,7 +3,7 @@ package cn.winddol.ai.trigger.http;
 import cn.winddol.ai.api.IScientificResearchController;
 import cn.winddol.ai.api.response.Response;
 import cn.winddol.ai.paper.api.IScientificResearchTools;
-import cn.winddol.ai.types.enums.ResponseCode;
+import cn.winddol.ai.shared.enums.ResponseCode;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;

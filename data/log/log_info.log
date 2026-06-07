@@ -550,3 +550,70 @@ Consider defining a bean of type 'cn.winddol.ai.domain.agent.service.bussiness.R
 26-05-02.19:28:58.345 [http-nio-8091-exec-4] WARN  DefaultHandlerExceptionResolver - Resolved [org.springframework.web.context.request.async.AsyncRequestTimeoutException]
 26-05-02.19:28:58.356 [SpringApplicationShutdownHook] INFO  HikariDataSource       - HikariPool-1 - Shutdown initiated...
 26-05-02.19:28:58.359 [SpringApplicationShutdownHook] INFO  HikariDataSource       - HikariPool-1 - Shutdown completed.
+26-06-07.19:01:17.141 [main            ] INFO  Application            - Starting Application using Java 17.0.15 with PID 7128 (C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app\target\classes started by Mr Ding in C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai)
+26-06-07.19:01:17.143 [main            ] INFO  Application            - The following 1 profile is active: "dev"
+26-06-07.19:01:19.646 [main            ] INFO  TomcatWebServer        - Tomcat initialized with port 8091 (http)
+26-06-07.19:01:19.664 [main            ] INFO  Http11NioProtocol      - Initializing ProtocolHandler ["http-nio-8091"]
+26-06-07.19:01:19.667 [main            ] INFO  StandardService        - Starting service [Tomcat]
+26-06-07.19:01:19.667 [main            ] INFO  StandardEngine         - Starting Servlet engine: [Apache Tomcat/10.1.17]
+26-06-07.19:01:19.781 [main            ] INFO  [/]                    - Initializing Spring embedded WebApplicationContext
+26-06-07.19:01:19.781 [main            ] INFO  ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2573 ms
+26-06-07.19:01:21.740 [main            ] WARN  AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'librarianPaperEventListener' defined in file [C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-agent-librarian\target\classes\cn\winddol\ai\agent\librarian\internal\LibrarianPaperEventListener.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'paperEnrichmentService': Injection of resource dependencies failed
+26-06-07.19:01:21.744 [main            ] INFO  StandardService        - Stopping service [Tomcat]
+26-06-07.19:01:21.762 [main            ] INFO  ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+26-06-07.19:01:21.786 [main            ] ERROR LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in cn.winddol.ai.agent.librarian.internal.LibrarianPaperEventListener required a bean of type 'cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository' in your configuration.
+
+26-06-07.19:03:12.977 [main            ] INFO  Application            - Starting Application using Java 17.0.15 with PID 18740 (C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app\target\classes started by Mr Ding in C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai)
+26-06-07.19:03:12.978 [main            ] INFO  Application            - The following 1 profile is active: "dev"
+26-06-07.19:03:16.173 [main            ] INFO  TomcatWebServer        - Tomcat initialized with port 8091 (http)
+26-06-07.19:03:16.189 [main            ] INFO  Http11NioProtocol      - Initializing ProtocolHandler ["http-nio-8091"]
+26-06-07.19:03:16.191 [main            ] INFO  StandardService        - Starting service [Tomcat]
+26-06-07.19:03:16.191 [main            ] INFO  StandardEngine         - Starting Servlet engine: [Apache Tomcat/10.1.17]
+26-06-07.19:03:16.299 [main            ] INFO  [/]                    - Initializing Spring embedded WebApplicationContext
+26-06-07.19:03:16.299 [main            ] INFO  ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3255 ms
+26-06-07.19:03:18.209 [main            ] WARN  AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'librarianPaperEventListener' defined in file [C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-agent-librarian\target\classes\cn\winddol\ai\agent\librarian\internal\LibrarianPaperEventListener.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'paperEnrichmentService': Injection of resource dependencies failed
+26-06-07.19:03:18.212 [main            ] INFO  StandardService        - Stopping service [Tomcat]
+26-06-07.19:03:18.226 [main            ] INFO  ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+26-06-07.19:03:18.250 [main            ] ERROR LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in cn.winddol.ai.agent.librarian.internal.LibrarianPaperEventListener required a bean of type 'cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'cn.winddol.ai.domain.paperTools.adapter.repository.IPaperRepository' in your configuration.
+
+26-06-07.19:11:11.691 [main            ] INFO  Application            - Starting Application using Java 17.0.15 with PID 17164 (C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app\target\classes started by Mr Ding in C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai)
+26-06-07.19:11:11.693 [main            ] INFO  Application            - The following 1 profile is active: "dev"
+26-06-07.19:11:14.161 [main            ] INFO  TomcatWebServer        - Tomcat initialized with port 8091 (http)
+26-06-07.19:11:14.176 [main            ] INFO  Http11NioProtocol      - Initializing ProtocolHandler ["http-nio-8091"]
+26-06-07.19:11:14.179 [main            ] INFO  StandardService        - Starting service [Tomcat]
+26-06-07.19:11:14.179 [main            ] INFO  StandardEngine         - Starting Servlet engine: [Apache Tomcat/10.1.17]
+26-06-07.19:11:14.283 [main            ] INFO  [/]                    - Initializing Spring embedded WebApplicationContext
+26-06-07.19:11:14.283 [main            ] INFO  ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2530 ms
+26-06-07.19:11:17.144 [main            ] INFO  Http11NioProtocol      - Starting ProtocolHandler ["http-nio-8091"]
+26-06-07.19:11:17.187 [main            ] INFO  TomcatWebServer        - Tomcat started on port 8091 (http) with context path ''
+26-06-07.19:11:17.206 [main            ] INFO  Application            - Started Application in 6.407 seconds (process running for 7.13)

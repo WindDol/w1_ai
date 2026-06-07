@@ -39,6 +39,10 @@
         </dependency>
         <dependency>
             <groupId>cn.winddol.ai</groupId>
+            <artifactId>w1_ai-shared</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.winddol.ai</groupId>
             <artifactId>w1_ai-agent-research</artifactId>
         </dependency>
         <dependency>

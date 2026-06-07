@@ -1,6 +1,6 @@
 package cn.winddol.ai.infrastructure.dao;
 
-import cn.winddol.ai.domain.paperTools.model.entity.PaperEntity;
+import cn.winddol.ai.paper.model.entity.PaperEntity;
 import cn.winddol.ai.infrastructure.dao.po.Paper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;

@@ -21,14 +21,6 @@
             <artifactId>w1_ai-shared</artifactId>
         </dependency>
         <dependency>
-            <groupId>cn.winddol.ai</groupId>
-            <artifactId>w1_ai-domain</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cn.winddol.ai</groupId>
-            <artifactId>w1_ai-types</artifactId>
-        </dependency>
-        <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j</artifactId>
         </dependency>
@@ -55,6 +47,10 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
         </dependency>
     </dependencies>
 </project>
