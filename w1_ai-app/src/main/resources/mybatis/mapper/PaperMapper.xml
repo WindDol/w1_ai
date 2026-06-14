@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.winddol.ai.infrastructure.dao.PaperMapper">
-    <select id="searchPapers" resultType="cn.winddol.ai.paper.model.entity.PaperEntity">
+    <select id="searchPapers" resultType="cn.winddol.ai.paper.domain.PaperEntity">
         SELECT
         id,
         title,

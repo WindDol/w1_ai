@@ -97,7 +97,7 @@ public class AgentRepository implements IAgentRepository {
     }
 
     private List<cn.winddol.ai.domain.paperTools.model.entity.OutlineNode> toLegacyOutline(
-            List<cn.winddol.ai.paper.model.entity.OutlineNode> outline) {
+            List<cn.winddol.ai.paper.domain.OutlineNode> outline) {
         if (outline == null) {
             return null;
         }

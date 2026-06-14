@@ -1,6 +1,6 @@
 package cn.winddol.ai.infrastructure.utils;
 
-import cn.winddol.ai.paper.adapter.tools.IFingerprintUtils;
+import cn.winddol.ai.paper.api.IFingerprintUtils;
 import org.apache.commons.codec.digest.DigestUtils;import org.springframework.stereotype.Service;
 
 import java.util.List;

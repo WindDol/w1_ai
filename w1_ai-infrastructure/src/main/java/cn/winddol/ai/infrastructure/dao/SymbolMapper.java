@@ -1,6 +1,6 @@
 package cn.winddol.ai.infrastructure.dao;
 
-import cn.winddol.ai.paper.model.aggregate.SearchResultDTO;
+import cn.winddol.ai.paper.domain.SearchResultDTO;
 import cn.winddol.ai.infrastructure.dao.po.Symbol;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;

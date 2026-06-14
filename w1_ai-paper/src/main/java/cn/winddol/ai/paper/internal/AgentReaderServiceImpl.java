@@ -1,7 +1,7 @@
 package cn.winddol.ai.paper.internal;
 
-import cn.winddol.ai.paper.model.entity.*;
-import cn.winddol.ai.paper.model.valobj.ReferenceItem;
+import cn.winddol.ai.paper.domain.*;
+import cn.winddol.ai.paper.domain.ReferenceItem;
 import cn.winddol.ai.paper.api.IPaperRepository;
 import org.springframework.stereotype.Service;
 

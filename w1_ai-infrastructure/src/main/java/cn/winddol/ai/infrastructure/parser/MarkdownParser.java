@@ -1,5 +1,5 @@
 package cn.winddol.ai.infrastructure.parser;
-import cn.winddol.ai.paper.model.entity.SectionPO;
+import cn.winddol.ai.paper.domain.SectionPO;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -42,10 +42,6 @@ public class MarkdownParser {
                 }
 
 
-                if (PaperCleaner.isNoise(line)) {
-                    continue;
-                }
-
                 Matcher matcher = headerPattern.matcher(line);
 
                 // 判断是否是标题行
@@ -65,6 +61,10 @@ public class MarkdownParser {
                         activeParentIds[i] = null;
                     }
                 } else {
+                    if (PaperCleaner.isNoise(line)) {
+                        continue;
+                    }
+
                     // 普通行：追加到当前章节内容
                     String trimmedLine = line.trim();
                     if (trimmedLine.isEmpty()) {

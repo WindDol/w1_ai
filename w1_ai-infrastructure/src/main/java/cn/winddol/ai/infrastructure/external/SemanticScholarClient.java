@@ -1,8 +1,8 @@
 package cn.winddol.ai.infrastructure.external;
 
-import cn.winddol.ai.paper.adapter.external.ISemanticScholar;
-import cn.winddol.ai.paper.model.entity.S2PaperData;
-import cn.winddol.ai.paper.model.aggregate.S2PaperResponse;
+import cn.winddol.ai.paper.api.ISemanticScholar;
+import cn.winddol.ai.paper.domain.S2PaperData;
+import cn.winddol.ai.paper.domain.S2PaperResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;

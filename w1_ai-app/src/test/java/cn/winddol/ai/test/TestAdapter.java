@@ -2,9 +2,9 @@ package cn.winddol.ai.test;
 
 import cn.winddol.ai.domain.agent.service.bussiness.LibrarianAuditService;
 import cn.winddol.ai.infrastructure.embedding.EmbeddingProcessor;
-import cn.winddol.ai.paper.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.paper.api.ISymbolExtractor;
 import cn.winddol.ai.paper.api.IPaperRepository;
-import cn.winddol.ai.paper.model.valobj.SymbolDefinition;
+import cn.winddol.ai.paper.domain.SymbolDefinition;
 import cn.winddol.ai.shared.api.ICitationEnrichmentService;
 import cn.winddol.ai.shared.api.IPaperEnrichmentService;
 import dev.ai4j.openai4j.Json;

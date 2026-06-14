@@ -1,9 +1,6 @@
 package cn.winddol.ai.paper.api;
 
-import cn.winddol.ai.paper.model.aggregate.SearchResultDTO;
-import cn.winddol.ai.paper.model.entity.*;
-import cn.winddol.ai.paper.model.valobj.PaperVO;
-import cn.winddol.ai.paper.model.valobj.ReferenceItem;
+import cn.winddol.ai.paper.domain.*;
 
 import java.util.List;
 import java.util.Map;
@@ -75,5 +72,5 @@ public interface IPaperRepository {
 
     List<GlobalReferenceEntity> getTopFrequentReferences(Integer limit);
 
-    void saveEnrichmentData(Long paperId, List<cn.winddol.ai.paper.model.valobj.SymbolDefinition> finalSymbols, SectionEntity refSection, Map<String, Set<String>> citationLinks);
+    void saveEnrichmentData(Long paperId, List<SymbolDefinition> finalSymbols, SectionEntity refSection, Map<String, Set<String>> citationLinks);
 }

@@ -1,6 +1,6 @@
 package cn.winddol.ai.infrastructure.parser;
 
-import cn.winddol.ai.paper.model.valobj.ReferenceItem;
+import cn.winddol.ai.paper.domain.ReferenceItem;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

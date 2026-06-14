@@ -4,7 +4,7 @@ import cn.winddol.ai.agent.librarian.api.ILibrarianAgent;
 import cn.winddol.ai.agent.librarian.api.ILibrarianRepository;
 import cn.winddol.ai.domain.agent.adapter.embedding.IEmbeddingProcessor;
 import cn.winddol.ai.paper.api.IPaperRepository;
-import cn.winddol.ai.paper.event.PaperIngestedEvent;
+import cn.winddol.ai.paper.api.PaperIngestedEvent;
 import cn.winddol.ai.shared.api.ICitationEnrichmentService;
 import cn.winddol.ai.shared.api.IPaperEnrichmentService;
 import lombok.extern.slf4j.Slf4j;

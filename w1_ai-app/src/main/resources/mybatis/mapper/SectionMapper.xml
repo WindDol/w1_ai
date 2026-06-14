@@ -10,7 +10,7 @@
         <result column="score" property="score"/>
     </resultMap>
 
-    <select id="searchByVector" resultType="cn.winddol.ai.paper.model.aggregate.SearchResultDTO$SectionDTO">
+    <select id="searchByVector" resultType="cn.winddol.ai.paper.domain.SearchResultDTO$SectionDTO">
         SELECT
         s.id,
         s.paper_id AS paperId,

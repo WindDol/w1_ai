@@ -12,7 +12,7 @@
 
     <!-- 向量检索 SQL -->
     <!-- order by embedding <=> [1,2,3] limit 5 -->
-    <select id="searchByVector" resultType="cn.winddol.ai.paper.model.aggregate.SearchResultDTO$SymbolDTO">
+    <select id="searchByVector" resultType="cn.winddol.ai.paper.domain.SearchResultDTO$SymbolDTO">
         SELECT
         sym.id,
         sym.paper_id AS paperId,

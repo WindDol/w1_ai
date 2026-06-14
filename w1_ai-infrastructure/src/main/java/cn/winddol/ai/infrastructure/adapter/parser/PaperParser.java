@@ -1,7 +1,7 @@
 package cn.winddol.ai.infrastructure.adapter.parser;
 
-import cn.winddol.ai.paper.adapter.parser.IPaperParser;
-import cn.winddol.ai.paper.model.entity.SectionPO;
+import cn.winddol.ai.paper.api.IPaperParser;
+import cn.winddol.ai.paper.domain.SectionPO;
 import cn.winddol.ai.infrastructure.parser.MarkdownParser;
 import cn.winddol.ai.infrastructure.parser.PythonParserAdapter;
 import jakarta.annotation.Resource;

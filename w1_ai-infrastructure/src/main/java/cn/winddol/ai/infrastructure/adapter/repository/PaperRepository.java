@@ -1,12 +1,12 @@
 package cn.winddol.ai.infrastructure.adapter.repository;
 
 import cn.winddol.ai.paper.api.IPaperRepository;
-import cn.winddol.ai.paper.model.aggregate.SearchResultDTO;
-import cn.winddol.ai.paper.model.entity.*;
-import cn.winddol.ai.paper.model.valobj.PaperVO;
-import cn.winddol.ai.paper.model.valobj.ReferenceEnum;
-import cn.winddol.ai.paper.model.valobj.ReferenceItem;
-import cn.winddol.ai.paper.model.valobj.SymbolDefinition;
+import cn.winddol.ai.paper.domain.SearchResultDTO;
+import cn.winddol.ai.paper.domain.*;
+import cn.winddol.ai.paper.domain.PaperVO;
+import cn.winddol.ai.paper.domain.ReferenceEnum;
+import cn.winddol.ai.paper.domain.ReferenceItem;
+import cn.winddol.ai.paper.domain.SymbolDefinition;
 import cn.winddol.ai.infrastructure.dao.*;
 import cn.winddol.ai.infrastructure.dao.impl.ReferenceSeriveceImpl;
 import cn.winddol.ai.infrastructure.dao.impl.SectionReferenceLinkService;

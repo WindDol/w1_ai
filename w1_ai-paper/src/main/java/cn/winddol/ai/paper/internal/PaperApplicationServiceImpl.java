@@ -1,16 +1,16 @@
 package cn.winddol.ai.paper.internal;
 
-import cn.winddol.ai.paper.adapter.ai.ISymbolExtractor;
-import cn.winddol.ai.paper.adapter.parser.IPaperParser;
-import cn.winddol.ai.paper.adapter.tools.IFingerprintUtils;
-import cn.winddol.ai.paper.model.entity.*;
-import cn.winddol.ai.paper.model.valobj.PaperDetailVO;
-import cn.winddol.ai.paper.model.valobj.PaperVO;
-import cn.winddol.ai.paper.model.valobj.ReferenceItem;
+import cn.winddol.ai.paper.api.ISymbolExtractor;
+import cn.winddol.ai.paper.api.IPaperParser;
+import cn.winddol.ai.paper.api.IFingerprintUtils;
+import cn.winddol.ai.paper.domain.*;
+import cn.winddol.ai.paper.domain.PaperDetailVO;
+import cn.winddol.ai.paper.domain.PaperVO;
+import cn.winddol.ai.paper.domain.ReferenceItem;
 import cn.winddol.ai.paper.api.IFileStorageService;
 import cn.winddol.ai.paper.api.IPaperApplication;
 import cn.winddol.ai.paper.api.IPaperRepository;
-import cn.winddol.ai.paper.event.PaperIngestedEvent;
+import cn.winddol.ai.paper.api.PaperIngestedEvent;
 import cn.winddol.ai.shared.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;

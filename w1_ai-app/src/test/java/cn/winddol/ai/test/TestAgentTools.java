@@ -3,7 +3,7 @@ package cn.winddol.ai.test;
 
 import cn.winddol.ai.domain.agent.service.bussiness.LibrarianAuditService;
 import cn.winddol.ai.paper.api.IScientificResearchTools;
-import cn.winddol.ai.paper.model.aggregate.SearchResultDTO;
+import cn.winddol.ai.paper.domain.SearchResultDTO;
 import cn.winddol.ai.paper.internal.AgentReaderServiceImpl;
 import cn.winddol.ai.paper.internal.HybridRetrieverServiceImpl;
 import com.alibaba.fastjson.JSON;

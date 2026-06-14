@@ -1,7 +1,7 @@
 package cn.winddol.ai.paper.internal;
 
-import cn.winddol.ai.paper.model.entity.GlobalReferenceEntity;
-import cn.winddol.ai.paper.model.entity.PaperEntity;
+import cn.winddol.ai.paper.domain.GlobalReferenceEntity;
+import cn.winddol.ai.paper.domain.PaperEntity;
 import cn.winddol.ai.paper.api.IPaperRepository;
 import org.springframework.stereotype.Service;
 

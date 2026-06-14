@@ -1,11 +1,11 @@
 package cn.winddol.ai.paper.internal;
 
-import cn.winddol.ai.paper.adapter.ai.ISymbolExtractor;
+import cn.winddol.ai.paper.api.ISymbolExtractor;
 import cn.winddol.ai.paper.api.IPaperRepository;
-import cn.winddol.ai.paper.model.entity.OutlineNode;
-import cn.winddol.ai.paper.model.entity.PaperEntity;
-import cn.winddol.ai.paper.model.entity.SectionEntity;
-import cn.winddol.ai.paper.model.valobj.SymbolDefinition;
+import cn.winddol.ai.paper.domain.OutlineNode;
+import cn.winddol.ai.paper.domain.PaperEntity;
+import cn.winddol.ai.paper.domain.SectionEntity;
+import cn.winddol.ai.paper.domain.SymbolDefinition;
 import cn.winddol.ai.shared.api.IPaperEnrichmentService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

@@ -37,6 +37,13 @@ public class PaperCleaner {
     // 6. 版权符号
     private static final Pattern COPYRIGHT_PATTERN = Pattern.compile(".*(©|\\(c\\)|Copyright|Downloaded from|Rights reserved).*", Pattern.CASE_INSENSITIVE);
     private static final Pattern CITATION_START_PATTERN = Pattern.compile("^\\s*(\\[\\d+]|\\d+\\.|\\(\\d+\\)).*");
+    private static final Pattern MARKDOWN_NUMBERED_HEADER_PATTERN = Pattern.compile(
+            "^\\s*#{1,6}\\s+(?:\\d+(?:\\.\\d+)*|[IVXLCDM]+|[A-Z])\\.\\s+.+$"
+    );
+    private static final Pattern MARKDOWN_STANDARD_HEADER_PATTERN = Pattern.compile(
+            "^\\s*#{1,6}\\s+(abstract|references|acknowledg(?:e)?ments?|data availability|appendix\\b.*)\\s*$",
+            Pattern.CASE_INSENSITIVE
+    );
     private static final int MAX_HEADER_LENGTH = 120;
 
     /**
@@ -48,6 +55,9 @@ public class PaperCleaner {
         }
         String content = line.trim();
         if (CITATION_START_PATTERN.matcher(content).matches()) {
+            return false;
+        }
+        if (isStructuralMarkdownHeader(content)) {
             return false;
         }
         if (content.length() > MAX_HEADER_LENGTH) {
@@ -96,5 +106,10 @@ public class PaperCleaner {
         }
 
         return false;
+    }
+
+    private static boolean isStructuralMarkdownHeader(String content) {
+        return MARKDOWN_NUMBERED_HEADER_PATTERN.matcher(content).matches()
+                || MARKDOWN_STANDARD_HEADER_PATTERN.matcher(content).matches();
     }
 }
