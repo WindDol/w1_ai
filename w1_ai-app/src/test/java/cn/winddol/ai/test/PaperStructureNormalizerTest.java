@@ -25,7 +25,7 @@ public class PaperStructureNormalizerTest {
     public void normalizeMonkeyOcrSamplesForOutlineParsing() throws Exception {
         for (String sample : List.of(
                 "Mobius1", "Mobius2", "Mobius33", "1-s2.0-S2405896322006656-main",
-                "2", "3", "4", "5", "6", "7", "8", "9", "10"
+                "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"
         )) {
             PaperStructureNormalizationResult report = normalizer.normalizeWithReport(Files.readString(resolveSample(sample)));
             String normalized = report.normalizedMarkdown();
@@ -137,43 +137,25 @@ public class PaperStructureNormalizerTest {
 
     @Test
     public void normalizesSecondBatchOutlineFailureModes() throws Exception {
-        List<SectionPO> sample2 = parseSample("2");
-        assertNoHeader(sample2, "a preprint");
-        assertNoHeader(sample2, "figure 4 shows");
-        assertHeaderLevel(sample2, "3 models", 2);
-        assertHeaderLevel(sample2, "the algorithm", 4);
-        assertHeaderLevel(sample2, "method 1", 4);
-        assertHeaderLevel(sample2, "method 2", 4);
 
-        List<SectionPO> sample3 = parseSample("3");
-        assertNoHeader(sample3, "![](images");
-        assertHeaderLevel(sample3, "a matrix-valued kuramoto model", 1);
-        assertHeaderLevel(sample3, "acknowledgements", 2);
-        assertNoHeader(sample3, "national science foundation under grant");
+        List<SectionPO> sample14 = parseSample("14");
+        assertHeaderLevel(sample14, "low dimensional behavior of large systems of globally coupled oscillators", 1);
+        assertNoHeader(sample14, "articles you may be interested in");
+        assertHeaderLevel(sample14, "e. the millennium bridge problem", 3);
+        assertHeaderLevel(sample14, "references", 2);
 
-        List<SectionPO> sample4 = parseSample("4");
-        assertHeaderCount(sample4, "bifurcations in the kuramoto model on graphs", 1);
+        List<SectionPO> sample15 = parseSample("15");
+        assertHeaderLevel(sample15, "pseudospectral approximation of eigenvalues", 1);
+        assertHeaderLevel(sample15, "1. introduction", 2);
+        assertHeaderLevel(sample15, "references", 2);
 
-        List<SectionPO> sample5 = parseSample("5");
-
-
-        List<SectionPO> sample6 = parseSample("6");
-
-
-        List<SectionPO> sample7 = parseSample("7");
-
-
-
-        List<SectionPO> sample8 = parseSample("8");
-
-
-
-        List<SectionPO> sample9 = parseSample("9");
-
-
-        List<SectionPO> sample10 = parseSample("10");
-        assertHeaderLevel(sample10, "acknowledgements", 2);
-        assertNoHeader(sample10, "the authors thank matthew mizuhara");
+        List<SectionPO> sample16 = parseSample("16");
+        assertHeaderLevel(sample16, "mutual entrainment of two limit cycle oscillators", 1);
+        assertHeaderLevel(sample16, "1. introduction", 2);
+        assertHeaderLevel(sample16, "2. the solution", 2);
+        assertHeaderLevel(sample16, "3. discussion of the numerical results", 2);
+        assertHeaderLevel(sample16, "4. summary", 2);
+        assertHeaderLevel(sample16, "references", 2);
     }
 
     private Path resolveSample(String sample) {

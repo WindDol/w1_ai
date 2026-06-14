@@ -12,6 +12,7 @@ class HeadingCandidateExtractor {
     static final Pattern INLINE_ABSTRACT = Pattern.compile("^(?i)(abstract)\\s*[:.]\\s+(.+)$");
     static final Pattern DECIMAL_SECTION = Pattern.compile("^(\\d+(?:\\.\\d+)+)\\.?\\s+(.+)$");
     static final Pattern NUMBERED_SECTION = Pattern.compile("^(\\d+)\\.\\s+(.+)$");
+    static final Pattern SECTION_SIGN_NUMBERED = Pattern.compile("^§\\s*(\\d+)\\.\\s+(.+)$");
     static final Pattern ROMAN_SECTION = Pattern.compile("^([IVXLCDM]+)\\.\\s+(.+)$");
     static final Pattern LETTER_SECTION = Pattern.compile("^([A-Z])\\.\\s+(.+)$");
     static final Pattern APPENDIX_SECTION = Pattern.compile("^(?i)(appendix\\s+[A-Z])[:.]?\\s+(.+)$");
@@ -77,7 +78,7 @@ class HeadingCandidateExtractor {
                 .replaceAll("^#+\\s*", "")
                 .replaceAll("\\s+\\*$", "")
                 .replaceAll("(?i)\\s+(FREE|EP)$", "")
-                .replaceAll("\\s*[\\u2713\\u2714]\\s*$", "")
+                .replaceAll("\\s*[\\u2610\\u2611\\u2713\\u2714]\\s*$", "")
                 .toLowerCase(Locale.ROOT);
     }
 
@@ -85,7 +86,7 @@ class HeadingCandidateExtractor {
         return clean(text)
                 .replaceAll("\\s+\\*$", "")
                 .replaceAll("(?i)\\s+(FREE|EP)$", "")
-                .replaceAll("\\s*[\\u2713\\u2714]\\s*$", "")
+                .replaceAll("\\s*[\\u2610\\u2611\\u2713\\u2714]\\s*$", "")
                 .trim();
     }
 
@@ -172,6 +173,9 @@ class HeadingCandidateExtractor {
         if (CHAPTER_SECTION.matcher(text).matches()) {
             return CandidateKind.SECTION;
         }
+        if (SECTION_SIGN_NUMBERED.matcher(text).matches()) {
+            return CandidateKind.SECTION;
+        }
         if (DECIMAL_SECTION.matcher(text).matches()) {
             return CandidateKind.SUBSECTION;
         }
@@ -206,7 +210,7 @@ class HeadingCandidateExtractor {
     private String extractMarker(String text, CandidateKind kind) {
         Pattern pattern = switch (kind) {
             case SUBSECTION -> DECIMAL_SECTION;
-            case SECTION -> NUMBERED_SECTION;
+            case SECTION -> SECTION_SIGN_NUMBERED.matcher(text).matches() ? SECTION_SIGN_NUMBERED : NUMBERED_SECTION;
             case APPENDIX -> APPENDIX_SECTION;
             default -> null;
         };

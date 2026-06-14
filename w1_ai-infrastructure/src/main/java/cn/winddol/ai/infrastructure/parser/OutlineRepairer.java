@@ -17,6 +17,7 @@ class OutlineRepairer {
     private static final Pattern CHAPTER_HEADER = Pattern.compile("(?i)^chapter\\s+(\\d+)\\b.*$");
     private static final Pattern CHAPTER_WITH_TITLE = Pattern.compile("(?i)^chapter\\s+(\\d+)\\.\\s*(.+)$");
     private static final Pattern INLINE_HEADING_BODY = Pattern.compile("^(.{8,100}?\\.)(\\s+)([A-Z].+)$");
+    private static final Pattern REFERENCE_ITEM_START = Pattern.compile("^(?:\\[\\d+]|\\$\\^\\{?\\d+\\}?\\$)\\s*.+$");
     private static final int MAX_LEVEL = 9;
 
     String recoverMissingParentHeadings(String markdown) {
@@ -38,13 +39,20 @@ class OutlineRepairer {
                 afterReferences = true;
             }
 
-            ParentHeading parentHeading = afterReferences ? null : recoverParentHeading(lines, i);
-            if (parentHeading == null) {
+            if (!afterReferences && isReferenceItemStart(text)) {
+                repaired.append("## References").append('\n').append(line);
+                afterReferences = true;
+            } else if (afterReferences) {
                 repaired.append(line);
             } else {
-                repaired.append("## ").append(parentHeading.heading());
-                if (!parentHeading.remainder().isBlank()) {
-                    repaired.append('\n').append(parentHeading.remainder());
+                ParentHeading parentHeading = recoverParentHeading(lines, i);
+                if (parentHeading == null) {
+                    repaired.append(line);
+                } else {
+                    repaired.append("## ").append(parentHeading.heading());
+                    if (!parentHeading.remainder().isBlank()) {
+                        repaired.append('\n').append(parentHeading.remainder());
+                    }
                 }
             }
 
@@ -241,6 +249,10 @@ class OutlineRepairer {
     private boolean isReferences(String text) {
         String key = normalizeKey(text);
         return key.equals("references") || key.equals("bibliography");
+    }
+
+    private boolean isReferenceItemStart(String text) {
+        return REFERENCE_ITEM_START.matcher(clean(text)).matches();
     }
 
     private boolean isLikelyListItem(String text) {

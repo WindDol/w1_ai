@@ -14,6 +14,10 @@ thread:
 
 # 数据库配置；启动时配置数据库资源信息
 spring:
+  config:
+    import:
+      - optional:file:${user.dir}/config/application-local.yml
+      - optional:file:${user.dir}/../config/application-local.yml
   datasource:
     url: jdbc:postgresql://localhost:15432/w1_ai?stringtype=unspecified
     username: postgres
@@ -31,10 +35,10 @@ mybatis-plus:
     map-underscore-to-camel-case: true # 开启驼峰命名转换
 ai:
   llm:
-    api-key: sk-4e6a9a95491a408b9b816c708c338d56
+    api-key: ${AI_LLM_API_KEY:}
   embedding:
-    api-key: sk-924a8ed2e50b43a188b7660aa2c1f93d
-    base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    api-key: ${AI_EMBEDDING_API_KEY:}
+    base-url: ${AI_EMBEDDING_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
 logging:
   level:
     root: info
@@ -42,7 +46,7 @@ logging:
 
 academic:
   s2:
-    base-url: https://api.semanticscholar.org/graph/v1
+    base-url: ${SEMANTIC_SCHOLAR_BASE_URL:https://api.semanticscholar.org/graph/v1}
     api-key: ""
 
 redis:
@@ -52,8 +56,20 @@ redis:
       port: 16379
       database: 2
 python:
-  path-python: "D:/anaconda/envs/py12/python.exe"
-  script-path: "C:/Users/Mr Ding.LAPTOP-H54HCE12/Desktop/ai_pdf/w1_ai/python/paper_parser.py"
+  parser-type: ${PDF_PARSER_TYPE:monkeyocr}
+  path-python: ${PYTHON_EXECUTABLE:python}
+  script-path: ${LLAMA_PARSE_SCRIPT:${user.dir}/python/paper_parser.py}
+  monkeyocr:
+    base-url: ${MONKEYOCR_BASE_URL:http://127.0.0.1:8000}
+    http-output-dir: ${MONKEYOCR_HTTP_OUTPUT_DIR:${user.dir}/data/monkeyocr-http-output}
+    http-timeout-seconds: ${MONKEYOCR_HTTP_TIMEOUT_SECONDS:1800}
+    python-path: ${MONKEYOCR_PYTHON:${PYTHON_EXECUTABLE:python}}
+    repo-path: ${MONKEYOCR_REPO_PATH:}
+    script-path: ${MONKEYOCR_SCRIPT_PATH:parse.py}
+    output-dir: ${MONKEYOCR_OUTPUT_DIR:${user.dir}/data/monkeyocr-output}
+    config-path: ${MONKEYOCR_CONFIG_PATH:}
+    timeout-seconds: ${MONKEYOCR_TIMEOUT_SECONDS:1800}
+    omp-num-threads: ${MONKEYOCR_OMP_NUM_THREADS:1}
 
 upload:
-  path: "C:/Users/Mr Ding.LAPTOP-H54HCE12/Desktop/ai_pdf"
+  path: ${UPLOAD_PATH:${user.dir}/data/upload}

@@ -206,6 +206,9 @@ class HeadingRuleScorer {
             int depth = decimal.group(1).split("\\.").length;
             return Math.min(depth + 1, 4);
         }
+        if (HeadingCandidateExtractor.SECTION_SIGN_NUMBERED.matcher(text).matches()) {
+            return 2;
+        }
         Matcher letter = HeadingCandidateExtractor.LETTER_SECTION.matcher(text);
         if (letter.matches() && isLetterSubsectionMarker(letter.group(1))) {
             return 3;
@@ -246,13 +249,15 @@ class HeadingRuleScorer {
         if (targetLevel >= 3
                 && (HeadingCandidateExtractor.LETTER_SECTION.matcher(text).matches()
                 || HeadingCandidateExtractor.DECIMAL_SECTION.matcher(text).matches()
-                || HeadingCandidateExtractor.NUMBERED_SECTION.matcher(text).matches())) {
+                || HeadingCandidateExtractor.NUMBERED_SECTION.matcher(text).matches()
+                || HeadingCandidateExtractor.SECTION_SIGN_NUMBERED.matcher(text).matches())) {
             return CandidateKind.SUBSECTION;
         }
         if (kind != CandidateKind.UNCERTAIN) {
             return kind;
         }
         if (HeadingCandidateExtractor.NUMBERED_SECTION.matcher(text).matches()
+                || HeadingCandidateExtractor.SECTION_SIGN_NUMBERED.matcher(text).matches()
                 || HeadingCandidateExtractor.ROMAN_SECTION.matcher(text).matches()) {
             return CandidateKind.SECTION;
         }
@@ -422,6 +427,11 @@ class HeadingRuleScorer {
         if (numbered.matches()) {
             HeadingCandidateExtractor.InlineSplit split = HeadingCandidateExtractor.splitInlineHeadingBody(numbered.group(2));
             return new HeadingCandidateExtractor.InlineSplit(numbered.group(1) + ". " + split.heading(), split.remainder());
+        }
+        Matcher sectionSign = HeadingCandidateExtractor.SECTION_SIGN_NUMBERED.matcher(text);
+        if (sectionSign.matches()) {
+            HeadingCandidateExtractor.InlineSplit split = HeadingCandidateExtractor.splitInlineHeadingBody(sectionSign.group(2));
+            return new HeadingCandidateExtractor.InlineSplit(sectionSign.group(1) + ". " + split.heading(), split.remainder());
         }
         return new HeadingCandidateExtractor.InlineSplit(text, "");
     }

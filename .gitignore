@@ -40,5 +40,6 @@ build/
 /.idea/
 /.idea/
 /data/
+/config/application-local.yml
 
 data/log/log_info.log
