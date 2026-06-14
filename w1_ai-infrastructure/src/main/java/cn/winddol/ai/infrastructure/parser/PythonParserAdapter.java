@@ -187,26 +187,49 @@ public class PythonParserAdapter {
     private JSONObject uploadPdfToMonkeyOcr(HttpClient client, Path pdfPath) throws IOException, InterruptedException {
         String boundary = "----ScholarBrainMonkeyOCR" + UUID.randomUUID();
         byte[] body = buildMultipartBody(boundary, pdfPath);
+        URI uri = resolveMonkeyOcrUri("/parse");
 
-
-        HttpRequest request = HttpRequest.newBuilder(resolveMonkeyOcrUri("/parse"))
+        HttpRequest request = HttpRequest.newBuilder(uri)
+                .version(HttpClient.Version.HTTP_1_1)
                 .timeout(Duration.ofSeconds(monkeyOcrHttpTimeoutSeconds))
-                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .header(
+                        "Content-Type",
+                        "multipart/form-data; boundary=" + boundary
+                )
+                .header("Accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofByteArray(body))
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new RuntimeException("MonkeyOCR HTTP parse failed with status "
-                    + response.statusCode() + ": " + response.body());
+            throw new RuntimeException(
+                    "MonkeyOCR HTTP parse failed with status "
+                            + response.statusCode()
+                            + ": "
+                            + response.body()
+            );
         }
 
-        JSONObject json = JSON.parseObject(response.body());
+        JSONObject json;
+        try {
+            json = JSON.parseObject(response.body());
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "MonkeyOCR returned invalid JSON: " + response.body(),
+                    e
+            );
+        }
+
         if (!json.getBooleanValue("success")) {
-            throw new RuntimeException("MonkeyOCR HTTP parse failed: " + response.body());
+            throw new RuntimeException(
+                    "MonkeyOCR HTTP parse failed: " + response.body()
+            );
         }
         return json;
     }
+
+
 
     private byte[] buildMultipartBody(String boundary, Path pdfPath) throws IOException {
         String filename = pdfPath.getFileName().toString().replace("\"", "");

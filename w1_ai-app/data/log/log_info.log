@@ -102,3 +102,1384 @@ java.lang.RuntimeException: MonkeyOCR HTTP parse failed with status 422: {"detai
 	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
 	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:237)
 	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:58)
+26-06-14.19:30:41.743 [main            ] WARN  DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/E:/develop/apache-maven-3.9.6/mvn_repo/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/E:/develop/apache-maven-3.9.6/mvn_repo/org/json/json/20231013/json-20231013.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+26-06-14.19:30:41.806 [main            ] INFO  MkTest                 - Starting MkTest using Java 17.0.15 with PID 24972 (started by Mr Ding in C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app)
+26-06-14.19:30:41.809 [main            ] INFO  MkTest                 - The following 1 profile is active: "dev"
+26-06-14.19:30:51.862 [main            ] INFO  MkTest                 - Started MkTest in 11.719 seconds (process running for 15.107)
+26-06-14.19:31:02.819 [main            ] INFO  PythonParserAdapter    - Calling PDF parser [monkeyocr-http] for: C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\18.pdf
+26-06-14.19:31:03.228 [main            ] INFO  PythonParserAdapter    - MonkeyOCR URI          : http://127.0.0.1:8000/parse
+26-06-14.19:31:03.228 [main            ] INFO  PythonParserAdapter    - MonkeyOCR file         : C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\18.pdf
+26-06-14.19:31:03.229 [main            ] INFO  PythonParserAdapter    - MonkeyOCR file exists  : true
+26-06-14.19:31:03.229 [main            ] INFO  PythonParserAdapter    - MonkeyOCR file size    : 2102990
+26-06-14.19:31:03.229 [main            ] INFO  PythonParserAdapter    - MonkeyOCR Content-Type : multipart/form-data; boundary=----ScholarBrainMonkeyOCR268dd51f-fe1b-4c89-a468-b40dda256188
+26-06-14.19:31:03.230 [main            ] INFO  PythonParserAdapter    - MonkeyOCR body size    : 2103221
+26-06-14.19:31:03.230 [main            ] INFO  PythonParserAdapter    - MonkeyOCR multipart header:
+------ScholarBrainMonkeyOCR268dd51f-fe1b-4c89-a468-b40dda256188\r\n
+Content-Disposition: form-data; name="file"; filename="18.pdf"\r\n
+Content-Type: application/pdf\r\n
+\r\n
+
+26-06-14.19:31:03.245 [main            ] INFO  PythonParserAdapter    - MonkeyOCR multipart body saved to: C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app\monkeyocr-multipart-debug.bin
+26-06-14.19:31:03.268 [main            ] INFO  PythonParserAdapter    - Actual request headers: {Accept=[application/json], Content-Type=[multipart/form-data; boundary=----ScholarBrainMonkeyOCR268dd51f-fe1b-4c89-a468-b40dda256188]}
+26-06-14.19:31:29.036 [main            ] INFO  PythonParserAdapter    - MonkeyOCR response: status=200, body={"success":true,"message":"PDF parsing (standard) completed successfully","output_dir":"/tmp/monkeyocr_parse_aba6bfa4_607uksk1/upload_aba6bfa4__oax63bt_1b4fe128","files":["upload_aba6bfa4__oax63bt_1b4fe128_model.pdf","upload_aba6bfa4__oax63bt_1b4fe128_layout.pdf","upload_aba6bfa4__oax63bt_1b4fe128_spans.pdf","upload_aba6bfa4__oax63bt_1b4fe128.md","upload_aba6bfa4__oax63bt_1b4fe128_content_list.json","upload_aba6bfa4__oax63bt_1b4fe128_middle.json","images/b086829b3bcb57ce545da1375a7714ef91f3ef63aca61a4c6deb84ad5bc467d1.jpg","images/eaa4917e047a373d38f5b82ea4ec723b3403be59fa5649770c98101c01af7286.jpg","images/2dc1484eac175e34b8cac7e320c7c89fd369f4b56891cc925405b911605ddcd1.jpg","images/23ec25f2e04ee8a82d27197ca6cb156a236c32abba0400aa05dd7e587dba32d5.jpg","images/a011a1f41bb1c8f4cb9e7fdca2ea5d92a6c5783994cf33bfa66522ed5e6a9305.jpg","images/456c060e96b551c097803bc5b3fcdf4dd20a8fe494694a8c1dad7cb33589f10c.jpg","images/8a978fa1faa6ae990325f1930e86159602976ddcf36db3a331d3fea529f31a92.jpg","images/22a96633bbbe15e075c0484a02178076972b6c0ed17f9d57524ee33c855c2343.jpg","images/c09a24775b885b3032c7abafe0a240fec9a318577e7c7cc15abc095b27781cb4.jpg","images/79adc8ccc00a2b5660e87e22f5299c8738bf59b73f06474d3ff1b81d31294b7a.jpg","images/7c7d1928727b4e18051009ea8c5d6583a9551757cc672e7bb08dc914c0651dd1.jpg","images/ff41b42e3892acbe53699289956fc4dd797520b07b2e0a8bff6d2f5f91c835bd.jpg","images/87b9b963af083579b5311467a5e5e7ed8219a530a727d7c064665da986718894.jpg","images/2f445251106b115248c40ebdbbe6c7b55e91777ea5d987df706ac75e1a69bd42.jpg","images/f9ab383973bb084a904aacdb4c137ff47875dd8fae711b717764b141bd3e93b7.jpg","images/24c85b09dbcc7512b9b3f90d74596a88bfca5a630954b70f37e22b36a45e6237.jpg","images/227178955284f6d1ec90bbf3c56c6140e461f3a9e3ae80596cda1af5cc14d23c.jpg","images/755befc550f7a4e63dfc11e6e678e8f7fcd29b0ae30c75adbf48bcec4de59a5f.jpg","images/000f0051206fe71b59a7341a93331a9ba2bbe6f324afaaa74b040c5a0347bd8f.jpg","images/c057a717af6a8fa08c566d9ab78e1487322492dbf24dc91e7a68ba428c7f0ba0.jpg","images/8f23c3be36d004866a4eb5272cc9c545912a05831a318b7e3eb1e3847f7e859b.jpg","images/9fe870a73c38bc5254bb9b226f38e5d0fbf03fdec6218687df76d8f99d01b830.jpg","images/bc64251839c2b8efb29d0a34a7c0dc694b8599fb6a6ce10884adfa1ff5c54ec3.jpg","images/014268f9d4bc18ed4a96d9b463e4e93415068c179a45d38a8151bea278c15614.jpg","images/1467737e59630ff6a4570aec95b3eff324425a3500f7aaf1cf542cdafb4e5b71.jpg","images/2a7d133345dee875bc17e58827ac56b733181a6a96ebbc70bab59578f8626a16.jpg","images/58de18b0348af4123d7d78499196536e829339b5690c1d3956fb10d2eb386ecd.jpg","images/9fe1786126b1bae6d6fc93c58232fbb6c9cc732edad6b5c492612d3c41f538a0.jpg","images/7e8862e1b8d192c4ac0475bf806859e5bf73ba3a3436ed7d37d92944d8532820.jpg"],"download_url":"/static/18_parsed_1781436689992_aba6bfa4.zip"}
+26-06-14.19:31:32.009 [main            ] INFO  PythonParserAdapter    - MonkeyOCR HTTP markdown output: C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app\data\monkeyocr-http-output\18-1781436691302\18.md
+26-06-14.19:31:38.477 [main            ] INFO  MkTest                 - # Synchronization patterns in rings of time-delayed Kuramoto oscillators  
+
+Károly Dénes, Bulcsú Sándor, and Zoltán Néda  
+
+Babeş-Bolyai University, Department of Physics,  
+
+1 Kogălniceanu str., 400084 Cluj-Napoca, Romania  
+
+Phase-locked states with a constant phase shift between the neighboring oscillators are studied in rings of identical Kuramoto oscillators with time-delayed nearest-neighbor coupling. The linear stability of these states is derived and it is found that the stability maps for the dimensionless equations show a high level of symmetry. The size of the attraction basins is numerically investigated. These sizes are changing periodically over several orders of magnitude as the parameters of the model are varied. Simple heuristic arguments are formulated to understand the changes in the attraction basin sizes and to predict the most probable states when the system is randomly initialized.  
+
+# I. INTRODUCTION  
+
+Coupled oscillator systems are widely used as model systems in studies of self-organizing phenomena and complex behavior [28]. Their widespread usage in the field of complex systems can be attributed to the fact that they are able to model phase-transitions and pattern selection in various periodic phenomena. Apart from the possibility to investigate such systems analytically, they are also appropriate for simple numerical studies. These systems were among the first ones considered computationally to understand emerging synchronization [34] and more recently chimera states [1, 19]. One of the most famous prototype system is the Kuramoto model with phase oscillators globally coupled through a sinusoidal interaction kernel [18]. Nowadays different versions of the original model are used for targeting different type of phenomena in complex systems [13].  
+
+One of the simplest variant of the locally coupled Kuramoto model consists of rotators placed in a ring-like topology with only nearest neighbor interaction. Though this one-dimensional topology may seem trivial, the setup has proven to produce many interesting dynamical features. The problem of critical coupling for phase locked patterns in case of heterogeneous Kuramoto-type rotators has recently been studied in detail [16, 22, 27, 29]. Beyond the linear stability and bifurcation analysis of states, several studies focus on the size of attraction basins belonging to the emergent phase locked patterns in rings of Kuramoto oscillators [12, 29, 33]. Instead of oscillator rings, a recent paper [3] for example considers one dimensional chains with no periodic boundary conditions and studies the effect of heterogeneity and phase shift on the robustness of synchronized states. While the above works analyze the one-dimensional rotator system from a pure fundamental dynamical systems point of view, there are application oriented studies as well. Díaz-Guilera and Arenas [10] investigated the possibilities of new wireless communication protocols based on emergent phase locked patterns, while Delabays et al. [7] show that synchronized patterns in rings are related to loop currents, thus linking this problem to electrical engineering. It has been shown by Daniels et al. that in certain cases arrays of Josephson junctions can be mapped into a Kuramoto-type system with nearest neighbor coupling [5]. Additionally to the already discussed analytical and numerical approaches in Kuramoto systems, the phenomenon of phase locking in coupled circuits has also been studied experimentally [20, 31, 35]. The plausibility of obtaining rotating waves in locally coupled mechanical systems is discussed in papers by Qin and Zhang [25], and by Ramírez and Alvarez [26].  
+
+# Synchronization patterns in rings of time-delayed Kuramoto oscillators  
+
+Károly Dénes, Bulcsú Sándor, and Zoltán Néda  
+
+Babeş-Bolyai University, Department of Physics,  
+
+1 Kogălniceanu str., 400084 Cluj-Napoca, Romania  
+
+*警告：该PDF由GPT-Academic开源项目调用大语言模型+Latex翻译插件一键生成，版权归原文作者所有。翻译内容可靠性  
+
+无保障，请仔细鉴别并以原文为准。  
+
+项目GitHub地址：https://github.com/binary-husky/gpt_academic/。  
+
+项目在线体验地址：https://chatpaper.org。  
+
+当前大语言模型: gpt-3.5-turbo, 当前语言模型温度设定: 1。为了防止大语言模型的意外谬误产生扩散影响, 禁止移除或修改此警告。在时间延迟最近邻相互耦合的相同Kuramoto振荡器环中, 研究具有相邻振荡器之间常数相位差的同步状态。导出了这些状态的线性稳定性, 并发现无量纲方程的稳定映射呈现出高度对称的特征。数值上探究了吸引盆的大小。随着模型参数的变化, 这些尺寸周期性地变化了数个数量级。提出了一些简单的启发式论证来理解吸引盆尺寸的变化, 并预测当系统在随机初始化时可能出现的状态。  
+
+# I. INTRODUCTION  
+
+耦合振荡器系统广泛用作自组织现象和复杂行为研究中的模型系统 [28]。它们在复杂系统领域的广泛应用可以归因于它们能够模拟各种周期性现象中的相变和模式选择。除了可以通过分析方法研究这些系统之外，它们也适合进行简单的数值研究。这些系统是最早被计算考虑的系统之一，用于理解新兴的同步现象 [34]，以及最近的合融态 [1, 19]。最著名的原型系统之一是通过正弦相互作用核全局耦合的Kuramoto模型中的相位振荡器 [18]。现在原始模型的不同版本用于针对复杂系统中不同类型的现象 [13]。  
+
+最简单的本地耦合Kuramoto模型变种之一是在呈环状拓扑结构中放置的旋转器，仅存在最近邻的相互作用。尽管这种一维拓扑结构可能看起来微不足道，但该设置被证明产生了许多有趣的动力学特性。在异质Kuramoto型旋转器的情况下，关于相位锁定模式的临界耦合问题最近得到了详细研究 [16, 22, 27, 29]。除了对状态的线性稳定性和分岔分析外，还有几项研究专注于属于Kuramoto振荡器环中出现的相位锁定模式的吸引域的大小 [12, 29, 33]。除了振荡器环外，最近的一篇论文 [3]举例考虑了没有周期边界条件的一维链，并研究了异质性和相移对同步状态的稳健性的影响。虽然上述工作从纯粹的基础动力学系统角度分析了一维旋转器系统，但也有一些面向应用的研究。Díaz-Guilera和Arenas [10]研究了基于出现的相位锁定模式的新无线通信协议的可能性，而Delabays等人 [7]表明环中的同步模式与回路电流有关，从而将这个问题与电气工程联系起来。 Daniels等人已经证明，在某些情况下，Josephson结阵列可以映射为具有最近邻耦合的Kuramoto型系统 [5]。除了在Kuramoto系统中已经讨论的分析和数值方法外，耦合电路中的相位锁定现象也进行了实验研究 [20, 31, 35]。在Qin和Zhang的论文中讨论了本地耦合机械系统中获得旋转波可能性的问题 [25]，Ramírez和Alvarez的论文也讨论了这个问题 [26]。  
+
+在研究耦合振荡器系统时，引入时间延迟是一个自然的进一步步骤，使模型对实际应用更加逼真。早期关于延迟效应的研究表明，频率同步和有序性可以在这种系统中类似于无延迟的情况下出现 [17, 21, 30, 36]。对于本地耦合系统，已经考虑了不同类型的振荡器：在Hopf分岔附近的极限环振子 [4, 11]，Stuart-Landau和FitzHugh-Nagumo振子 [24]。当涉及到延迟耦合的Kuramoto振荡器环时，Earl和Strogatz的工作对于正弦耦合核函数和最近邻耦合是一个重要的贡献 [15]。在这个开创性的工作中，推导了对于任意耦合函数和拓扑结构的同相位同步的稳定性准则。对于反相位同步的情况，应该提到D'Huys等人的工作 [14]。在噪声作用下，切换延迟耦合环中的相位锁定状态已经被研究 [9]。我们的工作旨在继续通过研究其他同步模式的稳定性，也是我们之前对非时滞系统中吸引盆和相位锁定模式选择的研究的自然延续 [8, 12]。接下来，我们着重研究相位锁  
+
+Introducing time delay in the interaction is a natural step forward in the study of coupled oscillator systems thus making the model more realistic for practical applications. Early studies on the effect of the delay suggests that frequency synchronization and order can emerge in such systems similarly to the non-delayed case [17, 21, 30, 36]. For locally coupled systems different oscillator types have been already considered: limit-cycle oscillators near Hopf bifurcations [4, 11], Stuart-Landau and FitzHugh-Nagumo oscillators [24]. When it comes to rings of delay-coupled Kuramoto oscillators, an important contribution for a sinusoidal coupling kernel and nearest neighbor coupling is the work of Earl and Strogatz [15]. In this seminal work the stability criterion of in-phase synchrony for arbitrary coupling functions and topology is derived. For the case of anti-phase synchronizations the work of D'Huys et al. [14] should be mentioned. Switching between phase-locked states in delay coupled rings under the effect of noise has been also studied [9].  
+
+Our work intends to continue this research by investigating the stability of other synchronization modes as well, being also a natural continuation of our previous studies on the attraction basins and selection of phase locked patterns in non-delayed systems [8, 12]. In the followings we focus on the stability of the phase locked states studying the changes in the basin size distribution as the parameters are varied. Since time-delayed systems are formally equivalent to infinite dimensional systems [32], one should expect also other complex attractors as well. Studies of limit cycles, chaos, and chimera-like states in Kuramoto rings are however beyond the scope of this paper.  
+
+# II. SYMMETRIC PHASE LOCKED STATES OF THE KURAMOTO RING  
+
+Locally coupled Kuramoto rotators with time-delayed interactions are considered on a chain with periodic boundary conditions  
+
+$$
+\begin{array} { r } { \dot { \theta } _ { i } ( t ) = \omega _ { 0 } + K [ \sin ( \theta _ { i - 1 } ( t - \tau ) - \theta _ { i } ( t ) ) + } \\ { + \sin ( \theta _ { i + 1 } ( t - \tau ) ~ - \theta _ { i } ( t ) ) ] \, , } \end{array}
+$$  
+
+where $\theta_{i}$ is the phase of the oscillator with index $i$, $i=1,2,\ldots,N$, $\omega_{0}$ is the natural frequency of all oscillators, $K$ is the coupling constant and $\tau$ is the length of time delay. Together with the system size $N$ there are thus four parameters of the model. The imposed periodic condition writes as $\theta_{N+1}=\theta_{1}$ and $\theta_{0}=\theta_{N}$. By rescaling the time with the delay ($t\rightarrow u=t/\tau$) we get a dimensionless system of equations with only three parameters  
+
+$$
+\begin{array} { r } { \frac { \mathrm { d } \theta _ { i } ( u ) } { \mathrm { d } u } = \omega + \kappa [ \sin ( \theta _ { i - 1 } ( u - 1 ) - \theta _ { i } ( u ) ) + } \\ { + \sin ( \theta _ { i + 1 } ( u - 1 ) - \ \theta _ { i } ( u ) ) ] \, , } \end{array}
+$$  
+
+$\omega=\omega_{0}\cdot\tau$ is the dimensionless intrinsic frequency and $\kappa=K\cdot\tau$ is the dimensionless coupling. Phase-locked pattern emerging as the solution of the above system may be written as  
+
+$$
+\theta _ { i } ( u ) = \Omega u + \varphi _ { i } \, ,
+$$  
+
+$\Omega$ being a final dimensionless frequency, constant over the system and time. The $\varphi_{i}$ phase is needed to include all kind of synchronized patterns not only in-phase synchrony [11, 12, 27, 29, 33]. We focus on symmetric states where the $\varphi_{i}-\varphi_{i-1}=\Delta\phi$ terms are constant over the system. Solution of this form of Eq. (2) yields for the final frequency [15] the equation  
+
+$$
+\Omega = \omega - 2 \kappa \cos ( \Delta \phi ) \sin ( \Omega ) \, ,
+$$  
+
+定状态的稳定性，研究参数变化时盆地大小分布的变化。由于时滞系统在形式上等价于无限维系统 [32]，我们还可以期望出现其他复杂的吸引子。然而，本文不涉及对Kuramoto环中极限循环、混沌和奇美拉样态的研究。  
+
+# II. SYMMETRIC PHASE LOCKED STATES OF THE KURAMOTO RING  
+
+考虑在具有周期边界条件的链上具有时滞相互作用的局部耦合Kuramoto旋转器。  
+
+$$
+\begin{array} { r l } { \dot { \theta } _ { i } ( t ) = \omega _ { 0 } + K [ \sin ( \theta _ { i - 1 } ( t - \tau ) - \theta _ { i } ( t ) ) + } & { } \\ { + \sin ( \theta _ { i + 1 } ( t - \tau ) } & { - \theta _ { i } ( t ) ) ] \, , } \end{array}
+$$  
+
+其中$\theta_{i}$是指标为$i$的振荡器的相位，$i=1,2,\ldots,N$，$\omega_{0}$是所有振荡器的固有频率，$K$是耦合常数，$\tau$是时间延迟的长度。加上系统大小$N$，因此模型有四个参数。施加的周期条件写为$\theta_{N+1}=\theta_{1}$和$\theta_{0}=\theta_{N}$。通过将时间按延迟进行重新标度（$t\rightarrow u=t/\tau$），我们可以得到一个无量纲的方程组，其中只有三个参数。  
+
+$$
+\begin{array} { r } { \frac { \mathrm { d } \theta _ { i } ( u ) } { \mathrm { d } u } = \omega + \kappa [ \sin ( \theta _ { i - 1 } ( u - 1 ) - \theta _ { i } ( u ) ) + } \\ { + \sin ( \theta _ { i + 1 } ( u - 1 ) - \ \theta _ { i } ( u ) ) ] \, , } \end{array}
+$$  
+
+$\omega=\omega_{0}\cdot\tau$是无量纲的内在频率，$\kappa=K\cdot\tau$是无量纲的耦合。上述系统的锁相模式可以表示为  
+
+$$
+\theta _ { i } ( u ) = \Omega u + \varphi _ { i } \, ,
+$$  
+
+Ω 是一个无量纲频率，在系统和时间上保持不变。$φ_{i}$ 相位包含了所有种类的同步模式，而不仅仅是相位同步 [11, 12, 27, 29, 33]。我们关注对称状态，在这种状态下，$φ_{i} - φ_{i-1} = Δϕ$ 在整个系统中保持不变。对于这种形式的方程 (2) 的解，具有最终频率 [15] 的方程为  
+
+$$
+\Omega = \omega - 2 \kappa \cos ( \Delta \phi ) \sin ( \Omega ) \, ,
+$$  
+
+其中，相邻振荡器间的相位差$\Delta\phi\in[-\pi,\pi)$等同于单位圆周上的有向距离测量 [12]。由于施加了周期性边界条件，在每个时刻，对所有$\{i,i+1\}$振荡器对的相位差之和应为$2\pi$的倍数。利用这个和，我们可以定义一个绕数$m$，对于偶数个振荡器$N$，绕数$m$被认为是介于$-N/2$和$N/2-1$之间的整数，对于奇数个振荡器$N$，绕数$m$被认为是介于$-\frac{N-1}{2}$和$\frac{N-1}{2}$之间的整数。相位同步对应于$m=0$，而反相同步对应于$m=-N/2$（对于偶数个振荡器）。因此，每个相位锁定的状态可以通过绕数$m$或相位差$\Delta\phi$与相应的$\Omega$频率的组合来明确定义，该频率由式(4)计算得到。  
+
+# III. STABILITY OF THE PHASE-LOCKED STATES  
+
+现在我们转向对考虑的相位锁定状态的稳定性。我们的方法基于Earl和Strogatz用来研究类似系统中同相位同步稳定性的标准线性稳定方法 [15]。在这里，与先前的研究不同，我们将同步的定义扩展到允许出现非零绕数$m$的状态。通过使用相同的方法，我们考虑对相位锁定状态的微扰。  
+
+$$
+\theta _ { i } ( u ) = \Omega u + \varphi _ { i } + \epsilon \, \eta _ { i } ( u ) \, ,
+$$  
+
+其中$\epsilon\ll1$。首先，我们集中讨论两种特殊的状态，即相位同步和反相位同步。  
+
+最广泛研究的相位同步状态$m=0$的稳定性已经在文献[15]中研究过。允许的最终频率$\Omega$与状态的稳定性有关，即当$\cos(\Omega)>0$时，状态是稳定的。所有可能的稳定频率候选者都可以从方程(4)计算得出。我们指出，  
+
+where the phase shift between neighboring oscillators, $\Delta\phi\in[-\pi,\pi)$, is equivalent to a directed distance measure on the perimeter of the unit circle [12]. Due to the imposed periodic boundary conditions, in each time-moment their sum over all $\{i,i+1\}$ oscillator pairs should be a multiple of $2\pi$. Using this sum, one can define a winding number $m$, which is considered to be an integer between $-N/2$ and $N/2-1$ for even, respectively between $-\frac{N-1}{2}$ and $\frac{N-1}{2}$ for odd number of oscillators $N$. In-phase synchrony corresponds to $m=0$, while anti-phase synchrony gets the $m=-N/2$ value (for even oscillator number). Each phase-locked state can be thus unambiguously defined by the combination of a winding number $m$ or a phase shift $\Delta\phi$ with a corresponding $\Omega$ frequency, calculated from Eq. (4).  
+
+# III. STABILITY OF THE PHASE-LOCKED STATES  
+
+Now we turn to the stability of the considered phase-locked states. Our approach is based on the standard linear stability method used by Earl and Strogatz to study the stability of in-phase synchrony in similar systems [15]. Here, in contrast to previous works we refer to synchrony in a broader sense allowing states with nonzero winding numbers $m$ to appear. Using the same workaround, we consider a perturbation to the phase-locked states  
+
+$$
+\theta _ { i } ( u ) = \Omega u + \varphi _ { i } + \epsilon \, \eta _ { i } ( u ) \, ,
+$$  
+
+where $\epsilon \ll 1$. First we concentrate on two particular states, namely in-phase and anti-phase synchrony.  
+
+The stability of the most widely studied in-phase synchronization state $m=0$ has already been investigated in Ref. [15]. The allowed final frequency $\Omega$ is linked to the stability of the state, that is the state is stable for $\cos(\Omega)>0$. All possible candidates for stable frequencies can be calculated from Eq. (4). We point out that the derivation presented in [15] also holds for the $m=-N/2$ case, resulting in a simple sign change in the stability condition. The final frequency for the $m=-N/2$ state is stable hence for $\cos(\Omega)<0$. A similar result is also presented for the anti-phase case in Ref. [14].  
+
+In order to understand the stability criteria for these two states, it is convenient to solve Eq. (4) graphically. Rearranging the equation yields:  
+
+$$
+\frac { \omega - \Omega } { 2 \kappa \cos ( \Delta \phi ) } = \sin ( \Omega ) \, .
+$$  
+
+In this form the solutions to this equation correspond to the intersection points of a linear and a sine function (see the sketch in Fig. 1). As proven in [15] the stability of the solutions is determined by the slope of the $\sin(\Omega)$ term which is exactly $\cos(\Omega)$.  
+
+In order to gain information about the other states we need to go deeper in the realm of Delay Differential Equations (DDE). The amplifying or diminishing trend for the considered $\eta_{i}(u)$ perturbations can be determined by a solution that is expressed with the matrix Lambert W function [23]. This analysis is done in the Appendix. Using this method we can numerically investigate for any $m$ value the stability of the $\Omega$ values obtained from Eq. (4). Fig. 2 shows the stability map of different states in the $\omega-\kappa$ space evaluated with the method from the Appendix using the exponents in Eq. (A.13). More precisely, on the graphs from Fig. 2 we indicate by a color-code the number of stable solutions with winding number $m$ for given $\omega$ and $\kappa$ parameters. Although the stability is determined by a complicated formula of transcendental functions, the stability map shows high level of symmetry and periodicity. First, each stability map is $2\pi$ periodic with respect to $\omega$. This is a result of the fact that an $\omega'=\omega+2\pi$ transformation will not change the form of Eq. (4) and will increase the value of $\Omega$ with  
+
+![](images/b086829b3bcb57ce545da1375a7714ef91f3ef63aca61a4c6deb84ad5bc467d1.jpg)  
+
+Figure 1: 图形化解方程 (6)，针对 $m=\{0,-N/2\}$，分别对应于 $\Delta\phi=\{0,-\pi\}$。正弦函数和线性函数的交点代表稳定解（实心点）和不稳定解（空心点）。十字标记在 $\Omega=\omega$ 时表示振荡器的固有频率。  
+
+[15]中提出的推导也适用于$m=-N/2$的情况，只需使稳定条件简单地换成相反符号。因此，$m=-N/2$状态的最终频率在$\cos(\Omega)<0$时是稳定的。在文献[14]中也提出了相反情况的类似结果。  
+
+为了理解这两种状态的稳定性条件，我们可以方便地通过图解求解方程(4)。重新排列方程得到:  
+
+$$
+\frac { \omega - \Omega } { 2 \kappa \cos ( \Delta \phi ) } = \sin ( \Omega ) \, .
+$$  
+
+这个形式的方程的解对应于线性函数和正弦函数的交点（见图1中的草图）。正如在参考文献 [15]中证明的那样，解的稳定性是由$sin(\Omega)$ 项的斜率，即$cos(\Omega)$ 决定的。  
+
+为了获取其他状态的信息，我们需要深入研究延迟微分方程（DDE）领域。针对所考虑的 $\eta_{i}(u)$ 扰动，放大或减小趋势由矩阵 Lambert W 函数表示的解可以确定 [23]。该分析在附录 中完成。使用这种方法，我们可以对于任意 $m$ 值数值地研究从式（4）中得到的 $\Omega$ 值的稳定性。图 2 显示了利用附录 中利用式（A.13）中的指数评估在 $\omega-\kappa$ 空间中不同状态稳定性的稳定性图。更确切地说，在图 2 中的图形中，我们通过颜色代码表示给定 $\omega$ 和 $\kappa$ 参数的具有缠绕数为 $m$ 的稳定解的数量。尽管稳定性由超越函数的复杂公式确定，但稳定性地图显示出高度的对称性和周期性。首先，每个稳定性图在 $\omega$ 方面具有 $2\pi$ 周期性。这是因为 $\omega'=\omega+2\pi$ 转换不会改变式（4）的形式，并将 $\Omega$ 的值增加 $2\pi$，保持 $\kappa_{c}$ 和 $\kappa_{s}$ 的不变性（该记号在附录中的方程（A.7）和（A.13）中引入）。其次，在图 2 中同一行的状态，对于满足 $|m_{1}|+|m_{2}|=N/2$ 的组，其上下移动一个值为 $\pi$ 的相对位置。这可以通过观察到 $\Omega'=\Omega-\pi$，$\omega'=\omega-\pi$，$\Delta\phi'=\Delta\phi+\pi$ 转化将式（4）和方程（A.13）中的 $\kappa_{c}$ 和 $\kappa_{s}$ 保持不变来理解。  
+
+# IV. BASINS OF ATTRACTION  
+
+线性稳定性分析仅提供了关于系统在稳定状态附近动力学的信息。对于维度 $d \geq 3$ 的系统，动力学可能变得更加复杂，当预测相位锁定对称状态的出现时，仅依靠这些信息是不可靠的。为了解决这个问题，我们通过数值实验测量给定状态 $m$ 出现的概率，确定吸引域的相对大小。  
+
+在对时滞微分方程（Eq. (1)）进行数值实验的过程中，需要提供一组函数来确定系统在 $t \in [-\tau, 0)$ 的状态历史 [32]。我们考虑一个实验可行的步骤，通过将具有简单（非时滞）未耦合相位振荡器的集合作为时间延迟  
+
+![](images/eaa4917e047a373d38f5b82ea4ec723b3403be59fa5649770c98101c01af7286.jpg)  
+
+Figure 1: Graphical solution of Eq. (6) for $m=\{0,-N/2\}$ corresponding to $\Delta\phi=\{0,-\pi\}$, respectively. Intersections of the sine and the linear functions represent the stable (filled dots) and unstable (hollow dots) solutions. The cross at $\Omega=\omega$ denotes the natural frequency of the oscillators.  
+
+$2\pi$, leaving $\kappa_{c}$ and $\kappa_{s}$ invariant (notations introduced in Eqs. (A.7) and (A.13) in the Appendix). Second, the patterns on the stability maps are translated one relative to the other on the vertical axis by a value of $\pi$, for pairs where $|m_{1}|+|m_{2}|=N/2$ (states in the same row in Fig. 2). This can be understood by the observation that the $\Omega'=\Omega-\pi$, $\omega'=\omega-\pi$, $\Delta\phi'=\Delta\phi+\pi$ transformations will leave Eq. (4), and $\kappa_{c}$ and $\kappa_{s}$ in Eq. (A.13) invariant.  
+
+# IV. BASINS OF ATTRACTION  
+
+Linear stability analysis provides information about the dynamics of the system only in the proximity of the stationary states. For systems with dimensionality $d \geq 3$ the dynamics may become more complex, and one cannot rely only on these information when predicting the appearance of the phase-locked symmetric states [33]. In order to deal with this problem we determine the relative size of the basins of attractions through numerical experiments by measuring the probability of appearance of a given state $m$.  
+
+In the numerical experiments for the initialization of DDEs from Eq. (1) one needs to provide a set of functions, determining the state history of the system for $t \in [-\tau,0)$ [32]. Here we consider an experimentally feasible procedure, by kick-starting the time-delayed Kuramoto system with a set of simple (non-delayed) uncoupled phase oscillators. This is possible by initializing the system with uniformly distributed random phases, $\theta_i(0) \in [0,2\pi)$, and solving Eq. (1) numerically with $K=0$ for the first $t \in [-\tau,0)$ period, or equivalently in the rescaled parameters $\kappa=0$ for $u \in [-1,0)$. This type of initialization of the history is equivalent to an interaction with a finite speed of propagation, meaning that there is no interaction between the oscillators up to a certain point. The final state is verified using the generalized order parameter $r_m$ defined in [12]:  
+
+$$
+r _ { m } = \left| \frac { 1 } { N } \sum _ { j = 1 } ^ { N } e ^ { i [ \theta _ { j } ( t ) - ( j - 1 ) \frac { 2 m \pi } { N } ] } \right| .
+$$  
+
+It has been shown in Ref. [12] that as the system approaches to a stable state characterized by the winding  
+
+![](images/2dc1484eac175e34b8cac7e320c7c89fd369f4b56891cc925405b911605ddcd1.jpg)  
+
+![](images/a011a1f41bb1c8f4cb9e7fdca2ea5d92a6c5783994cf33bfa66522ed5e6a9305.jpg)  
+
+![](images/23ec25f2e04ee8a82d27197ca6cb156a236c32abba0400aa05dd7e587dba32d5.jpg)  
+
+![](images/8a978fa1faa6ae990325f1930e86159602976ddcf36db3a331d3fea529f31a92.jpg)  
+
+![](images/456c060e96b551c097803bc5b3fcdf4dd20a8fe494694a8c1dad7cb33589f10c.jpg)  
+
+![](images/22a96633bbbe15e075c0484a02178076972b6c0ed17f9d57524ee33c855c2343.jpg)  
+
+Figure 2: 对于由颜色图所示的不同状态$m$指示的方程（4）的稳定$\Omega$解的数量。通过计算方程（A.13）中的指数，以函数$\omega$和$\kappa$参数的形式来研究稳定性。分别在面板$(a)-(f)$中显示了$m\in\{0,-5,1,4,2,3\}$的结果。振荡器的数量为$N=10$。  
+
+的 Kuramoto 系统的初始条件开始。这可以通过将系统初始化为均匀分布的随机相位，$\theta_{i}(0) \in [0,2\pi)$，并在第一个 $t \in [-\tau,0)$ 期间以 $K=0$ 数值求解方程 (1)，或者在缩放参数 $\kappa=0$ 和 $u \in [-1,0)$ 的情况下进行。这种历史初始化的方式相当于一种有限传播速度的相互作用，意味着在某一点之前振荡器之间没有相互作用。使用在 [12] 中定义的广义序参量 $r_{m}$ 来验证最终状态。  
+
+$$
+r _ { m } = \left| \frac { 1 } { N } \sum _ { j = 1 } ^ { N } e ^ { i [ \theta _ { j } ( t ) - ( j - 1 ) \frac { 2 m \pi } { N } ] } \right|
+$$  
+
+在文献 [12] 中表明, 当系统接近于由缠绕数 $m=m^{*}$ 表征的稳定状态时, 相应的秩序参数收敛于 1 ( $r_{m^{*}} \rightarrow 1$ ), 而其他所有参数都下降到 0 ( $r_{m \neq m^{*}} \rightarrow 0$ )。因此, 通过跟踪秩序参数的演化, 可以识别出高阈值对应的最终锁相状态, 从而较为有信心地确定长期行为。我们在此指出, 附录 中提出的稳定性分析表明, 描述稳定性的特征指数（公式 (A.13)）可以具有非零虚部, 这表明系统在稳定状态附近可能表现出振荡动力学。因此, 仅基于秩序参数导数的预测方法（文献 [12] 中提出）是不恰当的。  
+
+我们从采样中获得了盆地大小分布，第 ?? 图中的顶部面板进行了说明。为了解释图形，我们提醒人们，$m=0$ 对应于 $\Delta\phi=0$ 的相位差，$|m|=5$ 表示 $|\Delta\phi|=\pi$ 的反相位同步。当 $\omega$ 变化时，可以观察到分布从中心到两侧的强移动。为了避免歧义，本文将 $\Delta\phi$ 的定义如 [12]一样，从而避免了存在 $\Delta\phi=\pi$ 的状态。然而，为了获得图 ?? 中对称的分布，我们仍然将 $\Delta\phi=-\pi$ 状态的概率平均分配在 $m=\pm5$ 之间，因为在相位差的层面上，它们对应于同一种状态。对于盆地大小的更全面分析的结果可以在图 ?? 的底部图中观察到。如结果所示，与文献 [12, 29, 33] 中的非延迟情况相比，这些分布可能会有很大不同。系统的典型行为在很大程度上取决于  
+
+![](images/c09a24775b885b3032c7abafe0a240fec9a318577e7c7cc15abc095b27781cb4.jpg)  
+
+![](images/7c7d1928727b4e18051009ea8c5d6583a9551757cc672e7bb08dc914c0651dd1.jpg)  
+
+![](images/87b9b963af083579b5311467a5e5e7ed8219a530a727d7c064665da986718894.jpg)  
+
+![](images/79adc8ccc00a2b5660e87e22f5299c8738bf59b73f06474d3ff1b81d31294b7a.jpg)  
+
+![](images/ff41b42e3892acbe53699289956fc4dd797520b07b2e0a8bff6d2f5f91c835bd.jpg)  
+
+![](images/2f445251106b115248c40ebdbbe6c7b55e91777ea5d987df706ac75e1a69bd42.jpg)  
+
+Figure 2: Number of stable $\Omega$ solutions of Eq. (4) for different states $m$ indicated by a colormap. Stability is investigated as a function of $\omega$ and $\kappa$ parameters, by calculating numerically the exponents in Eq. (A.13). Results for $m \in \{0, -5, 1, 4, 2, 3\}$ values are shown in panels $(a) - (f)$, respectively. The number of oscillators is $N = 10$.  
+
+number $m=m^{*}$ the corresponding order parameter converges to 1 ($r_{m^{*}}\rightarrow1$), while all the others decline to 0 ($r_{m\neq m^{*}}\rightarrow0$). Therefore, the long term behavior, which is the final phase-locked state for a randomly selected initial condition, may be identified by tracking the evolution of the order parameters. Selecting a high enough threshold one may identify the final state with a high confidence as the one corresponding to $r_{m}\rightarrow1$. We note here that the stability analysis presented in the Appendix suggests that the characteristic exponent governing the stability (Eq. (A.13)) may have also nonzero imaginary part indicating that the system can exhibit oscillatory dynamics in the vicinity of the stable states. A prediction method based thus only on the derivatives of the order parameter proposed also in [12] is not appropriate.  
+
+Basin size distributions obtained from our sampling are illustrated in the top panel of Fig. 3. In order to interpret the graphs we remind that $m=0$ corresponds to $\Delta\phi=0$ phase difference and $|m|=5$ means $|\Delta\phi|=\pi$ anti-phase synchrony. A strong shift from the center to the sides can be observed in the distributions as $\omega$ changes. In order to avoid ambiguity, $\Delta\phi$ is defined as in [12] such that there is no state with $\Delta\phi=\pi$. However, to get a symmetric distribution in Fig. 3 we included it nevertheless by dividing equally the probability of the $\Delta\phi=-\pi$ state between $m=\pm5$, since at the level of the phase differences they correspond to the same state. The outcome of a more thorough analysis on the basin sizes is visible in the bottom plot of Fig. 3. As the results show, these distributions can be drastically different compared to the non-delayed case presented in [12, 29, 33]. The typical behavior of the system heavily depends on the parameters: for constant $\kappa$ there  
+
+![](images/f9ab383973bb084a904aacdb4c137ff47875dd8fae711b717764b141bd3e93b7.jpg)  
+
+![](images/24c85b09dbcc7512b9b3f90d74596a88bfca5a630954b70f37e22b36a45e6237.jpg)  
+
+![](images/227178955284f6d1ec90bbf3c56c6140e461f3a9e3ae80596cda1af5cc14d23c.jpg)  
+
+![](images/755befc550f7a4e63dfc11e6e678e8f7fcd29b0ae30c75adbf48bcec4de59a5f.jpg)  
+
+Figure 3: 上部分:三个 $\omega$ 值对应不同相位锁定状态的出现概率。下部分:$\omega$ 的函数关系下，相关相位锁定状态的出现概率。由于对称概率分布函数关于 0 对称，负 $m$ 的状态被省略。虚线表示上图中构建的概率分布对应的 $\omega$ 值。系统大小为 $N=10$ 振荡器，耦合强度为 $\kappa=2$。标签为 ??.  
+
+于参数：对于恒定的 $\kappa$，在 $\omega$ 的间隔上，大致处于 $2k\pi - \frac{\pi}{2}$ 和 $2k\pi + \frac{\pi}{2}$ 之间的状态 $m=0$ 是最可能的，而在 $2(k+1)\pi - \frac{\pi}{2}$ 和 $2(k+1)\pi + \frac{\pi}{2}$ 之间，反向相位同步是主导的。  
+
+考虑到在无量纲方程的情况下，时间延迟总是一时间单位，为了理解延迟的影响，我们需要切换回原始参数集。通过保持方程（1）中的 $\omega_{0}$ 和 $K$ 不变，我们可以得出这种交替行为可能是由延迟引起的，使得一些状态在实际上无法观测到，尽管它们处于线性稳定状态（请参见图 2 和图 ??）。我们注意到，如果系统以随机相位初始化，并且之前的历史记录被认为是被考虑的，那么这种行为就会出现。  
+
+# V. DISCUSSION  
+
+有趣的是将$P(\Delta\Phi)$概率的变化与$\omega$改变时最终频率的分叉相联系起来。正如我们从图2中的$\omega-\kappa$稳定性图所了解到的，对于大多数参数，系统是多态的，即对于给定的参数集，存在共存的稳定频率。改变参数对$\Omega$的数量和稳定性的影响可以通过像图1中那样以图形方式求解方程(6)来理解。增加$\kappa$将使线性函数的斜率绝对值变小，因此将会有更多的与$\sin(\Omega)$曲线相交。对于不同的$\Delta\phi$值，我们将会得到不同斜率的直线，它们都位于两个极限$\Delta\phi=0$和$\Delta\phi=\pi$之间，并在$\Omega=\omega$处相交。因此，修改$\omega$等效于平移线性函数本身。由于正弦函数是周期性的，因此方程(4)的解的数量也会以相同的$2\pi$周期性变化。尽管可能解的数量是已知的，但除了$\Delta\phi=\{0,-\pi\}$之外，它们的稳定性尚未确定。对于完整的分叉图。我们需要再次使用方程(A.13)来排序出不稳定状态。  
+
+![](images/000f0051206fe71b59a7341a93331a9ba2bbe6f324afaaa74b040c5a0347bd8f.jpg)  
+
+![](images/c057a717af6a8fa08c566d9ab78e1487322492dbf24dc91e7a68ba428c7f0ba0.jpg)  
+
+![](images/8f23c3be36d004866a4eb5272cc9c545912a05831a318b7e3eb1e3847f7e859b.jpg)  
+
+![](images/9fe870a73c38bc5254bb9b226f38e5d0fbf03fdec6218687df76d8f99d01b830.jpg)  
+
+Figure 3: Top: Probability of the appearance of different phase-locked states for three $\omega$ values. Bottom: Probability of the relevant phase locked states as a function of $\omega$. States with negative $m$ are omitted due to the symmetrical probability distribution function with respect to 0. Dashed lines indicate the $\omega$ values corresponding to the probability distributions constructed on the top panel. The size of the system is $N=10$ oscillators, the coupling strength is $\kappa=2$.  
+
+are intervals in $\omega$, roughly between $2k\pi - \frac{\pi}{2}$ and $2k\pi + \frac{\pi}{2}$, where the state $m=0$ is the most probable, while between $2(k+1)\pi - \frac{\pi}{2}$ and $2(k+1)\pi + \frac{\pi}{2}$ anti-phase synchrony is dominant.  
+
+Taking into account that in case of the dimensionless equations the time delay is always one time unit, in order to understand the effect of the delay we need to switch back to the original parameter set. By keeping $\omega_{0}$ and $K$ from Eq. (1) constant, one can conclude that this alternating behavior could be caused by the delay, making some states practically unobservable even though they are linearly stable (compare Fig. 2 and Fig. 3). We note that this behavior is present if the system is initialized with random phases and the history for initialization is considered as described previously.  
+
+# V. DISCUSSION  
+
+It is interesting to correlate the changes in the $P(\Delta\Phi)$ probabilities to the bifurcations of the final frequencies as $\omega$ changes. As we learn from the $\omega-\kappa$ stability maps from Fig. 2, for most of the parameters the system is multistable, i.e. there are coexisting stable frequencies for a given parameter set. The effect of changing the parameters on the number and stability of $\Omega$ can be understood by solving Eq. (6) graphically like in Fig.  
+
+![](images/bc64251839c2b8efb29d0a34a7c0dc694b8599fb6a6ce10884adfa1ff5c54ec3.jpg)  
+
+Figure 4: 当$m=0$和$m=-5$（分别为$\Delta\phi=0$和$\Delta\phi=-\pi$）时，最终频率的分叉图在重标准化自然频率$\omega/\pi$作为函数的情况。在垂直轴上，将最终的频率$\Omega$和自然$\omega$频率之间的差异标准化为$2\kappa$进行绘制。稳定/不稳定频率用实/虚线标记。黑色水平虚线标记的是$\Omega=\omega$的情况。橙色和蓝色阴影的宽度对应于相对于由灰色阴影区域指示的概率1而言观察到给定频率的概率。任何分支的稳定频率没有着色代表观察到频率为零。其他参数为$N=10$，$\kappa=2$。  
+
+![](images/014268f9d4bc18ed4a96d9b463e4e93415068c179a45d38a8151bea278c15614.jpg)  
+
+$\sigma$  
+
+![](images/1467737e59630ff6a4570aec95b3eff324425a3500f7aaf1cf542cdafb4e5b71.jpg)  
+
+$\sigma$  
+
+![](images/2a7d133345dee875bc17e58827ac56b733181a6a96ebbc70bab59578f8626a16.jpg)  
+
+Figure 5: 在三个$\omega$值下计算得到的方程(4)稳定解的$\delta$和$\sigma$图。虚线和曲线分别代表不同状态下随着$\omega$变化而移动的$\Omega$频率的路径。数字$m$的绝对值对应于使用上述$\omega$的实际最终频率确定的$\sigma$和$\delta$值。灰色圆圈的面积与给定的$\{\Delta\phi,\Omega\}$对的概率成比例。注意，在中间的图中，以数字5和0表示的状态对应于稍微不同的$\delta$值，因此导致不同的概率（参见图3）。参数为$N=10\mathrm{fi}\ \kappa=2.0$。  
+
+图4上呈现了两个主要状态（$\Delta\phi=0$和$\Delta\phi=-\pi$）的分叉图。为了比较，我们还通过阴影区域表示了这些状态的概率。对于所选择的$\kappa$，无论$\omega$取值如何，这两个状态都至少有一个稳定的$\Omega$频率，请将此与图2进行比较。尽管存在多个稳定频率，但只有一个频率几乎作为渐近状态出现，考虑到上述初始化。有趣的是，正如图4所示，状态的概率与无量纲自然频率$\omega$和最终频率$\Omega$之间的差异强烈相关。换句话说，当$|\Omega_0-\omega|<|\Omega_{-\pi}-\omega|$且反之时，系统更倾向于稳定状态$\{\Delta\phi=0,\Omega_0\}$而不是稳定状态$\{\Delta\phi=-\pi,\Omega_{-\pi}\}$。此外，这种优势不仅是相对的，而且除了在接近$(2k+1)\frac{\pi}{2}$的狭窄$\omega$区间内，另一个状态根本不出现，其中前面提到的两个状态对$\omega$的距离几乎相同。在参考文献[9]中也报告了在具有高斯白噪声的延迟耦合振荡器环的情况下，停留在某一状态的时间与频率差异之间的类似相关性。换句话说，系统在频率最接近旋转体的固有频率的轨道上停留的时间最长。  
+
+现在让我们考虑一些启发式的论据，关于实现与 $\Delta\phi=0$ 和 $\Delta\phi=-\pi$ 不同的其他稳定状态的问题。通过  
+
+![](images/58de18b0348af4123d7d78499196536e829339b5690c1d3956fb10d2eb386ecd.jpg)  
+
+Figure 4: Bifurcation diagram of the final frequencies for $m=0$ and $m=-5$ ($\Delta\phi=0$ and $\Delta\phi=-\pi$, respectively) as a function of the rescaled natural frequency $\omega/\pi$. On the vertical axis the difference between the final $\Omega$ and the natural $\omega$ frequencies is plotted, normalized with $2\kappa$. Stable/unstable frequencies are marked with solid/dashed lines. The black horizontal dashed line marks the $\Omega=\omega$ case. The width of orange and blue shadings correspond to the probability of observing the given frequency, compared to probability 1 indicated by gray shaded region. No shading at stable frequencies for any branch means zero observations. The other parameters are $N=10$, $\kappa=2$.  
+
+1. Increasing $\kappa$ will make the slope of the linear function smaller in absolute value, thus there will be more intersections with the $\sin(\Omega)$ curve. For different $\Delta\phi$ values we will have lines with different slopes, all of them lying between the two extremes $\Delta\phi=0$ and $\Delta\phi=\pi$ and crossing each other at the $\Omega=\omega$ point. Modifying the $\omega$ is equivalent thus to sliding the linear function parallel to itself. Since the sine function is periodic, the number of solutions of Eq. (4) changes with the same $2\pi$ periodicity. Even though the number of possible solutions is known, their stability, apart of $\Delta\phi=\{0,-\pi\}$, is not yet determined. For the full bifurcation diagram we need again Eq. (A.13) for sorting out unstable states.  
+
+The bifurcation diagram of the two dominant states ($\Delta\phi=0$ and $\Delta\phi=-\pi$) is presented on Fig. 4. For comparison we also indicate the probability of these states by shaded areas. For the chosen $\kappa$ both states have at least one stable $\Omega$ frequency for all $\omega$ values, please compare this with Fig. 2. Though there exist multiple stable frequencies, only one of them appears almost exclusively as asymptotic state, given the initialization described above. Interestingly, as Fig. 4 shows, the probability of the states strongly correlates with the difference between the dimensionless natural frequency $\omega$ and the final frequency $\Omega$. In other words, the system prefers a stable $\{\Delta\phi=0,\Omega_0\}$ state over an also stable $\{\Delta\phi=-\pi,\Omega_{-\pi}\}$ when $|\Omega_0-\omega|<|\Omega_{-\pi}-\omega|$ and vice versa. Furthermore, this dominance is not only relative, but the other state does not appear at all, except for narrow $\omega$ intervals around $(2k+1)\frac{\pi}{2}$, where the distances to $\omega$ are almost the same for both of the states mentioned before. A similar correlation between the resident time spent in one state and the difference in frequency is reported in Ref. [9] in the case of delay coupled rings of oscillators with Gaussian white noise. Namely, the system spends the most time on orbits which have the frequency closest to the natural frequency of the rotators.  
+
+Let us consider now some heuristic arguments concerning the realization of other stable states different from $\Delta\phi=0$ and $\Delta\phi=-\pi$. By recalling Eq.(4) one can see that difference $\Omega-\omega$ is determined by  
+
+$$
+\delta = \cos ( \Delta \phi ) \sin ( \Omega ) \, ,
+$$  
+
+回忆方程（4），我们可以看到差异 $\Omega-\omega$ 是由以下决定的:  
+
+$$
+\delta = \cos ( \Delta \phi ) \sin ( \Omega ) \, ,
+$$  
+
+在这里，$-2\kappa$的因子被省略以保持该参数的标准化。使用与0和$-N/2$这两个特殊状态相同的$(\omega, \kappa)$参数来计算除$m$之外的其他状态的$\delta$，发现相对于这两个特殊状态，$\delta$可以更接近于0。另一方面，由于这些中间状态的概率往往较小（参见图??），在状态选择过程中必须有其他相关参数。可以注意到相对于$\Delta\phi=\{0, -\pi\}$情况，主要的区别与方程(2)中的两个正弦项的对称性有关，如果$\Delta\phi$既不是0也不是$-\pi$，那么它们会取不同的值。这种情况的一个结果是，在这样的状态中，振荡器会按照一个优选方向或顺序排列，因此，两个方向的相互作用强度的对称性被破坏。这主要是由于正弦是一个奇函数，因此它对振荡器的交换敏感，并且通过对其编号，我们已经赋予了一个预定义的方向，用于相位之间的比较。为了量化一个状态的对称性，我们引入了第二个参数。  
+
+$$
+\sigma = \sin ( \Delta \phi ) \cos ( \Omega ) \, ,
+$$  
+
+通过从给定的$\Omega$和$\Delta\phi$减去Eq.(2)中的两个正弦项来获得。类似于$\delta$，$2\kappa$项被省略。对称状态将具有$\sigma=0$。与图2中的稳定映射情况类似，具有$|m_{1}|+|m_{2}|=N/2$的态对在$\omega$变化时具有类似的$\delta$和$\sigma$趋势。此外，具有相反指数的态对($m_{1}=-m_{2}$)具有相同的$\delta$，但是$\sigma$相反。  
+
+为了更好地理解$\delta$和$\sigma$之间的相互作用，我们在图5上绘制了Eq. (4)的稳定解在$\delta-\sigma$平面上的不同$\omega$值。根据这些图形，我们可以提出一些简单的启发式准则来理解振荡器是如何自组织的。  
+
+- 首先，所选的状态倾向于尽可能对称，这就解释了为什么分布的峰值总是在0和$-\pi$左右。  
+
+- 如果有不止一种与$|\sigma|$值相同的解，则首选$|\delta|$值较小的解（例如参见$\sigma=0$行）。  
+
+- 具有相同的$|\sigma|$和$|\delta|$的状态具有相等的概率。  
+
+基于以上观察，对于一个随机的初始态合集和给定的参数集，计算$|\sigma|$和$|\delta|$值可以帮助我们估计期望的吸引盆大小。  
+
+最后, 请注意我们的系统是确定性的, 因此不需要基于概率的吸引盆大小方法, 然而时延存在将问题转化为无限维系统的范畴 [32], 这限制了动力学的可预测性。$N$ 维相空间也失去了它的传统意义, 因为$\theta_{i}$值不足以完全定义相空间中的状态, 状态历史也是必要的。  
+
+# VI. CONCLUSIONS & OUTLOOK  
+
+我们研究了通过时滞耦合相互作用的局部耦合Kuramoto振荡器环中的对称相位锁定状态。对称相位锁定状态是指相邻振荡器间允许有恒定的相位差。以往关于这样的局部耦合系统的研究只确定了有限数量的这种状态的稳定性标准。我们得到了所有具有恒定相位差状态的一种隐含稳定条件。为了了解稳定静止状态的选择统计情况，通过考虑大量均匀分布的随机初始状态，我们研究了其吸引盆地。我们的数值结果表明，吸引盆地的尺寸可以随参数变化几个数量级。这导致由于吸引域几乎可以忽略不计，从随机初始条件中稳定静止状态实际上是不可观测的。通过考虑简单的对称性论证，我们假设相对于吸引盆地的尺寸有启发式规则。在我们的数值研究中，与文献 [44] 的结果一致，我们还观察到时滞的存在通常会导致简单固定点吸引子的不稳定，从而除了这些相位锁定状态外，还出现了更复杂的动态行为。因此，在局部耦合的时滞系统中寻找不同类型的吸引子应该是未来研究的另一个目标。  
+
+![](images/9fe1786126b1bae6d6fc93c58232fbb6c9cc732edad6b5c492612d3c41f538a0.jpg)  
+
+![](images/7e8862e1b8d192c4ac0475bf806859e5bf73ba3a3436ed7d37d92944d8532820.jpg)  
+
+Figure 5: Diagram of $\delta$ versus $\sigma$ for stable solutions of Eq. (4) calculated for three values of $\omega$. Dashed lines and curves represent the paths along which the $\Omega$ frequencies for different states move as $\omega$ changes. Numbers, corresponding to $|m|$, indicate the $\sigma$ and $\delta$ values determined using actual final frequencies for the $\omega$ noted above. The area of the gray circles are proportional to the probability of a given $\{\Delta\phi,\Omega\}$ pair. Note that in the middle plot the states denoted by numbers 5 and 0 correspond to slightly different $\delta$ values, hence leading to different probabilities (compare Fig. 3). The parameters are $N=10$, $\kappa=2.0$.  
+
+where the $-2\kappa$ factor is dropped to keep this parameter normalized. Calculating $\delta$ using the same $(\omega, \kappa)$ parameters for other states $m$ than 0 and $-N/2$, one finds that $\delta$ can be closer to 0 than in the case of these two particular states. On the other hand, since the probability of these intermediate states tends to be smaller (see Fig. 3), there must be other relevant parameters as well in the process of state selection. One can notice that the main difference relative to the $\Delta\phi=\{0,-\pi\}$ case is related to the symmetry of the two sine terms in Eq. (2), taking different values if $\Delta\phi$ is neither 0, nor $-\pi$. One consequence of this is that in such states there is a preferred direction or order in which the oscillators arrange themselves, thus the symmetry of the interaction intensity for the two directions is broken. This is mainly caused by the fact that sine is an odd function, so it is sensible to the interchange of oscillators and by numbering them we already imposed a predefined direction in which the phases should be compared to each other. In order to quantify the symmetry of a state, we introduce a second parameter  
+
+$$
+\sigma = \sin ( \Delta \phi ) \cos ( \Omega ) \, ,
+$$  
+
+obtained by subtracting the two sine terms from Eq. (2) for a given $\Omega$ and $\Delta\phi$. Similarly to $\delta$ the $2\kappa$ term is omitted. Symmetric states will have $\sigma=0$. As in case of the stability maps in Fig. 2, pairs of states with $|m_1|+|m_2|=N/2$ have similar trends of $\delta$ and $\sigma$ as $\omega$ changes. Also, pairs with opposite index ($m_1=-m_2$) have the same $\delta$, but opposite $\sigma$.  
+
+In order to better understand the interplay between $\delta$ and $\sigma$ we plotted on Fig. 5 the stable solutions of Eq. (4) on the $\delta - \sigma$ plane for different $\omega$ values. Based on these graphs we can formulate some simple heuristic guidelines along which one can understand how the oscillators self-organize themselves.  
+
+- First, the selected state tends to be symmetric as possible, which explains why the peak of the distributions are always around 0 and $-\pi$.  
+
+- If there is more than one solution with the same $|\sigma|$ value, the one with the smaller $|\delta|$ will be preferred (see for example the $\sigma=0$ line).  
+
+- States, having the same $|\sigma|$ and $|\delta|$ are equally probable.  
+
+# Acknowledgments  
+
+The present work was funded by the Romanian UEFISCDI grant nr. PN-III-P4-PCE-2016-0363.  
+
+Appendix: Stability of linear DDEs using the Lambert W function  
+
+将从公式（5）中提出的扰动解代入公式（2），并保留到线性项，得到以下线性DDE  
+
+$$
+\frac { \mathrm { d } \boldsymbol { \eta } ( u ) } { \mathrm { d } u } = \mathbf { A } \cdot \boldsymbol { \eta } ( u ) + \mathbf { A _ { d } } \cdot \boldsymbol { \eta } ( u - 1 ) ,
+$$  
+
+where $\eta(u)$ is the perturbation vector, while $\mathbf{A}$ and $\mathbf{A_d}$ are $N \times N$ coefficient matrices. Matrix $\mathbf{A}$ is proportional to the identity matrix  
+
+$$
+\mathbf { A } = - \kappa \left( \cos ( \Delta \phi + \Omega ) + \cos ( \Delta \phi - \Omega ) \right) \cdot \mathbf { 1 } _ { N } \, ,
+$$  
+
+# 文本翻译  
+
+而矩阵 $A_{\mathrm{\~d\~}}$ 是形如循环矩阵的矩阵。  
+
+$$
+\mathbf { A _ { d } } = \kappa \cdot \left( \begin{array} { c c c c c c } { 0 } & { \cos ( \Delta \phi - \Omega ) } & { 0 } & { \ldots } & { 0 } & { \cos ( \Delta \phi + \Omega ) } \\ { \cos ( \Delta \phi + \Omega ) } & { 0 } & { \cos ( \Delta \phi - \Omega ) } & { \ldots } & { 0 } & { 0 } \\ { 0 } & { \cos ( \Delta \phi + \Omega ) } & { 0 } & { \ldots } & { 0 } & { 0 } \\ { \vdots } & { \vdots } & { \vdots } & { \ddots } & { \vdots } & { \vdots } \\ { 0 } & { 0 } & { 0 } & { \ldots } & { 0 } & { \cos ( \Delta \phi - \Omega ) } \\ { \cos ( \Delta \phi - \Omega ) } & { 0 } & { 0 } & { \ldots } & { \cos ( \Delta \phi + \Omega ) } & { 0 } \end{array} \right) ,
+$$  
+
+其中$\mathbf{1}_{N}$是$N \times N$的单位矩阵。方程 (A.1)是一组线性时滞微分方程。对于满足延迟项和非延迟项矩阵的交换的系统，解是已知的 [2]。在我们的案例中，$\mathbf{A}$和$\mathbf{A}_{\mathrm{d}}$的交换是成立的，因为$\mathbf{A}$与单位矩阵成比例。因此解可表示为:  
+
+$$
+\eta ( u ) = \sum _ { k = - \infty } ^ { + \infty } \mathrm { e } ^ { [ \mathbf { W } _ { k } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) + \mathbf { A } ] u } \mathbf { c } _ { k } ^ { I }
+$$  
+
+矩阵$\mathbf{W}_{k}$是矩阵Lambert W函数的第k个分支 [23]，而向量$\mathbf{c}_{k}^{I}$则依赖于系数矩阵、初始条件以及延迟系统的历史。通常，为了确定稳定性，我们需要计算方括号内指数的最大特征值，涵盖所有k的取值。由于Lambert W函数具有无穷多个分支，线性解的特征谱也是无穷的。对于标量系统，与式（2）相反，$k=0$的主分支提供了最右侧的特征值。幸运的是，对于系数矩阵对易的DDE系统，上述陈述也成立 [2]。包含主分支的术语如下所示:  
+
+$$
+\eta _ { 0 } ( u ) = \mathrm { e } ^ { [ \mathbf { W } _ { 0 } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) + \mathbf { A } ] u } \mathbf { c } _ { 0 } ^ { I }
+$$  
+
+为了方便计算矩阵指数，我们需要将指数对角化。首先，我们有一个Lambert W函数参数中的矩阵指数，由于矩阵A是对角矩阵，所以可以很容易地计算:  
+
+$$
+\mathrm { e } ^ { - \mathbf { A } } = \mathrm { e } ^ { 2 \kappa \cos ( \Delta \phi ) \cos ( \Omega ) } \cdot \mathbf { 1 } _ { N } .
+$$  
+
+因此，矩阵 Lambert W 函数的参数得到简化，仅为一个矩阵与一个标量的乘积。  
+
+$$
+\mathbf { W } _ { 0 } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) = \mathbf { W } _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \mathbf { A } _ { \mathrm { d } } ) ,
+$$  
+
+As a result of the above observations, for a random ensemble of initial states and a given parameter set the calculation of the $|\sigma|$ and $|\delta|$ values could help us in estimating the expected attraction basin sizes.  
+
+Finally, please note that our system is deterministic, so a probabilistic approach on the basin sizes should not be necessary, nevertheless the presence of time delay shifts the problem in the realm of infinite-dimensional systems [32], which limits the predictability of the dynamics. The $N$-dimensional phase space also looses its traditional meaning, since the $\theta_{i}$ values are not enough for a complete definition of a state in the phase space, the state histories are also needed.  
+
+# VI. CONCLUSIONS & OUTLOOK  
+
+We studied symmetric phase locked states in rings of locally coupled Kuramoto rotators, interacting through time-delayed coupling. By symmetric phase-locked states we imply that a constant phase difference is allowed between neighboring oscillators. Former studies of such locally coupled systems determined a stability criterion for only a limited number of such states [14, 15]. An implicit stability condition is derived for all the states with constant phase difference. In order to understand the statistics for the selection of the stable stationary states, the attraction basins were investigated by considering large ensembles of uniformly distributed random initial states. Our numerical results show, that the size of the attraction basins can vary between several orders of magnitudes as a function of the parameters. This leads to the situation where stable stationary states are practically unobservable from random initial conditions due to their almost negligible attraction domain. By considering simple symmetry arguments we conjecture heuristic rules regarding the relative sizes of the attraction basins. During our numerical studies, in agreement with [32], we also observed that the presence of time-delay may often lead to the destabilization of simple fixpoint attractors, allowing the emergence of more complex dynamical behaviors besides these phase locked states. Searching for different types of attractors in locally coupled time-delayed systems of oscillators should be thus another objective for future studies.  
+
+# Acknowledgments  
+
+The present work was funded by the Romanian UEFISCDI grant nr. PN-III-P4-PCE-2016-0363.  
+
+# Appendix: Stability of linear DDEs using the Lambert W function  
+
+Substituting the proposed perturbed solution from Eq. (5) into Eq. (2) and keeping terms up to linear order yields the following linear DDE  
+
+$$
+\frac { \mathrm { d } \pmb { \eta } ( u ) } { \mathrm { d } u } = \mathbf { A } \cdot \pmb { \eta } ( u ) + \mathbf { A _ { d } } \cdot \pmb { \eta } ( u - 1 ) ,
+$$  
+
+where $\boldsymbol{\eta}(u)$ is the perturbation vector, while $\mathbf{A}$ and $\mathbf{A}_{\mathrm{d}}$ are $N \times N$ coefficient matrices. Matrix $\mathbf{A}$ is proportional to the identity matrix  
+
+$$
+\mathbf { A } = - \kappa \left( \cos ( \Delta \phi + \Omega ) + \cos ( \Delta \phi - \Omega ) \right) \cdot \mathbf { 1 } _ { N } \, ,
+$$  
+
+while matrix $\mathbf{A}_{\mathrm{d}}$ is a circulant matrix of the form  
+
+我们引入了简写符号$\kappa_{c}=\kappa\cos(\Delta\phi)\cos(\Omega)$。$\mathbf{A}_{\mathrm{d}}$矩阵是循环矩阵，因此可以使用单位离散傅里叶变换矩阵对其进行对角化 [6]: $\mathbf{A}_{\mathrm{d}}=\mathbf{U}\cdot\mathbf{D}\cdot\mathbf{U}^{-1}$。这个性质有助于评估矩阵Lambert W函数，该函数仅作用于对角元素。  
+
+$$
+\begin{array} { r l r } & { } & { \mathbf { W } _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \mathbf { A _ { d } } ) = } \\ & { } & { \mathbf { U } \cdot \left( \begin{array} { l l l } { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { 1 } ) } & { 0 } & { 0 } \\ { 0 } & { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { 2 } ) } & { 0 } \\ { \vdots } & { \vdots } & { \vdots } \\ { 0 } & { 0 } & { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { N } ) } \end{array} \right) \cdot \mathbf { U } ^ { - 1 } , } \end{array}
+$$  
+
+其中，$\lambda^{i}$是$\mathbf{A}_{\mathrm{d}}$的第$i$个特征值。为了简明起见，我们将上述对角矩阵表示为$\mathbf{D}_{W}(\mathrm{e}^{2\kappa_{c}}\lambda)$。在等式(A.5)中，我们在指数项中有一个求和，可以分解为指数的乘积，因为$\mathbf{A}$与等式(A.8)中的三重乘积交换。  
+
+$$
+\mathrm { e } ^ { \left( \mathbf { U } \cdot \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } + \mathbf { A } \right) u } = \mathrm { e } ^ { \mathbf { U } \cdot \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } u } \cdot \mathrm { e } ^ { \mathbf { A } u } .
+$$  
+
+我们可以通过利用幂级数展开来重新排列项，轻松地计算第一个指数部分。  
+
+$$
+\mathrm { e } ^ { \mathbf { U } \cdot \mathbf { D } _ { W } \cdot \mathbf { U } ^ { - 1 } u } = \mathbf { U } \sum _ { k = 0 } ^ { \infty } \frac { 1 } { k ! } \left( \mathbf { D } _ { W } u \right) ^ { k } \mathbf { U } ^ { - 1 } = \mathbf { U } \mathrm { e } ^ { \mathbf { D } _ { W } u } \mathbf { U } ^ { - 1 } .
+$$  
+
+由于$\mathbf{U}^{-1}$与方程(A.9)中的第二个指数函数交换，我们得到以下结果:  
+
+$$
+\mathrm { e } ^ { \left( \mathbf { U } \cdot \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } + \mathbf { A } \right) u } = \mathbf { U } \cdot \mathrm { e } ^ { \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) u } \cdot \mathrm { e } ^ { - 2 \kappa _ { c } \mathbf { 1 } _ { N } u } \cdot \mathbf { U } ^ { - 1 } .
+$$  
+
+指数函数的指数再次交换，它们的和是一个对角矩阵，因此我们最终可以将方程（A.5）重写为以下形式  
+
+$$
+\eta _ { 0 } ( u ) = \mathbf { U } \cdot \mathbf { M } ( u ) \cdot \mathbf { U } ^ { - 1 } \mathbf { c } _ { 0 } ^ { I } ,
+$$  
+
+其中$\mathbf{M}(u)$是一个对角矩阵，其元素为  
+
+$$
+\mathbf { M } _ { j j } ( u ) = \mathrm { e } ^ { \left[ W _ { 0 } \left( 2 ( \kappa _ { c } \cos \frac { 2 \pi j } { N } + \mathrm { i } \kappa _ { s } \sin \frac { 2 \pi j } { N } ) \mathrm { e } ^ { 2 \kappa _ { c } } \right) - 2 \kappa _ { c } \right] u } ,
+$$  
+
+其中，$j=0,1,...N-1$。这里我们已经插入了$\mathbf{A_d}$的特征值，并使用了类似于$\kappa_c$的符号$\kappa_s=\kappa\sin(\Delta\phi)\sin(\Omega)$。$\eta_i$扰动的动力学由这些项的线性组合所控制，这意味着如果所有N个指数的实部为负，则对于给定的$\{\Omega,\Delta\phi\}$对，相位锁定状态是线性稳定的。  
+
+[1] D. M. Abrams and S. H. Strogatz. Chimera states for coupled oscillators. Phys. Rev. Lett., 93:174102, Oct 2004.  
+
+[2] F. M. Asl and A. G. Ulsoy. Analysis of a system of linear delay differential equations. J. Dyn. Sys., Meas., Control, 125(2):215–223, 2003.  
+
+[3] M. Bolotov, T. Levanova, L. Smirnov, and A. Pikovsky. Dynamics of disordered heterogeneous chains of phase oscillators. Cybernetics and Physics, pages 215–221, 12 2019.  
+
+[4] M. Bonnin. Waves and patterns in ring lattices with delays. Physica D: Nonlinear Phenomena, 238(1):77–87, 2009.  
+
+[5] B. C. Daniels, S. T. M. Dissanayake, and B. R. Trees. Synchronization of coupled rotators: Josephson junction ladders and the locally coupled kuramoto model. Phys. Rev. E, 67:026216, Feb 2003.  
+
+[6] P. Davis. Circulant matrices. Pure and applied mathematics. Wiley, 1979.  
+
+[7] R. Delabays, T. Coletta, and P. Jacquod. Multistability of phase-locking and topological winding numbers in locally coupled kuramoto models on single-loop networks. Journal of Mathematical Physics, 57(3):032701, 2016.  
+
+$$
+\mathbf { A _ { d } } = \kappa \cdot \left( \begin{array} { c c c c c c } { 0 } & { \cos ( \Delta \phi - \Omega ) } & { 0 } & { \ldots } & { 0 } & { \cos ( \Delta \phi + \Omega ) } \\ { \cos ( \Delta \phi + \Omega ) } & { 0 } & { \cos ( \Delta \phi - \Omega ) } & { \ldots } & { 0 } & { 0 } \\ { 0 } & { \cos ( \Delta \phi + \Omega ) } & { 0 } & { \ldots } & { 0 } & { 0 } \\ { \vdots } & { \vdots } & { \vdots } & { \ddots } & { \vdots } & { \vdots } \\ { 0 } & { 0 } & { 0 } & { \ldots } & { 0 } & { \cos ( \Delta \phi - \Omega ) } \\ { \cos ( \Delta \phi - \Omega ) } & { 0 } & { 0 } & { \ldots } & { \cos ( \Delta \phi + \Omega ) } & { 0 } \end{array} \right) ,
+$$  
+
+where $\mathbf{1}_{N}$ is the $N \times N$ identity matrix. Eq. (A.1) is a system of linear DDEs. For systems where the matrices of the delayed and non-delayed terms commute the solution is known [2]. In our case the commutation of $\mathbf{A}$ and $\mathbf{A}_{\mathrm{d}}$ is fulfilled since $\mathbf{A}$ is proportional to the identity matrix. The solution hence writes as:  
+
+$$
+\eta ( u ) = \sum _ { k = - \infty } ^ { + \infty } \mathrm { e } ^ { \left[ \mathbf { W } _ { k } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) + \mathbf { A } \right] u } \mathbf { c } _ { k } ^ { I } .
+$$  
+
+The matrix $\mathbf{W}_{k}$ is $k$-th branch of the matrix Lambert W function [23], while the vector $\mathbf{c}_{k}^{I}$ depends on the coefficient matrices, the initial conditions, and the history of the delayed system. Generally, in order to determine the stability we have to calculate the greatest eigenvalue of the exponent in square brackets over all $k$ values. Since the Lambert W function has infinite branches the whole eigenspectrum of the linear solution is infinite. For a scalar system, as opposed to Eq. (2), the principal branch of $k=0$ gives the rightmost eigenvalue. Fortunately for us the above statement holds for systems of DDEs as well if the coefficient matrices commute [2]. The term that contains the principal branch is the following:  
+
+$$
+\eta _ { 0 } ( u ) = \mathrm { e } ^ { [ \mathbf { W } _ { 0 } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) + \mathbf { A } ] u } \mathbf { c } _ { 0 } ^ { I } \, .
+$$  
+
+In order to easily calculate matrix exponentials we need to diagonalize the exponent. First, we have a matrix exponential in the argument of the Lambert W function, which is easy to calculate since $\mathbf{A}$ is diagonal:  
+
+$$
+\mathrm { e } ^ { - \mathbf { A } } = \mathrm { e } ^ { 2 \kappa \cos ( \Delta \phi ) \cos ( \Omega ) } \cdot \mathbf { 1 } _ { N } .
+$$  
+
+Thus the argument of the matrix Lambert W function is simplified, having only one matrix multiplied by a scalar  
+
+$$
+\mathbf { W } _ { 0 } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) = \mathbf { W } _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \mathbf { A } _ { \mathrm { d } } ) ,
+$$  
+
+where we introduced the shorthand notation $\kappa_{c}=\kappa\cos(\Delta\phi)\cos(\Omega)$. The $\mathbf{A}_{\mathrm{d}}$ matrix is circulant, thus diagonalizable using the unitary discrete Fourier transform matrix [6]: $\mathbf{A}_{\mathrm{d}}=\mathbf{U}\cdot\mathbf{D}\cdot\mathbf{U}^{-1}$. This property helps in evaluating the matrix Lambert W function, which is simply the scalar function acting on the diagonal elements  
+
+$$
+\begin{array} { r l r } & { } & { \mathbf { W } _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \mathbf { A _ { d } } ) = } \\ & { } & { \mathbf { U } \cdot \left( \begin{array} { c c c } { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { 1 } ) } & { 0 } & { 0 } \\ { 0 } & { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { 2 } ) } & { 0 } \\ { \vdots } & { \vdots } & { \vdots } \\ { 0 } & { 0 } & { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { N } ) } \end{array} \right) \cdot \mathbf { U } ^ { - 1 } , } \end{array}
+$$  
+
+[8] K. Dénes, B. Sándor, and Z. Néda. On the predictability of the final state in a ring of kuramoto rotators. Romanian Reports in Physics, 71:108, 2019.  
+
+[9] O. D'Huys, T. Jüngling, and W. Kinzel. Stochastic switching in delay-coupled oscillators. Physical Review E, 90(3):032918, 2014.  
+
+[10] A. Diaz-Guilera and A. Arenas. Phase Patterns of Coupled Oscillators with Application to Wireless Communication. In Lio, P and Yoneki, E and Verma, DC, editor, Bio-inspired Computing and Communications, volume 5151 of Lecture Notes in Computer Science, pages 184+, 2008.  
+
+[11] R. Dodla, A. Sen, and G. L. Johnston. Phase-locked patterns and amplitude death in a ring of delay-coupled limit cycle oscillators. Phys. Rev. E, 69:056217, May 2004.  
+
+[12] K. Dénes, B. Sándor, and Z. Néda. Pattern selection in a ring of kuramoto oscillators. Communications in Nonlinear Science and Numerical Simulation, 78:104868, 2019.  
+
+[13] F. Dörfler and F. Bullo. Synchronization in complex networks of phase oscillators: A survey. Automatica, 50(6):1539 - 1564, 2014.  
+
+[14] O. D' Huys, R. Vicente, T. Erneux, J. Danckaert, and I. Fischer. Synchronization properties of network motifs: Influence of coupling delay and symmetry. Chaos: An Interdisciplinary Journal of Nonlinear Science, 18(3):037116, 2008.  
+
+[15] M. G. Earl and S. H. Strogatz. Synchronization in oscillator networks with delayed coupling: A stability criterion. Phys. Rev. E, 67:036204, Mar 2003.  
+
+[16] X. Huang, M. Zhan, F. Li, and Z. Zheng. Single-clustering synchronization in a ring of kuramoto oscillators. Journal of Physics A: Mathematical and Theoretical, 47:125101, 03 2014.  
+
+[17] A.Kouda and S. Mori. Analysis of a ring of mutually coupled van der pol oscillators with coupling delay. IEEE Transactions on Circuits and Systems, 28(3):247–253, March 1981.  
+
+[18] Y. Kuramoto. Self-entrainment of a population of coupled non-linear oscillators. In H. Araki, editor, International Symposium on Mathematical Problems in Theoretical Physics, volume 39 of Lecture Notes in Physics, pages 420–422. Springer Berlin Heidelberg, 1975.  
+
+[19] Y. Kuramoto and D. Battogtokh. Coexistence of coherence and incoherence in nonlocally coupled phase oscillators. 2002.  
+
+[20] M. A. Matías, V. Pérez-Muñuzuri, M. N. Lorenzo, I. P. Mariño, and V. Pérez-Villar. Observation of a fast rotating wave in rings of coupled chaotic oscillators. Phys. Rev. Lett., 78:219–222, Jan 1997.  
+
+[21] E. Niebur, H. G. Schuster, and D. M. Kammen. Collective frequencies and metastability in networks of limit-cycle oscillators with time delay. Phys. Rev. Lett., 67:2753–2756, Nov 1991.  
+
+[22] J. Ochab and P. F. Gora. Synchronisation of coupled oscillators in a local one-dimensional Kumamoto model. In Lawniczak, AT and Makowiec, D and Di Stefano, BN, editor, Summer Solstice 2009, International Conference on Discrete Models of Complex Systems, volume 3 of Acta Physica Polonica B Proceedings Supplement, pages 453–462, 2010.  
+
+[23] M. Pease. Methods of matrix algebra. Academic Press, New York, 1965.  
+
+[24] P. Perlikowski, S. Yanchuk, O. Popovych, and P. Tass. Periodic patterns in a ring of delay-coupled oscillators. Physical Review E, 82(3):036208, 2010.  
+
+[25] W.-X. Qin and P.-L. Zhang. Discrete rotating waves in a ring of coupled mechanical oscillators with strong damping. Journal of Mathematical Physics, 50(5):052701, 2009.  
+
+[26] J. P. Ramírez and J. Alvarez. Rotating waves in oscillators with huygens' coupling**this work was partly supported by the conacyt under grant cb2012-180011-y. IFAC-PapersOnLine, 48(18):71 – 76, 2015. 4th IFAC Conference on Analysis and Control of Chaotic Systems CHAOS 2015.  
+
+[27] T. K. Roy and A. Lahiri. Synchronized oscillations on a Kuramoto ring and their entrainment under periodic driving. Chaos, Solitons & Fractals, 45(6):888 – 898, 2012.  
+
+[28] S. Strogatz. Sync: The emerging science of spontaneous order. Penguin UK, 2004.  
+
+[29] P. F. Tilles, F. F. Ferreira, and H. A. Cerdeira. Multistable behavior above synchronization in a locally coupled kuramoto model. Physical Review E, 83(6):066206, 2011.  
+
+[30] K. Y. Tsang, R. E. Mirollo, S. H. Strogatz, and K. Wiesenfeld. Dynamics of a globally coupled oscillator array. Physica D: Nonlinear Phenomena, 48(1):102 – 112, 1991.  
+
+where $\lambda^{i}$ is the $i$th eigenvalue of $\mathbf{A}_{\mathrm{d}}$. For compactness we denote the diagonal matrix from above as $\mathbf{D}_{W}\left(\mathrm{e}^{2 \kappa_{c}} \lambda\right)$. In Eq. (A.5) we have a sum in the exponent which can be decomposed to product of exponentials, since $\mathbf{A}$ commutes with the triple product in Eq. (A.8):  
+
+$$
+\mathrm { e } ^ { \left( \mathbf { U } \cdot \mathbf { D } _ { W } ( e ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } + \mathbf { A } \right) u } = \mathrm { e } ^ { \mathbf { U } \cdot \mathbf { D } _ { W } ( e ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } u } \cdot \mathrm { e } ^ { \mathbf { A } u } .
+$$  
+
+We can easily rearrange the terms by evaluating the first exponential using expansion in power series:  
+
+$$
+\mathrm { e } ^ { \mathbf { U } \cdot \mathbf { D } _ { W } \cdot \mathbf { U } ^ { - 1 } u } = \mathbf { U } \sum _ { k = 0 } ^ { \infty } \frac { 1 } { k ! } \left( \mathbf { D } _ { W } u \right) ^ { k } \mathbf { U } ^ { - 1 } = \mathbf { U } \mathrm { e } ^ { \mathbf { D } _ { W } u } \mathbf { U } ^ { - 1 } .
+$$  
+
+Since $\mathbf{U}^{-1}$ commutes with the second exponential in Eq. (A.9) we arrive to the following:  
+
+$$
+\mathrm { e } ^ { \left( \mathbf { U } \cdot \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } + \mathbf { A } \right) u } = \mathbf { U } \cdot \mathrm { e } ^ { \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) u } \cdot \mathrm { e } ^ { - 2 \kappa _ { c } \mathbf { 1 } _ { N } u } \cdot \mathbf { U } ^ { - 1 } .
+$$  
+
+The exponents of the exponential functions commute again and their sum is a diagonal matrix, thus we can finally rewrite Eq. (A.5) as follows  
+
+$$
+\eta _ { 0 } ( u ) = \mathbf { U } \cdot \mathbf { M } ( u ) \cdot \mathbf { U } ^ { - 1 } \mathbf { c } _ { 0 } ^ { I } ,
+$$  
+
+where $\mathbf{M}(u)$ is a diagonal matrix with entries  
+
+$$
+\mathbf { M } _ { j j } ( u ) = \mathrm { e } ^ { \left[ W _ { 0 } \left( 2 ( \kappa _ { c } \cos \frac { 2 \pi j } { N } + \mathrm { i } \kappa _ { s } \sin \frac { 2 \pi j } { N } ) \mathrm { e } ^ { 2 \kappa _ { c } } \right) - 2 \kappa _ { c } \right] u } ,
+$$  
+
+where $j=0,1,...N-1$. Here we already inserted the eigenvalues of $\mathbf{A_d}$ and used the notation $\kappa_s=\kappa\sin(\Delta\phi)\sin(\Omega)$ similar to $\kappa_c$. The dynamics of the $\eta_i$ perturbations is governed by the linear combination of such terms, meaning that if the real part of all $N$ exponents is negative then the phase locked state for a given $\{\Omega,\Delta\phi\}$ pair is linearly stable.  
+
+[1] D. M. Abrams and S. H. Strogatz. Chimera states for coupled oscillators. Phys. Rev. Lett., 93:174102, Oct 2004.  
+
+[2] F. M. Asl and A. G. Ulsoy. Analysis of a system of linear delay differential equations. J. Dyn. Sys., Meas., Control, 125(2):215–223, 2003.  
+
+[3] M. Bolotov, T. Levanova, L. Smirnov, and A. Pikovsky. Dynamics of disordered heterogeneous chains of phase oscillators. Cybernetics and Physics, pages 215–221, 12 2019.  
+
+[4] M. Bonnin. Waves and patterns in ring lattices with delays. Physica D: Nonlinear Phenomena, 238(1):77–87, 2009.  
+
+[5] B. C. Daniels, S. T. M. Dissanayake, and B. R. Trees. Synchronization of coupled rotators: Josephson junction ladders and the locally coupled kuramoto model. Phys. Rev. E, 67:026216, Feb 2003.  
+
+[6] P. Davis. Circulant matrices. Pure and applied mathematics. Wiley, 1979.  
+
+[7] R. Delabays, T. Coletta, and P. Jacquod. Multistability of phase-locking and topological winding numbers in locally coupled kuramoto models on single-loop networks. Journal of Mathematical Physics, 57(3):032701, 2016.  
+
+[8] K. Dénes, B. Sándor, and Z. Néda. On the predictability of the final state in a ring of kuramoto rotators. Romanian Reports in Physics, 71:108, 2019.  
+
+[9] O. D'Huys, T. Jüngling, and W. Kinzel. Stochastic switching in delay-coupled oscillators. Physical Review E, 90(3):032918, 2014.  
+
+[10] A. Diaz-Guilera and A. Arenas. Phase Patterns of Coupled Oscillators with Application to Wireless Communication. In Lio, P and Yoneki, E and Verma, DC, editor, Bio-inspired Computing and Communications, volume 5151 of Lecture Notes in Computer Science, pages 184+, 2008.  
+
+[31] S. Watanabe, H. S. van der Zant, S. H. Strogatz, and T. P. Orlando. Dynamics of circular arrays of josephson junctions and the discrete sine-gordon equation. Physica D: Nonlinear Phenomena, 97(4):429 – 470, 1996.  
+
+[32] H. Wernecke, B. Sándor, and C. Gros. Chaos in time delay systems, an educational review. Physics Reports, 824:1 – 40, 2019.  
+
+[33] D. A. Wiley, S. H. Strogatz, and M. Girvan. The size of the sync basin. Chaos: An Interdisciplinary Journal of Nonlinear Science, 16(1):015103, 2006.  
+
+[34] A. T. Winfree. Biological rhythms and the behavior of populations of coupled oscillators. Journal of Theoretical Biology, 16(1):15 – 42, 1967.  
+
+[35] J. Wood, T. Edwards, and S. Lipa. Rotary traveling-wave oscillator arrays: A new clock technology. IEEE Journal of Solid-State Circuits, 36(11):11654–1665, 2001.  
+
+[36] M. K. S. Yeung and S. H. Strogatz. Time delay in the kuramoto model of coupled oscillators. Phys. Rev. Lett., 82:648–651, Jan 1999.  
+
+[11] R. Dodla, A. Sen, and G. L. Johnston. Phase-locked patterns and amplitude death in a ring of delay-coupled limit cycle oscillators. Phys. Rev. E, 69:056217, May 2004.  
+
+[12] K. Dénes, B. Sándor, and Z. Néda. Pattern selection in a ring of kuramoto oscillators. Communications in Nonlinear Science and Numerical Simulation, 78:104868, 2019.  
+
+[13] F. Dörfler and F. Bullo. Synchronization in complex networks of phase oscillators: A survey. Automatica, 50(6):1539-1564, 2014.  
+
+[14] O. D' Huys, R. Vicente, T. Erneux, J. Danckaert, and I. Fischer. Synchronization properties of network motifs: Influence of coupling delay and symmetry. Chaos: An Interdisciplinary Journal of Nonlinear Science, 18(3):037116, 2008.  
+
+[15] M. G. Earl and S. H. Strogatz. Synchronization in oscillator networks with delayed coupling: A stability criterion. Phys. Rev. E, 67:036204, Mar 2003.  
+
+[16] X. Huang, M. Zhan, F. Li, and Z. Zheng. Single-clustering synchronization in a ring of kuramoto oscillators. Journal of Physics A: Mathematical and Theoretical, 47:125101, 03 2014.  
+
+[17] A. Kouda and S. Mori. Analysis of a ring of mutually coupled van der pol oscillators with coupling delay. IEEE Transactions on Circuits and Systems, 28(3):247–253, March 1981.  
+
+[18] Y. Kuramoto. Self-entrainment of a population of coupled non-linear oscillators. In H. Araki, editor, International Symposium on Mathematical Problems in Theoretical Physics, volume 39 of Lecture Notes in Physics, pages 420–422. Springer Berlin Heidelberg, 1975.  
+
+[19] Y. Kuramoto and D. Battogtokh. Coexistence of coherence and incoherence in nonlocally coupled phase oscillators. 2002.  
+
+[20] M. A. Matías, V. Pérez-Muñuzuri, M. N. Lorenzo, I. P. Mariño, and V. Pérez-Villar. Observation of a fast rotating wave in rings of coupled chaotic oscillators. Phys. Rev. Lett., 78:219–222, Jan 1997.  
+
+[21] E. Niebur, H. G. Schuster, and D. M. Kammen. Collective frequencies and metastability in networks of limit-cycle oscillators with time delay. Phys. Rev. Lett., 67:2753–2756, Nov 1991.  
+
+[22] J. Ochab and P. F. Gora. Synchronisation of coupled oscillators in a local one-dimensional Kumamoto model. In Lawniczak, AT and Makowiec, D and Di Stefano, BN, editor, Summer Solstice 2009, International Conference on Discrete Models of Complex Systems, volume 3 of Acta Physica Polonica B Proceedings Supplement, pages 453–462, 2010.  
+
+[23] M. Pease. Methods of matrix algebra. Academic Press, New York, 1965.  
+
+[24] P. Perlikowski, S. Yanchuk, O. Popovych, and P. Tass. Periodic patterns in a ring of delay-coupled oscillators. Physical Review E, 82(3):036208, 2010.  
+
+[25] W.-X. Qin and P.-L. Zhang. Discrete rotating waves in a ring of coupled mechanical oscillators with strong damping. Journal of Mathematical Physics, 50(5):052701, 2009.  
+
+[26] J. P. Ramírez and J. Alvarez. Rotating waves in oscillators with huygens' coupling**this work was partly supported by the conacyt under grant cb2012-180011-y. IFAC-PapersOnLine, 48(18):71 – 76, 2015. 4th IFAC Conference on Analysis and Control of Chaotic Systems CHAOS 2015.  
+
+[27] T. K. Roy and A. Lahiri. Synchronized oscillations on a Kuramoto ring and their entrainment under periodic driving. Chaos, Solitons & Fractals, 45(6):888 – 898, 2012.  
+
+[28] S. Strogatz. Sync: The emerging science of spontaneous order. Penguin UK, 2004.  
+
+[29] P. F. Tilles, F. F. Ferreira, and H. A. Cerdeira. Multistable behavior above synchronization in a locally coupled kuramoto model. Physical Review E, 83(6):066206, 2011.  
+
+[30] K. Y. Tsang, R. E. Mirollo, S. H. Strogatz, and K. Wiesenfeld. Dynamics of a globally coupled oscillator array. Physica D: Nonlinear Phenomena, 48(1):102 – 112, 1991.  
+
+[31] S. Watanabe, H. S. van der Zant, S. H. Strogatz, and T. P. Orlando. Dynamics of circular arrays of josephson junctions and the discrete sine-gordon equation. Physica D: Nonlinear Phenomena, 97(4):429 – 470, 1996.  
+
+[32] H. Wernecke, B. Sándor, and C. Gros. Chaos in time delay systems, an educational review. Physics Reports, 824:1 – 40, 2019.  
+
+[33] D. A. Wiley, S. H. Strogatz, and M. Girvan. The size of the sync basin. Chaos: An Interdisciplinary Journal of Nonlinear Science, 16(1):015103, 2006.  
+
+[34] A. T. Winfree. Biological rhythms and the behavior of populations of coupled oscillators. Journal of Theoretical Biology,  
+
+16(1):15 - 42, 1967.  
+
+[35] J. Wood, T. Edwards, and S. Lipa. Rotary traveling-wave oscillator arrays: A new clock technology. IEEE Journal of Solid-State Circuits, 36(11):11654–1665, 2001.  
+
+[36] M. K. S. Yeung and S. H. Strogatz. Time delay in the kuramoto model of coupled oscillators. Phys. Rev. Lett., 82:648–651, Jan 1999.  
+26-06-14.19:38:24.156 [main            ] WARN  DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer - 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/E:/develop/apache-maven-3.9.6/mvn_repo/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/E:/develop/apache-maven-3.9.6/mvn_repo/org/json/json/20231013/json-20231013.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+26-06-14.19:38:24.225 [main            ] INFO  MkTest                 - Starting MkTest using Java 17.0.15 with PID 22556 (started by Mr Ding in C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app)
+26-06-14.19:38:24.230 [main            ] INFO  MkTest                 - The following 1 profile is active: "dev"
+26-06-14.19:38:34.072 [main            ] INFO  MkTest                 - Started MkTest in 11.608 seconds (process running for 14.089)
+26-06-14.19:38:41.211 [main            ] INFO  PythonParserAdapter    - Calling PDF parser [monkeyocr-http] for: C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\18.pdf
+26-06-14.19:39:11.911 [main            ] INFO  PythonParserAdapter    - MonkeyOCR HTTP markdown output: C:\Users\Mr Ding.LAPTOP-H54HCE12\Desktop\ai_pdf\w1_ai\w1_ai-app\data\monkeyocr-http-output\18-1781437151660\18.md
+26-06-14.19:39:14.720 [main            ] INFO  MkTest                 - # Synchronization patterns in rings of time-delayed Kuramoto oscillators  
+
+Károly Dénes, Bulcsú Sándor, and Zoltán Néda  
+
+Babeş-Bolyai University, Department of Physics,  
+
+1 Kogălniceanu str., 400084 Cluj-Napoca, Romania  
+
+Phase-locked states with a constant phase shift between the neighboring oscillators are studied in rings of identical Kuramoto oscillators with time-delayed nearest-neighbor coupling. The linear stability of these states is derived and it is found that the stability maps for the dimensionless equations show a high level of symmetry. The size of the attraction basins is numerically investigated. These sizes are changing periodically over several orders of magnitude as the parameters of the model are varied. Simple heuristic arguments are formulated to understand the changes in the attraction basin sizes and to predict the most probable states when the system is randomly initialized.  
+
+# I. INTRODUCTION  
+
+Coupled oscillator systems are widely used as model systems in studies of self-organizing phenomena and complex behavior [28]. Their widespread usage in the field of complex systems can be attributed to the fact that they are able to model phase-transitions and pattern selection in various periodic phenomena. Apart from the possibility to investigate such systems analytically, they are also appropriate for simple numerical studies. These systems were among the first ones considered computationally to understand emerging synchronization [34] and more recently chimera states [1, 19]. One of the most famous prototype system is the Kuramoto model with phase oscillators globally coupled through a sinusoidal interaction kernel [18]. Nowadays different versions of the original model are used for targeting different type of phenomena in complex systems [13].  
+
+One of the simplest variant of the locally coupled Kuramoto model consists of rotators placed in a ring-like topology with only nearest neighbor interaction. Though this one-dimensional topology may seem trivial, the setup has proven to produce many interesting dynamical features. The problem of critical coupling for phase locked patterns in case of heterogeneous Kuramoto-type rotators has recently been studied in detail [16, 22, 27, 29]. Beyond the linear stability and bifurcation analysis of states, several studies focus on the size of attraction basins belonging to the emergent phase locked patterns in rings of Kuramoto oscillators [12, 29, 33]. Instead of oscillator rings, a recent paper [3] for example considers one dimensional chains with no periodic boundary conditions and studies the effect of heterogeneity and phase shift on the robustness of synchronized states. While the above works analyze the one-dimensional rotator system from a pure fundamental dynamical systems point of view, there are application oriented studies as well. Díaz-Guilera and Arenas [10] investigated the possibilities of new wireless communication protocols based on emergent phase locked patterns, while Delabays et al. [7] show that synchronized patterns in rings are related to loop currents, thus linking this problem to electrical engineering. It has been shown by Daniels et al. that in certain cases arrays of Josephson junctions can be mapped into a Kuramoto-type system with nearest neighbor coupling [5]. Additionally to the already discussed analytical and numerical approaches in Kuramoto systems, the phenomenon of phase locking in coupled circuits has also been studied experimentally [20, 31, 35]. The plausibility of obtaining rotating waves in locally coupled mechanical systems is discussed in papers by Qin and Zhang [25], and by Ramírez and Alvarez [26].  
+
+# Synchronization patterns in rings of time-delayed Kuramoto oscillators  
+
+Károly Dénes, Bulcsú Sándor, and Zoltán Néda  
+
+Babeş-Bolyai University, Department of Physics,  
+
+1 Kogălniceanu str., 400084 Cluj-Napoca, Romania  
+
+*警告：该PDF由GPT-Academic开源项目调用大语言模型+Latex翻译插件一键生成，版权归原文作者所有。翻译内容可靠性  
+
+无保障，请仔细鉴别并以原文为准。  
+
+项目GitHub地址：https://github.com/binary-husky/gpt_academic/。  
+
+项目在线体验地址：https://chatpaper.org。  
+
+当前大语言模型: gpt-3.5-turbo, 当前语言模型温度设定: 1。为了防止大语言模型的意外谬误产生扩散影响, 禁止移除或修改此警告。在时间延迟最近邻相互耦合的相同Kuramoto振荡器环中, 研究具有相邻振荡器之间常数相位差的同步状态。导出了这些状态的线性稳定性, 并发现无量纲方程的稳定映射呈现出高度对称的特征。数值上探究了吸引盆的大小。随着模型参数的变化, 这些尺寸周期性地变化了数个数量级。提出了一些简单的启发式论证来理解吸引盆尺寸的变化, 并预测当系统在随机初始化时可能出现的状态。  
+
+# I. INTRODUCTION  
+
+耦合振荡器系统广泛用作自组织现象和复杂行为研究中的模型系统 [28]。它们在复杂系统领域的广泛应用可以归因于它们能够模拟各种周期性现象中的相变和模式选择。除了可以通过分析方法研究这些系统之外，它们也适合进行简单的数值研究。这些系统是最早被计算考虑的系统之一，用于理解新兴的同步现象 [34]，以及最近的合融态 [1, 19]。最著名的原型系统之一是通过正弦相互作用核全局耦合的Kuramoto模型中的相位振荡器 [18]。现在原始模型的不同版本用于针对复杂系统中不同类型的现象 [13]。  
+
+最简单的本地耦合Kuramoto模型变种之一是在呈环状拓扑结构中放置的旋转器，仅存在最近邻的相互作用。尽管这种一维拓扑结构可能看起来微不足道，但该设置被证明产生了许多有趣的动力学特性。在异质Kuramoto型旋转器的情况下，关于相位锁定模式的临界耦合问题最近得到了详细研究 [16, 22, 27, 29]。除了对状态的线性稳定性和分岔分析外，还有几项研究专注于属于Kuramoto振荡器环中出现的相位锁定模式的吸引域的大小 [12, 29, 33]。除了振荡器环外，最近的一篇论文 [3]举例考虑了没有周期边界条件的一维链，并研究了异质性和相移对同步状态的稳健性的影响。虽然上述工作从纯粹的基础动力学系统角度分析了一维旋转器系统，但也有一些面向应用的研究。Díaz-Guilera和Arenas [10]研究了基于出现的相位锁定模式的新无线通信协议的可能性，而Delabays等人 [7]表明环中的同步模式与回路电流有关，从而将这个问题与电气工程联系起来。 Daniels等人已经证明，在某些情况下，Josephson结阵列可以映射为具有最近邻耦合的Kuramoto型系统 [5]。除了在Kuramoto系统中已经讨论的分析和数值方法外，耦合电路中的相位锁定现象也进行了实验研究 [20, 31, 35]。在Qin和Zhang的论文中讨论了本地耦合机械系统中获得旋转波可能性的问题 [25]，Ramírez和Alvarez的论文也讨论了这个问题 [26]。  
+
+在研究耦合振荡器系统时，引入时间延迟是一个自然的进一步步骤，使模型对实际应用更加逼真。早期关于延迟效应的研究表明，频率同步和有序性可以在这种系统中类似于无延迟的情况下出现 [17, 21, 30, 36]。对于本地耦合系统，已经考虑了不同类型的振荡器：在Hopf分岔附近的极限环振子 [4, 11]，Stuart-Landau和FitzHugh-Nagumo振子 [24]。当涉及到延迟耦合的Kuramoto振荡器环时，Earl和Strogatz的工作对于正弦耦合核函数和最近邻耦合是一个重要的贡献 [15]。在这个开创性的工作中，推导了对于任意耦合函数和拓扑结构的同相位同步的稳定性准则。对于反相位同步的情况，应该提到D'Huys等人的工作 [14]。在噪声作用下，切换延迟耦合环中的相位锁定状态已经被研究 [9]。我们的工作旨在继续通过研究其他同步模式的稳定性，也是我们之前对非时滞系统中吸引盆和相位锁定模式选择的研究的自然延续 [8, 12]。接下来，我们着重研究相位锁  
+
+Introducing time delay in the interaction is a natural step forward in the study of coupled oscillator systems thus making the model more realistic for practical applications. Early studies on the effect of the delay suggests that frequency synchronization and order can emerge in such systems similarly to the non-delayed case [17, 21, 30, 36]. For locally coupled systems different oscillator types have been already considered: limit-cycle oscillators near Hopf bifurcations [4, 11], Stuart-Landau and FitzHugh-Nagumo oscillators [24]. When it comes to rings of delay-coupled Kuramoto oscillators, an important contribution for a sinusoidal coupling kernel and nearest neighbor coupling is the work of Earl and Strogatz [15]. In this seminal work the stability criterion of in-phase synchrony for arbitrary coupling functions and topology is derived. For the case of anti-phase synchronizations the work of D'Huys et al. [14] should be mentioned. Switching between phase-locked states in delay coupled rings under the effect of noise has been also studied [9].  
+
+Our work intends to continue this research by investigating the stability of other synchronization modes as well, being also a natural continuation of our previous studies on the attraction basins and selection of phase locked patterns in non-delayed systems [8, 12]. In the followings we focus on the stability of the phase locked states studying the changes in the basin size distribution as the parameters are varied. Since time-delayed systems are formally equivalent to infinite dimensional systems [32], one should expect also other complex attractors as well. Studies of limit cycles, chaos, and chimera-like states in Kuramoto rings are however beyond the scope of this paper.  
+
+# II. SYMMETRIC PHASE LOCKED STATES OF THE KURAMOTO RING  
+
+Locally coupled Kuramoto rotators with time-delayed interactions are considered on a chain with periodic boundary conditions  
+
+$$
+\begin{array} { r } { \dot { \theta } _ { i } ( t ) = \omega _ { 0 } + K [ \sin ( \theta _ { i - 1 } ( t - \tau ) - \theta _ { i } ( t ) ) + } \\ { + \sin ( \theta _ { i + 1 } ( t - \tau ) ~ - \theta _ { i } ( t ) ) ] \, , } \end{array}
+$$  
+
+where $\theta_{i}$ is the phase of the oscillator with index $i$, $i=1,2,\ldots,N$, $\omega_{0}$ is the natural frequency of all oscillators, $K$ is the coupling constant and $\tau$ is the length of time delay. Together with the system size $N$ there are thus four parameters of the model. The imposed periodic condition writes as $\theta_{N+1}=\theta_{1}$ and $\theta_{0}=\theta_{N}$. By rescaling the time with the delay ($t\rightarrow u=t/\tau$) we get a dimensionless system of equations with only three parameters  
+
+$$
+\begin{array} { r } { \frac { \mathrm { d } \theta _ { i } ( u ) } { \mathrm { d } u } = \omega + \kappa [ \sin ( \theta _ { i - 1 } ( u - 1 ) - \theta _ { i } ( u ) ) + } \\ { + \sin ( \theta _ { i + 1 } ( u - 1 ) - \ \theta _ { i } ( u ) ) ] \, , } \end{array}
+$$  
+
+$\omega=\omega_{0}\cdot\tau$ is the dimensionless intrinsic frequency and $\kappa=K\cdot\tau$ is the dimensionless coupling. Phase-locked pattern emerging as the solution of the above system may be written as  
+
+$$
+\theta _ { i } ( u ) = \Omega u + \varphi _ { i } \, ,
+$$  
+
+$\Omega$ being a final dimensionless frequency, constant over the system and time. The $\varphi_{i}$ phase is needed to include all kind of synchronized patterns not only in-phase synchrony [11, 12, 27, 29, 33]. We focus on symmetric states where the $\varphi_{i}-\varphi_{i-1}=\Delta\phi$ terms are constant over the system. Solution of this form of Eq. (2) yields for the final frequency [15] the equation  
+
+$$
+\Omega = \omega - 2 \kappa \cos ( \Delta \phi ) \sin ( \Omega ) \, ,
+$$  
+
+定状态的稳定性，研究参数变化时盆地大小分布的变化。由于时滞系统在形式上等价于无限维系统 [32]，我们还可以期望出现其他复杂的吸引子。然而，本文不涉及对Kuramoto环中极限循环、混沌和奇美拉样态的研究。  
+
+# II. SYMMETRIC PHASE LOCKED STATES OF THE KURAMOTO RING  
+
+考虑在具有周期边界条件的链上具有时滞相互作用的局部耦合Kuramoto旋转器。  
+
+$$
+\begin{array} { r l } { \dot { \theta } _ { i } ( t ) = \omega _ { 0 } + K [ \sin ( \theta _ { i - 1 } ( t - \tau ) - \theta _ { i } ( t ) ) + } & { } \\ { + \sin ( \theta _ { i + 1 } ( t - \tau ) } & { - \theta _ { i } ( t ) ) ] \, , } \end{array}
+$$  
+
+其中$\theta_{i}$是指标为$i$的振荡器的相位，$i=1,2,\ldots,N$，$\omega_{0}$是所有振荡器的固有频率，$K$是耦合常数，$\tau$是时间延迟的长度。加上系统大小$N$，因此模型有四个参数。施加的周期条件写为$\theta_{N+1}=\theta_{1}$和$\theta_{0}=\theta_{N}$。通过将时间按延迟进行重新标度（$t\rightarrow u=t/\tau$），我们可以得到一个无量纲的方程组，其中只有三个参数。  
+
+$$
+\begin{array} { r } { \frac { \mathrm { d } \theta _ { i } ( u ) } { \mathrm { d } u } = \omega + \kappa [ \sin ( \theta _ { i - 1 } ( u - 1 ) - \theta _ { i } ( u ) ) + } \\ { + \sin ( \theta _ { i + 1 } ( u - 1 ) - \ \theta _ { i } ( u ) ) ] \, , } \end{array}
+$$  
+
+$\omega=\omega_{0}\cdot\tau$是无量纲的内在频率，$\kappa=K\cdot\tau$是无量纲的耦合。上述系统的锁相模式可以表示为  
+
+$$
+\theta _ { i } ( u ) = \Omega u + \varphi _ { i } \, ,
+$$  
+
+Ω 是一个无量纲频率，在系统和时间上保持不变。$φ_{i}$ 相位包含了所有种类的同步模式，而不仅仅是相位同步 [11, 12, 27, 29, 33]。我们关注对称状态，在这种状态下，$φ_{i} - φ_{i-1} = Δϕ$ 在整个系统中保持不变。对于这种形式的方程 (2) 的解，具有最终频率 [15] 的方程为  
+
+$$
+\Omega = \omega - 2 \kappa \cos ( \Delta \phi ) \sin ( \Omega ) \, ,
+$$  
+
+其中，相邻振荡器间的相位差$\Delta\phi\in[-\pi,\pi)$等同于单位圆周上的有向距离测量 [12]。由于施加了周期性边界条件，在每个时刻，对所有$\{i,i+1\}$振荡器对的相位差之和应为$2\pi$的倍数。利用这个和，我们可以定义一个绕数$m$，对于偶数个振荡器$N$，绕数$m$被认为是介于$-N/2$和$N/2-1$之间的整数，对于奇数个振荡器$N$，绕数$m$被认为是介于$-\frac{N-1}{2}$和$\frac{N-1}{2}$之间的整数。相位同步对应于$m=0$，而反相同步对应于$m=-N/2$（对于偶数个振荡器）。因此，每个相位锁定的状态可以通过绕数$m$或相位差$\Delta\phi$与相应的$\Omega$频率的组合来明确定义，该频率由式(4)计算得到。  
+
+# III. STABILITY OF THE PHASE-LOCKED STATES  
+
+现在我们转向对考虑的相位锁定状态的稳定性。我们的方法基于Earl和Strogatz用来研究类似系统中同相位同步稳定性的标准线性稳定方法 [15]。在这里，与先前的研究不同，我们将同步的定义扩展到允许出现非零绕数$m$的状态。通过使用相同的方法，我们考虑对相位锁定状态的微扰。  
+
+$$
+\theta _ { i } ( u ) = \Omega u + \varphi _ { i } + \epsilon \, \eta _ { i } ( u ) \, ,
+$$  
+
+其中$\epsilon\ll1$。首先，我们集中讨论两种特殊的状态，即相位同步和反相位同步。  
+
+最广泛研究的相位同步状态$m=0$的稳定性已经在文献[15]中研究过。允许的最终频率$\Omega$与状态的稳定性有关，即当$\cos(\Omega)>0$时，状态是稳定的。所有可能的稳定频率候选者都可以从方程(4)计算得出。我们指出，  
+
+where the phase shift between neighboring oscillators, $\Delta\phi\in[-\pi,\pi)$, is equivalent to a directed distance measure on the perimeter of the unit circle [12]. Due to the imposed periodic boundary conditions, in each time-moment their sum over all $\{i,i+1\}$ oscillator pairs should be a multiple of $2\pi$. Using this sum, one can define a winding number $m$, which is considered to be an integer between $-N/2$ and $N/2-1$ for even, respectively between $-\frac{N-1}{2}$ and $\frac{N-1}{2}$ for odd number of oscillators $N$. In-phase synchrony corresponds to $m=0$, while anti-phase synchrony gets the $m=-N/2$ value (for even oscillator number). Each phase-locked state can be thus unambiguously defined by the combination of a winding number $m$ or a phase shift $\Delta\phi$ with a corresponding $\Omega$ frequency, calculated from Eq. (4).  
+
+# III. STABILITY OF THE PHASE-LOCKED STATES  
+
+Now we turn to the stability of the considered phase-locked states. Our approach is based on the standard linear stability method used by Earl and Strogatz to study the stability of in-phase synchrony in similar systems [15]. Here, in contrast to previous works we refer to synchrony in a broader sense allowing states with nonzero winding numbers $m$ to appear. Using the same workaround, we consider a perturbation to the phase-locked states  
+
+$$
+\theta _ { i } ( u ) = \Omega u + \varphi _ { i } + \epsilon \, \eta _ { i } ( u ) \, ,
+$$  
+
+where $\epsilon \ll 1$. First we concentrate on two particular states, namely in-phase and anti-phase synchrony.  
+
+The stability of the most widely studied in-phase synchronization state $m=0$ has already been investigated in Ref. [15]. The allowed final frequency $\Omega$ is linked to the stability of the state, that is the state is stable for $\cos(\Omega)>0$. All possible candidates for stable frequencies can be calculated from Eq. (4). We point out that the derivation presented in [15] also holds for the $m=-N/2$ case, resulting in a simple sign change in the stability condition. The final frequency for the $m=-N/2$ state is stable hence for $\cos(\Omega)<0$. A similar result is also presented for the anti-phase case in Ref. [14].  
+
+In order to understand the stability criteria for these two states, it is convenient to solve Eq. (4) graphically. Rearranging the equation yields:  
+
+$$
+\frac { \omega - \Omega } { 2 \kappa \cos ( \Delta \phi ) } = \sin ( \Omega ) \, .
+$$  
+
+In this form the solutions to this equation correspond to the intersection points of a linear and a sine function (see the sketch in Fig. 1). As proven in [15] the stability of the solutions is determined by the slope of the $\sin(\Omega)$ term which is exactly $\cos(\Omega)$.  
+
+In order to gain information about the other states we need to go deeper in the realm of Delay Differential Equations (DDE). The amplifying or diminishing trend for the considered $\eta_{i}(u)$ perturbations can be determined by a solution that is expressed with the matrix Lambert W function [23]. This analysis is done in the Appendix. Using this method we can numerically investigate for any $m$ value the stability of the $\Omega$ values obtained from Eq. (4). Fig. 2 shows the stability map of different states in the $\omega-\kappa$ space evaluated with the method from the Appendix using the exponents in Eq. (A.13). More precisely, on the graphs from Fig. 2 we indicate by a color-code the number of stable solutions with winding number $m$ for given $\omega$ and $\kappa$ parameters. Although the stability is determined by a complicated formula of transcendental functions, the stability map shows high level of symmetry and periodicity. First, each stability map is $2\pi$ periodic with respect to $\omega$. This is a result of the fact that an $\omega'=\omega+2\pi$ transformation will not change the form of Eq. (4) and will increase the value of $\Omega$ with  
+
+![](images/b086829b3bcb57ce545da1375a7714ef91f3ef63aca61a4c6deb84ad5bc467d1.jpg)  
+
+Figure 1: 图形化解方程 (6)，针对 $m=\{0,-N/2\}$，分别对应于 $\Delta\phi=\{0,-\pi\}$。正弦函数和线性函数的交点代表稳定解（实心点）和不稳定解（空心点）。十字标记在 $\Omega=\omega$ 时表示振荡器的固有频率。  
+
+[15]中提出的推导也适用于$m=-N/2$的情况，只需使稳定条件简单地换成相反符号。因此，$m=-N/2$状态的最终频率在$\cos(\Omega)<0$时是稳定的。在文献[14]中也提出了相反情况的类似结果。  
+
+为了理解这两种状态的稳定性条件，我们可以方便地通过图解求解方程(4)。重新排列方程得到:  
+
+$$
+\frac { \omega - \Omega } { 2 \kappa \cos ( \Delta \phi ) } = \sin ( \Omega ) \, .
+$$  
+
+这个形式的方程的解对应于线性函数和正弦函数的交点（见图1中的草图）。正如在参考文献 [15]中证明的那样，解的稳定性是由$sin(\Omega)$ 项的斜率，即$cos(\Omega)$ 决定的。  
+
+为了获取其他状态的信息，我们需要深入研究延迟微分方程（DDE）领域。针对所考虑的 $\eta_{i}(u)$ 扰动，放大或减小趋势由矩阵 Lambert W 函数表示的解可以确定 [23]。该分析在附录 中完成。使用这种方法，我们可以对于任意 $m$ 值数值地研究从式（4）中得到的 $\Omega$ 值的稳定性。图 2 显示了利用附录 中利用式（A.13）中的指数评估在 $\omega-\kappa$ 空间中不同状态稳定性的稳定性图。更确切地说，在图 2 中的图形中，我们通过颜色代码表示给定 $\omega$ 和 $\kappa$ 参数的具有缠绕数为 $m$ 的稳定解的数量。尽管稳定性由超越函数的复杂公式确定，但稳定性地图显示出高度的对称性和周期性。首先，每个稳定性图在 $\omega$ 方面具有 $2\pi$ 周期性。这是因为 $\omega'=\omega+2\pi$ 转换不会改变式（4）的形式，并将 $\Omega$ 的值增加 $2\pi$，保持 $\kappa_{c}$ 和 $\kappa_{s}$ 的不变性（该记号在附录中的方程（A.7）和（A.13）中引入）。其次，在图 2 中同一行的状态，对于满足 $|m_{1}|+|m_{2}|=N/2$ 的组，其上下移动一个值为 $\pi$ 的相对位置。这可以通过观察到 $\Omega'=\Omega-\pi$，$\omega'=\omega-\pi$，$\Delta\phi'=\Delta\phi+\pi$ 转化将式（4）和方程（A.13）中的 $\kappa_{c}$ 和 $\kappa_{s}$ 保持不变来理解。  
+
+# IV. BASINS OF ATTRACTION  
+
+线性稳定性分析仅提供了关于系统在稳定状态附近动力学的信息。对于维度 $d \geq 3$ 的系统，动力学可能变得更加复杂，当预测相位锁定对称状态的出现时，仅依靠这些信息是不可靠的。为了解决这个问题，我们通过数值实验测量给定状态 $m$ 出现的概率，确定吸引域的相对大小。  
+
+在对时滞微分方程（Eq. (1)）进行数值实验的过程中，需要提供一组函数来确定系统在 $t \in [-\tau, 0)$ 的状态历史 [32]。我们考虑一个实验可行的步骤，通过将具有简单（非时滞）未耦合相位振荡器的集合作为时间延迟  
+
+![](images/eaa4917e047a373d38f5b82ea4ec723b3403be59fa5649770c98101c01af7286.jpg)  
+
+Figure 1: Graphical solution of Eq. (6) for $m=\{0,-N/2\}$ corresponding to $\Delta\phi=\{0,-\pi\}$, respectively. Intersections of the sine and the linear functions represent the stable (filled dots) and unstable (hollow dots) solutions. The cross at $\Omega=\omega$ denotes the natural frequency of the oscillators.  
+
+$2\pi$, leaving $\kappa_{c}$ and $\kappa_{s}$ invariant (notations introduced in Eqs. (A.7) and (A.13) in the Appendix). Second, the patterns on the stability maps are translated one relative to the other on the vertical axis by a value of $\pi$, for pairs where $|m_{1}|+|m_{2}|=N/2$ (states in the same row in Fig. 2). This can be understood by the observation that the $\Omega'=\Omega-\pi$, $\omega'=\omega-\pi$, $\Delta\phi'=\Delta\phi+\pi$ transformations will leave Eq. (4), and $\kappa_{c}$ and $\kappa_{s}$ in Eq. (A.13) invariant.  
+
+# IV. BASINS OF ATTRACTION  
+
+Linear stability analysis provides information about the dynamics of the system only in the proximity of the stationary states. For systems with dimensionality $d \geq 3$ the dynamics may become more complex, and one cannot rely only on these information when predicting the appearance of the phase-locked symmetric states [33]. In order to deal with this problem we determine the relative size of the basins of attractions through numerical experiments by measuring the probability of appearance of a given state $m$.  
+
+In the numerical experiments for the initialization of DDEs from Eq. (1) one needs to provide a set of functions, determining the state history of the system for $t \in [-\tau,0)$ [32]. Here we consider an experimentally feasible procedure, by kick-starting the time-delayed Kuramoto system with a set of simple (non-delayed) uncoupled phase oscillators. This is possible by initializing the system with uniformly distributed random phases, $\theta_i(0) \in [0,2\pi)$, and solving Eq. (1) numerically with $K=0$ for the first $t \in [-\tau,0)$ period, or equivalently in the rescaled parameters $\kappa=0$ for $u \in [-1,0)$. This type of initialization of the history is equivalent to an interaction with a finite speed of propagation, meaning that there is no interaction between the oscillators up to a certain point. The final state is verified using the generalized order parameter $r_m$ defined in [12]:  
+
+$$
+r _ { m } = \left| \frac { 1 } { N } \sum _ { j = 1 } ^ { N } e ^ { i [ \theta _ { j } ( t ) - ( j - 1 ) \frac { 2 m \pi } { N } ] } \right| .
+$$  
+
+It has been shown in Ref. [12] that as the system approaches to a stable state characterized by the winding  
+
+![](images/2dc1484eac175e34b8cac7e320c7c89fd369f4b56891cc925405b911605ddcd1.jpg)  
+
+![](images/a011a1f41bb1c8f4cb9e7fdca2ea5d92a6c5783994cf33bfa66522ed5e6a9305.jpg)  
+
+![](images/23ec25f2e04ee8a82d27197ca6cb156a236c32abba0400aa05dd7e587dba32d5.jpg)  
+
+![](images/8a978fa1faa6ae990325f1930e86159602976ddcf36db3a331d3fea529f31a92.jpg)  
+
+![](images/456c060e96b551c097803bc5b3fcdf4dd20a8fe494694a8c1dad7cb33589f10c.jpg)  
+
+![](images/22a96633bbbe15e075c0484a02178076972b6c0ed17f9d57524ee33c855c2343.jpg)  
+
+Figure 2: 对于由颜色图所示的不同状态$m$指示的方程（4）的稳定$\Omega$解的数量。通过计算方程（A.13）中的指数，以函数$\omega$和$\kappa$参数的形式来研究稳定性。分别在面板$(a)-(f)$中显示了$m\in\{0,-5,1,4,2,3\}$的结果。振荡器的数量为$N=10$。  
+
+的 Kuramoto 系统的初始条件开始。这可以通过将系统初始化为均匀分布的随机相位，$\theta_{i}(0) \in [0,2\pi)$，并在第一个 $t \in [-\tau,0)$ 期间以 $K=0$ 数值求解方程 (1)，或者在缩放参数 $\kappa=0$ 和 $u \in [-1,0)$ 的情况下进行。这种历史初始化的方式相当于一种有限传播速度的相互作用，意味着在某一点之前振荡器之间没有相互作用。使用在 [12] 中定义的广义序参量 $r_{m}$ 来验证最终状态。  
+
+$$
+r _ { m } = \left| \frac { 1 } { N } \sum _ { j = 1 } ^ { N } e ^ { i [ \theta _ { j } ( t ) - ( j - 1 ) \frac { 2 m \pi } { N } ] } \right|
+$$  
+
+在文献 [12] 中表明, 当系统接近于由缠绕数 $m=m^{*}$ 表征的稳定状态时, 相应的秩序参数收敛于 1 ( $r_{m^{*}} \rightarrow 1$ ), 而其他所有参数都下降到 0 ( $r_{m \neq m^{*}} \rightarrow 0$ )。因此, 通过跟踪秩序参数的演化, 可以识别出高阈值对应的最终锁相状态, 从而较为有信心地确定长期行为。我们在此指出, 附录 中提出的稳定性分析表明, 描述稳定性的特征指数（公式 (A.13)）可以具有非零虚部, 这表明系统在稳定状态附近可能表现出振荡动力学。因此, 仅基于秩序参数导数的预测方法（文献 [12] 中提出）是不恰当的。  
+
+我们从采样中获得了盆地大小分布，第 ?? 图中的顶部面板进行了说明。为了解释图形，我们提醒人们，$m=0$ 对应于 $\Delta\phi=0$ 的相位差，$|m|=5$ 表示 $|\Delta\phi|=\pi$ 的反相位同步。当 $\omega$ 变化时，可以观察到分布从中心到两侧的强移动。为了避免歧义，本文将 $\Delta\phi$ 的定义如 [12]一样，从而避免了存在 $\Delta\phi=\pi$ 的状态。然而，为了获得图 ?? 中对称的分布，我们仍然将 $\Delta\phi=-\pi$ 状态的概率平均分配在 $m=\pm5$ 之间，因为在相位差的层面上，它们对应于同一种状态。对于盆地大小的更全面分析的结果可以在图 ?? 的底部图中观察到。如结果所示，与文献 [12, 29, 33] 中的非延迟情况相比，这些分布可能会有很大不同。系统的典型行为在很大程度上取决于  
+
+![](images/c09a24775b885b3032c7abafe0a240fec9a318577e7c7cc15abc095b27781cb4.jpg)  
+
+![](images/7c7d1928727b4e18051009ea8c5d6583a9551757cc672e7bb08dc914c0651dd1.jpg)  
+
+![](images/87b9b963af083579b5311467a5e5e7ed8219a530a727d7c064665da986718894.jpg)  
+
+![](images/79adc8ccc00a2b5660e87e22f5299c8738bf59b73f06474d3ff1b81d31294b7a.jpg)  
+
+![](images/ff41b42e3892acbe53699289956fc4dd797520b07b2e0a8bff6d2f5f91c835bd.jpg)  
+
+![](images/2f445251106b115248c40ebdbbe6c7b55e91777ea5d987df706ac75e1a69bd42.jpg)  
+
+Figure 2: Number of stable $\Omega$ solutions of Eq. (4) for different states $m$ indicated by a colormap. Stability is investigated as a function of $\omega$ and $\kappa$ parameters, by calculating numerically the exponents in Eq. (A.13). Results for $m \in \{0, -5, 1, 4, 2, 3\}$ values are shown in panels $(a) - (f)$, respectively. The number of oscillators is $N = 10$.  
+
+number $m=m^{*}$ the corresponding order parameter converges to 1 ($r_{m^{*}}\rightarrow1$), while all the others decline to 0 ($r_{m\neq m^{*}}\rightarrow0$). Therefore, the long term behavior, which is the final phase-locked state for a randomly selected initial condition, may be identified by tracking the evolution of the order parameters. Selecting a high enough threshold one may identify the final state with a high confidence as the one corresponding to $r_{m}\rightarrow1$. We note here that the stability analysis presented in the Appendix suggests that the characteristic exponent governing the stability (Eq. (A.13)) may have also nonzero imaginary part indicating that the system can exhibit oscillatory dynamics in the vicinity of the stable states. A prediction method based thus only on the derivatives of the order parameter proposed also in [12] is not appropriate.  
+
+Basin size distributions obtained from our sampling are illustrated in the top panel of Fig. 3. In order to interpret the graphs we remind that $m=0$ corresponds to $\Delta\phi=0$ phase difference and $|m|=5$ means $|\Delta\phi|=\pi$ anti-phase synchrony. A strong shift from the center to the sides can be observed in the distributions as $\omega$ changes. In order to avoid ambiguity, $\Delta\phi$ is defined as in [12] such that there is no state with $\Delta\phi=\pi$. However, to get a symmetric distribution in Fig. 3 we included it nevertheless by dividing equally the probability of the $\Delta\phi=-\pi$ state between $m=\pm5$, since at the level of the phase differences they correspond to the same state. The outcome of a more thorough analysis on the basin sizes is visible in the bottom plot of Fig. 3. As the results show, these distributions can be drastically different compared to the non-delayed case presented in [12, 29, 33]. The typical behavior of the system heavily depends on the parameters: for constant $\kappa$ there  
+
+![](images/f9ab383973bb084a904aacdb4c137ff47875dd8fae711b717764b141bd3e93b7.jpg)  
+
+![](images/24c85b09dbcc7512b9b3f90d74596a88bfca5a630954b70f37e22b36a45e6237.jpg)  
+
+![](images/227178955284f6d1ec90bbf3c56c6140e461f3a9e3ae80596cda1af5cc14d23c.jpg)  
+
+![](images/755befc550f7a4e63dfc11e6e678e8f7fcd29b0ae30c75adbf48bcec4de59a5f.jpg)  
+
+Figure 3: 上部分:三个 $\omega$ 值对应不同相位锁定状态的出现概率。下部分:$\omega$ 的函数关系下，相关相位锁定状态的出现概率。由于对称概率分布函数关于 0 对称，负 $m$ 的状态被省略。虚线表示上图中构建的概率分布对应的 $\omega$ 值。系统大小为 $N=10$ 振荡器，耦合强度为 $\kappa=2$。标签为 ??.  
+
+于参数：对于恒定的 $\kappa$，在 $\omega$ 的间隔上，大致处于 $2k\pi - \frac{\pi}{2}$ 和 $2k\pi + \frac{\pi}{2}$ 之间的状态 $m=0$ 是最可能的，而在 $2(k+1)\pi - \frac{\pi}{2}$ 和 $2(k+1)\pi + \frac{\pi}{2}$ 之间，反向相位同步是主导的。  
+
+考虑到在无量纲方程的情况下，时间延迟总是一时间单位，为了理解延迟的影响，我们需要切换回原始参数集。通过保持方程（1）中的 $\omega_{0}$ 和 $K$ 不变，我们可以得出这种交替行为可能是由延迟引起的，使得一些状态在实际上无法观测到，尽管它们处于线性稳定状态（请参见图 2 和图 ??）。我们注意到，如果系统以随机相位初始化，并且之前的历史记录被认为是被考虑的，那么这种行为就会出现。  
+
+# V. DISCUSSION  
+
+有趣的是将$P(\Delta\Phi)$概率的变化与$\omega$改变时最终频率的分叉相联系起来。正如我们从图2中的$\omega-\kappa$稳定性图所了解到的，对于大多数参数，系统是多态的，即对于给定的参数集，存在共存的稳定频率。改变参数对$\Omega$的数量和稳定性的影响可以通过像图1中那样以图形方式求解方程(6)来理解。增加$\kappa$将使线性函数的斜率绝对值变小，因此将会有更多的与$\sin(\Omega)$曲线相交。对于不同的$\Delta\phi$值，我们将会得到不同斜率的直线，它们都位于两个极限$\Delta\phi=0$和$\Delta\phi=\pi$之间，并在$\Omega=\omega$处相交。因此，修改$\omega$等效于平移线性函数本身。由于正弦函数是周期性的，因此方程(4)的解的数量也会以相同的$2\pi$周期性变化。尽管可能解的数量是已知的，但除了$\Delta\phi=\{0,-\pi\}$之外，它们的稳定性尚未确定。对于完整的分叉图。我们需要再次使用方程(A.13)来排序出不稳定状态。  
+
+![](images/000f0051206fe71b59a7341a93331a9ba2bbe6f324afaaa74b040c5a0347bd8f.jpg)  
+
+![](images/c057a717af6a8fa08c566d9ab78e1487322492dbf24dc91e7a68ba428c7f0ba0.jpg)  
+
+![](images/8f23c3be36d004866a4eb5272cc9c545912a05831a318b7e3eb1e3847f7e859b.jpg)  
+
+![](images/9fe870a73c38bc5254bb9b226f38e5d0fbf03fdec6218687df76d8f99d01b830.jpg)  
+
+Figure 3: Top: Probability of the appearance of different phase-locked states for three $\omega$ values. Bottom: Probability of the relevant phase locked states as a function of $\omega$. States with negative $m$ are omitted due to the symmetrical probability distribution function with respect to 0. Dashed lines indicate the $\omega$ values corresponding to the probability distributions constructed on the top panel. The size of the system is $N=10$ oscillators, the coupling strength is $\kappa=2$.  
+
+are intervals in $\omega$, roughly between $2k\pi - \frac{\pi}{2}$ and $2k\pi + \frac{\pi}{2}$, where the state $m=0$ is the most probable, while between $2(k+1)\pi - \frac{\pi}{2}$ and $2(k+1)\pi + \frac{\pi}{2}$ anti-phase synchrony is dominant.  
+
+Taking into account that in case of the dimensionless equations the time delay is always one time unit, in order to understand the effect of the delay we need to switch back to the original parameter set. By keeping $\omega_{0}$ and $K$ from Eq. (1) constant, one can conclude that this alternating behavior could be caused by the delay, making some states practically unobservable even though they are linearly stable (compare Fig. 2 and Fig. 3). We note that this behavior is present if the system is initialized with random phases and the history for initialization is considered as described previously.  
+
+# V. DISCUSSION  
+
+It is interesting to correlate the changes in the $P(\Delta\Phi)$ probabilities to the bifurcations of the final frequencies as $\omega$ changes. As we learn from the $\omega-\kappa$ stability maps from Fig. 2, for most of the parameters the system is multistable, i.e. there are coexisting stable frequencies for a given parameter set. The effect of changing the parameters on the number and stability of $\Omega$ can be understood by solving Eq. (6) graphically like in Fig.  
+
+![](images/bc64251839c2b8efb29d0a34a7c0dc694b8599fb6a6ce10884adfa1ff5c54ec3.jpg)  
+
+Figure 4: 当$m=0$和$m=-5$（分别为$\Delta\phi=0$和$\Delta\phi=-\pi$）时，最终频率的分叉图在重标准化自然频率$\omega/\pi$作为函数的情况。在垂直轴上，将最终的频率$\Omega$和自然$\omega$频率之间的差异标准化为$2\kappa$进行绘制。稳定/不稳定频率用实/虚线标记。黑色水平虚线标记的是$\Omega=\omega$的情况。橙色和蓝色阴影的宽度对应于相对于由灰色阴影区域指示的概率1而言观察到给定频率的概率。任何分支的稳定频率没有着色代表观察到频率为零。其他参数为$N=10$，$\kappa=2$。  
+
+![](images/014268f9d4bc18ed4a96d9b463e4e93415068c179a45d38a8151bea278c15614.jpg)  
+
+$\sigma$  
+
+![](images/1467737e59630ff6a4570aec95b3eff324425a3500f7aaf1cf542cdafb4e5b71.jpg)  
+
+$\sigma$  
+
+![](images/2a7d133345dee875bc17e58827ac56b733181a6a96ebbc70bab59578f8626a16.jpg)  
+
+Figure 5: 在三个$\omega$值下计算得到的方程(4)稳定解的$\delta$和$\sigma$图。虚线和曲线分别代表不同状态下随着$\omega$变化而移动的$\Omega$频率的路径。数字$m$的绝对值对应于使用上述$\omega$的实际最终频率确定的$\sigma$和$\delta$值。灰色圆圈的面积与给定的$\{\Delta\phi,\Omega\}$对的概率成比例。注意，在中间的图中，以数字5和0表示的状态对应于稍微不同的$\delta$值，因此导致不同的概率（参见图3）。参数为$N=10\mathrm{fi}\ \kappa=2.0$。  
+
+图4上呈现了两个主要状态（$\Delta\phi=0$和$\Delta\phi=-\pi$）的分叉图。为了比较，我们还通过阴影区域表示了这些状态的概率。对于所选择的$\kappa$，无论$\omega$取值如何，这两个状态都至少有一个稳定的$\Omega$频率，请将此与图2进行比较。尽管存在多个稳定频率，但只有一个频率几乎作为渐近状态出现，考虑到上述初始化。有趣的是，正如图4所示，状态的概率与无量纲自然频率$\omega$和最终频率$\Omega$之间的差异强烈相关。换句话说，当$|\Omega_0-\omega|<|\Omega_{-\pi}-\omega|$且反之时，系统更倾向于稳定状态$\{\Delta\phi=0,\Omega_0\}$而不是稳定状态$\{\Delta\phi=-\pi,\Omega_{-\pi}\}$。此外，这种优势不仅是相对的，而且除了在接近$(2k+1)\frac{\pi}{2}$的狭窄$\omega$区间内，另一个状态根本不出现，其中前面提到的两个状态对$\omega$的距离几乎相同。在参考文献[9]中也报告了在具有高斯白噪声的延迟耦合振荡器环的情况下，停留在某一状态的时间与频率差异之间的类似相关性。换句话说，系统在频率最接近旋转体的固有频率的轨道上停留的时间最长。  
+
+现在让我们考虑一些启发式的论据，关于实现与 $\Delta\phi=0$ 和 $\Delta\phi=-\pi$ 不同的其他稳定状态的问题。通过  
+
+![](images/58de18b0348af4123d7d78499196536e829339b5690c1d3956fb10d2eb386ecd.jpg)  
+
+Figure 4: Bifurcation diagram of the final frequencies for $m=0$ and $m=-5$ ($\Delta\phi=0$ and $\Delta\phi=-\pi$, respectively) as a function of the rescaled natural frequency $\omega/\pi$. On the vertical axis the difference between the final $\Omega$ and the natural $\omega$ frequencies is plotted, normalized with $2\kappa$. Stable/unstable frequencies are marked with solid/dashed lines. The black horizontal dashed line marks the $\Omega=\omega$ case. The width of orange and blue shadings correspond to the probability of observing the given frequency, compared to probability 1 indicated by gray shaded region. No shading at stable frequencies for any branch means zero observations. The other parameters are $N=10$, $\kappa=2$.  
+
+1. Increasing $\kappa$ will make the slope of the linear function smaller in absolute value, thus there will be more intersections with the $\sin(\Omega)$ curve. For different $\Delta\phi$ values we will have lines with different slopes, all of them lying between the two extremes $\Delta\phi=0$ and $\Delta\phi=\pi$ and crossing each other at the $\Omega=\omega$ point. Modifying the $\omega$ is equivalent thus to sliding the linear function parallel to itself. Since the sine function is periodic, the number of solutions of Eq. (4) changes with the same $2\pi$ periodicity. Even though the number of possible solutions is known, their stability, apart of $\Delta\phi=\{0,-\pi\}$, is not yet determined. For the full bifurcation diagram we need again Eq. (A.13) for sorting out unstable states.  
+
+The bifurcation diagram of the two dominant states ($\Delta\phi=0$ and $\Delta\phi=-\pi$) is presented on Fig. 4. For comparison we also indicate the probability of these states by shaded areas. For the chosen $\kappa$ both states have at least one stable $\Omega$ frequency for all $\omega$ values, please compare this with Fig. 2. Though there exist multiple stable frequencies, only one of them appears almost exclusively as asymptotic state, given the initialization described above. Interestingly, as Fig. 4 shows, the probability of the states strongly correlates with the difference between the dimensionless natural frequency $\omega$ and the final frequency $\Omega$. In other words, the system prefers a stable $\{\Delta\phi=0,\Omega_0\}$ state over an also stable $\{\Delta\phi=-\pi,\Omega_{-\pi}\}$ when $|\Omega_0-\omega|<|\Omega_{-\pi}-\omega|$ and vice versa. Furthermore, this dominance is not only relative, but the other state does not appear at all, except for narrow $\omega$ intervals around $(2k+1)\frac{\pi}{2}$, where the distances to $\omega$ are almost the same for both of the states mentioned before. A similar correlation between the resident time spent in one state and the difference in frequency is reported in Ref. [9] in the case of delay coupled rings of oscillators with Gaussian white noise. Namely, the system spends the most time on orbits which have the frequency closest to the natural frequency of the rotators.  
+
+Let us consider now some heuristic arguments concerning the realization of other stable states different from $\Delta\phi=0$ and $\Delta\phi=-\pi$. By recalling Eq.(4) one can see that difference $\Omega-\omega$ is determined by  
+
+$$
+\delta = \cos ( \Delta \phi ) \sin ( \Omega ) \, ,
+$$  
+
+回忆方程（4），我们可以看到差异 $\Omega-\omega$ 是由以下决定的:  
+
+$$
+\delta = \cos ( \Delta \phi ) \sin ( \Omega ) \, ,
+$$  
+
+在这里，$-2\kappa$的因子被省略以保持该参数的标准化。使用与0和$-N/2$这两个特殊状态相同的$(\omega, \kappa)$参数来计算除$m$之外的其他状态的$\delta$，发现相对于这两个特殊状态，$\delta$可以更接近于0。另一方面，由于这些中间状态的概率往往较小（参见图??），在状态选择过程中必须有其他相关参数。可以注意到相对于$\Delta\phi=\{0, -\pi\}$情况，主要的区别与方程(2)中的两个正弦项的对称性有关，如果$\Delta\phi$既不是0也不是$-\pi$，那么它们会取不同的值。这种情况的一个结果是，在这样的状态中，振荡器会按照一个优选方向或顺序排列，因此，两个方向的相互作用强度的对称性被破坏。这主要是由于正弦是一个奇函数，因此它对振荡器的交换敏感，并且通过对其编号，我们已经赋予了一个预定义的方向，用于相位之间的比较。为了量化一个状态的对称性，我们引入了第二个参数。  
+
+$$
+\sigma = \sin ( \Delta \phi ) \cos ( \Omega ) \, ,
+$$  
+
+通过从给定的$\Omega$和$\Delta\phi$减去Eq.(2)中的两个正弦项来获得。类似于$\delta$，$2\kappa$项被省略。对称状态将具有$\sigma=0$。与图2中的稳定映射情况类似，具有$|m_{1}|+|m_{2}|=N/2$的态对在$\omega$变化时具有类似的$\delta$和$\sigma$趋势。此外，具有相反指数的态对($m_{1}=-m_{2}$)具有相同的$\delta$，但是$\sigma$相反。  
+
+为了更好地理解$\delta$和$\sigma$之间的相互作用，我们在图5上绘制了Eq. (4)的稳定解在$\delta-\sigma$平面上的不同$\omega$值。根据这些图形，我们可以提出一些简单的启发式准则来理解振荡器是如何自组织的。  
+
+- 首先，所选的状态倾向于尽可能对称，这就解释了为什么分布的峰值总是在0和$-\pi$左右。  
+
+- 如果有不止一种与$|\sigma|$值相同的解，则首选$|\delta|$值较小的解（例如参见$\sigma=0$行）。  
+
+- 具有相同的$|\sigma|$和$|\delta|$的状态具有相等的概率。  
+
+基于以上观察，对于一个随机的初始态合集和给定的参数集，计算$|\sigma|$和$|\delta|$值可以帮助我们估计期望的吸引盆大小。  
+
+最后, 请注意我们的系统是确定性的, 因此不需要基于概率的吸引盆大小方法, 然而时延存在将问题转化为无限维系统的范畴 [32], 这限制了动力学的可预测性。$N$ 维相空间也失去了它的传统意义, 因为$\theta_{i}$值不足以完全定义相空间中的状态, 状态历史也是必要的。  
+
+# VI. CONCLUSIONS & OUTLOOK  
+
+我们研究了通过时滞耦合相互作用的局部耦合Kuramoto振荡器环中的对称相位锁定状态。对称相位锁定状态是指相邻振荡器间允许有恒定的相位差。以往关于这样的局部耦合系统的研究只确定了有限数量的这种状态的稳定性标准。我们得到了所有具有恒定相位差状态的一种隐含稳定条件。为了了解稳定静止状态的选择统计情况，通过考虑大量均匀分布的随机初始状态，我们研究了其吸引盆地。我们的数值结果表明，吸引盆地的尺寸可以随参数变化几个数量级。这导致由于吸引域几乎可以忽略不计，从随机初始条件中稳定静止状态实际上是不可观测的。通过考虑简单的对称性论证，我们假设相对于吸引盆地的尺寸有启发式规则。在我们的数值研究中，与文献 [44] 的结果一致，我们还观察到时滞的存在通常会导致简单固定点吸引子的不稳定，从而除了这些相位锁定状态外，还出现了更复杂的动态行为。因此，在局部耦合的时滞系统中寻找不同类型的吸引子应该是未来研究的另一个目标。  
+
+![](images/9fe1786126b1bae6d6fc93c58232fbb6c9cc732edad6b5c492612d3c41f538a0.jpg)  
+
+![](images/7e8862e1b8d192c4ac0475bf806859e5bf73ba3a3436ed7d37d92944d8532820.jpg)  
+
+Figure 5: Diagram of $\delta$ versus $\sigma$ for stable solutions of Eq. (4) calculated for three values of $\omega$. Dashed lines and curves represent the paths along which the $\Omega$ frequencies for different states move as $\omega$ changes. Numbers, corresponding to $|m|$, indicate the $\sigma$ and $\delta$ values determined using actual final frequencies for the $\omega$ noted above. The area of the gray circles are proportional to the probability of a given $\{\Delta\phi,\Omega\}$ pair. Note that in the middle plot the states denoted by numbers 5 and 0 correspond to slightly different $\delta$ values, hence leading to different probabilities (compare Fig. 3). The parameters are $N=10$, $\kappa=2.0$.  
+
+where the $-2\kappa$ factor is dropped to keep this parameter normalized. Calculating $\delta$ using the same $(\omega, \kappa)$ parameters for other states $m$ than 0 and $-N/2$, one finds that $\delta$ can be closer to 0 than in the case of these two particular states. On the other hand, since the probability of these intermediate states tends to be smaller (see Fig. 3), there must be other relevant parameters as well in the process of state selection. One can notice that the main difference relative to the $\Delta\phi=\{0,-\pi\}$ case is related to the symmetry of the two sine terms in Eq. (2), taking different values if $\Delta\phi$ is neither 0, nor $-\pi$. One consequence of this is that in such states there is a preferred direction or order in which the oscillators arrange themselves, thus the symmetry of the interaction intensity for the two directions is broken. This is mainly caused by the fact that sine is an odd function, so it is sensible to the interchange of oscillators and by numbering them we already imposed a predefined direction in which the phases should be compared to each other. In order to quantify the symmetry of a state, we introduce a second parameter  
+
+$$
+\sigma = \sin ( \Delta \phi ) \cos ( \Omega ) \, ,
+$$  
+
+obtained by subtracting the two sine terms from Eq. (2) for a given $\Omega$ and $\Delta\phi$. Similarly to $\delta$ the $2\kappa$ term is omitted. Symmetric states will have $\sigma=0$. As in case of the stability maps in Fig. 2, pairs of states with $|m_1|+|m_2|=N/2$ have similar trends of $\delta$ and $\sigma$ as $\omega$ changes. Also, pairs with opposite index ($m_1=-m_2$) have the same $\delta$, but opposite $\sigma$.  
+
+In order to better understand the interplay between $\delta$ and $\sigma$ we plotted on Fig. 5 the stable solutions of Eq. (4) on the $\delta - \sigma$ plane for different $\omega$ values. Based on these graphs we can formulate some simple heuristic guidelines along which one can understand how the oscillators self-organize themselves.  
+
+- First, the selected state tends to be symmetric as possible, which explains why the peak of the distributions are always around 0 and $-\pi$.  
+
+- If there is more than one solution with the same $|\sigma|$ value, the one with the smaller $|\delta|$ will be preferred (see for example the $\sigma=0$ line).  
+
+- States, having the same $|\sigma|$ and $|\delta|$ are equally probable.  
+
+# Acknowledgments  
+
+The present work was funded by the Romanian UEFISCDI grant nr. PN-III-P4-PCE-2016-0363.  
+
+Appendix: Stability of linear DDEs using the Lambert W function  
+
+将从公式（5）中提出的扰动解代入公式（2），并保留到线性项，得到以下线性DDE  
+
+$$
+\frac { \mathrm { d } \boldsymbol { \eta } ( u ) } { \mathrm { d } u } = \mathbf { A } \cdot \boldsymbol { \eta } ( u ) + \mathbf { A _ { d } } \cdot \boldsymbol { \eta } ( u - 1 ) ,
+$$  
+
+where $\eta(u)$ is the perturbation vector, while $\mathbf{A}$ and $\mathbf{A_d}$ are $N \times N$ coefficient matrices. Matrix $\mathbf{A}$ is proportional to the identity matrix  
+
+$$
+\mathbf { A } = - \kappa \left( \cos ( \Delta \phi + \Omega ) + \cos ( \Delta \phi - \Omega ) \right) \cdot \mathbf { 1 } _ { N } \, ,
+$$  
+
+# 文本翻译  
+
+而矩阵 $A_{\mathrm{\~d\~}}$ 是形如循环矩阵的矩阵。  
+
+$$
+\mathbf { A _ { d } } = \kappa \cdot \left( \begin{array} { c c c c c c } { 0 } & { \cos ( \Delta \phi - \Omega ) } & { 0 } & { \ldots } & { 0 } & { \cos ( \Delta \phi + \Omega ) } \\ { \cos ( \Delta \phi + \Omega ) } & { 0 } & { \cos ( \Delta \phi - \Omega ) } & { \ldots } & { 0 } & { 0 } \\ { 0 } & { \cos ( \Delta \phi + \Omega ) } & { 0 } & { \ldots } & { 0 } & { 0 } \\ { \vdots } & { \vdots } & { \vdots } & { \ddots } & { \vdots } & { \vdots } \\ { 0 } & { 0 } & { 0 } & { \ldots } & { 0 } & { \cos ( \Delta \phi - \Omega ) } \\ { \cos ( \Delta \phi - \Omega ) } & { 0 } & { 0 } & { \ldots } & { \cos ( \Delta \phi + \Omega ) } & { 0 } \end{array} \right) ,
+$$  
+
+其中$\mathbf{1}_{N}$是$N \times N$的单位矩阵。方程 (A.1)是一组线性时滞微分方程。对于满足延迟项和非延迟项矩阵的交换的系统，解是已知的 [2]。在我们的案例中，$\mathbf{A}$和$\mathbf{A}_{\mathrm{d}}$的交换是成立的，因为$\mathbf{A}$与单位矩阵成比例。因此解可表示为:  
+
+$$
+\eta ( u ) = \sum _ { k = - \infty } ^ { + \infty } \mathrm { e } ^ { [ \mathbf { W } _ { k } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) + \mathbf { A } ] u } \mathbf { c } _ { k } ^ { I }
+$$  
+
+矩阵$\mathbf{W}_{k}$是矩阵Lambert W函数的第k个分支 [23]，而向量$\mathbf{c}_{k}^{I}$则依赖于系数矩阵、初始条件以及延迟系统的历史。通常，为了确定稳定性，我们需要计算方括号内指数的最大特征值，涵盖所有k的取值。由于Lambert W函数具有无穷多个分支，线性解的特征谱也是无穷的。对于标量系统，与式（2）相反，$k=0$的主分支提供了最右侧的特征值。幸运的是，对于系数矩阵对易的DDE系统，上述陈述也成立 [2]。包含主分支的术语如下所示:  
+
+$$
+\eta _ { 0 } ( u ) = \mathrm { e } ^ { [ \mathbf { W } _ { 0 } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) + \mathbf { A } ] u } \mathbf { c } _ { 0 } ^ { I }
+$$  
+
+为了方便计算矩阵指数，我们需要将指数对角化。首先，我们有一个Lambert W函数参数中的矩阵指数，由于矩阵A是对角矩阵，所以可以很容易地计算:  
+
+$$
+\mathrm { e } ^ { - \mathbf { A } } = \mathrm { e } ^ { 2 \kappa \cos ( \Delta \phi ) \cos ( \Omega ) } \cdot \mathbf { 1 } _ { N } .
+$$  
+
+因此，矩阵 Lambert W 函数的参数得到简化，仅为一个矩阵与一个标量的乘积。  
+
+$$
+\mathbf { W } _ { 0 } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) = \mathbf { W } _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \mathbf { A } _ { \mathrm { d } } ) ,
+$$  
+
+As a result of the above observations, for a random ensemble of initial states and a given parameter set the calculation of the $|\sigma|$ and $|\delta|$ values could help us in estimating the expected attraction basin sizes.  
+
+Finally, please note that our system is deterministic, so a probabilistic approach on the basin sizes should not be necessary, nevertheless the presence of time delay shifts the problem in the realm of infinite-dimensional systems [32], which limits the predictability of the dynamics. The $N$-dimensional phase space also looses its traditional meaning, since the $\theta_{i}$ values are not enough for a complete definition of a state in the phase space, the state histories are also needed.  
+
+# VI. CONCLUSIONS & OUTLOOK  
+
+We studied symmetric phase locked states in rings of locally coupled Kuramoto rotators, interacting through time-delayed coupling. By symmetric phase-locked states we imply that a constant phase difference is allowed between neighboring oscillators. Former studies of such locally coupled systems determined a stability criterion for only a limited number of such states [14, 15]. An implicit stability condition is derived for all the states with constant phase difference. In order to understand the statistics for the selection of the stable stationary states, the attraction basins were investigated by considering large ensembles of uniformly distributed random initial states. Our numerical results show, that the size of the attraction basins can vary between several orders of magnitudes as a function of the parameters. This leads to the situation where stable stationary states are practically unobservable from random initial conditions due to their almost negligible attraction domain. By considering simple symmetry arguments we conjecture heuristic rules regarding the relative sizes of the attraction basins. During our numerical studies, in agreement with [32], we also observed that the presence of time-delay may often lead to the destabilization of simple fixpoint attractors, allowing the emergence of more complex dynamical behaviors besides these phase locked states. Searching for different types of attractors in locally coupled time-delayed systems of oscillators should be thus another objective for future studies.  
+
+# Acknowledgments  
+
+The present work was funded by the Romanian UEFISCDI grant nr. PN-III-P4-PCE-2016-0363.  
+
+# Appendix: Stability of linear DDEs using the Lambert W function  
+
+Substituting the proposed perturbed solution from Eq. (5) into Eq. (2) and keeping terms up to linear order yields the following linear DDE  
+
+$$
+\frac { \mathrm { d } \pmb { \eta } ( u ) } { \mathrm { d } u } = \mathbf { A } \cdot \pmb { \eta } ( u ) + \mathbf { A _ { d } } \cdot \pmb { \eta } ( u - 1 ) ,
+$$  
+
+where $\boldsymbol{\eta}(u)$ is the perturbation vector, while $\mathbf{A}$ and $\mathbf{A}_{\mathrm{d}}$ are $N \times N$ coefficient matrices. Matrix $\mathbf{A}$ is proportional to the identity matrix  
+
+$$
+\mathbf { A } = - \kappa \left( \cos ( \Delta \phi + \Omega ) + \cos ( \Delta \phi - \Omega ) \right) \cdot \mathbf { 1 } _ { N } \, ,
+$$  
+
+while matrix $\mathbf{A}_{\mathrm{d}}$ is a circulant matrix of the form  
+
+我们引入了简写符号$\kappa_{c}=\kappa\cos(\Delta\phi)\cos(\Omega)$。$\mathbf{A}_{\mathrm{d}}$矩阵是循环矩阵，因此可以使用单位离散傅里叶变换矩阵对其进行对角化 [6]: $\mathbf{A}_{\mathrm{d}}=\mathbf{U}\cdot\mathbf{D}\cdot\mathbf{U}^{-1}$。这个性质有助于评估矩阵Lambert W函数，该函数仅作用于对角元素。  
+
+$$
+\begin{array} { r l r } & { } & { \mathbf { W } _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \mathbf { A _ { d } } ) = } \\ & { } & { \mathbf { U } \cdot \left( \begin{array} { l l l } { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { 1 } ) } & { 0 } & { 0 } \\ { 0 } & { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { 2 } ) } & { 0 } \\ { \vdots } & { \vdots } & { \vdots } \\ { 0 } & { 0 } & { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { N } ) } \end{array} \right) \cdot \mathbf { U } ^ { - 1 } , } \end{array}
+$$  
+
+其中，$\lambda^{i}$是$\mathbf{A}_{\mathrm{d}}$的第$i$个特征值。为了简明起见，我们将上述对角矩阵表示为$\mathbf{D}_{W}(\mathrm{e}^{2\kappa_{c}}\lambda)$。在等式(A.5)中，我们在指数项中有一个求和，可以分解为指数的乘积，因为$\mathbf{A}$与等式(A.8)中的三重乘积交换。  
+
+$$
+\mathrm { e } ^ { \left( \mathbf { U } \cdot \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } + \mathbf { A } \right) u } = \mathrm { e } ^ { \mathbf { U } \cdot \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } u } \cdot \mathrm { e } ^ { \mathbf { A } u } .
+$$  
+
+我们可以通过利用幂级数展开来重新排列项，轻松地计算第一个指数部分。  
+
+$$
+\mathrm { e } ^ { \mathbf { U } \cdot \mathbf { D } _ { W } \cdot \mathbf { U } ^ { - 1 } u } = \mathbf { U } \sum _ { k = 0 } ^ { \infty } \frac { 1 } { k ! } \left( \mathbf { D } _ { W } u \right) ^ { k } \mathbf { U } ^ { - 1 } = \mathbf { U } \mathrm { e } ^ { \mathbf { D } _ { W } u } \mathbf { U } ^ { - 1 } .
+$$  
+
+由于$\mathbf{U}^{-1}$与方程(A.9)中的第二个指数函数交换，我们得到以下结果:  
+
+$$
+\mathrm { e } ^ { \left( \mathbf { U } \cdot \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } + \mathbf { A } \right) u } = \mathbf { U } \cdot \mathrm { e } ^ { \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) u } \cdot \mathrm { e } ^ { - 2 \kappa _ { c } \mathbf { 1 } _ { N } u } \cdot \mathbf { U } ^ { - 1 } .
+$$  
+
+指数函数的指数再次交换，它们的和是一个对角矩阵，因此我们最终可以将方程（A.5）重写为以下形式  
+
+$$
+\eta _ { 0 } ( u ) = \mathbf { U } \cdot \mathbf { M } ( u ) \cdot \mathbf { U } ^ { - 1 } \mathbf { c } _ { 0 } ^ { I } ,
+$$  
+
+其中$\mathbf{M}(u)$是一个对角矩阵，其元素为  
+
+$$
+\mathbf { M } _ { j j } ( u ) = \mathrm { e } ^ { \left[ W _ { 0 } \left( 2 ( \kappa _ { c } \cos \frac { 2 \pi j } { N } + \mathrm { i } \kappa _ { s } \sin \frac { 2 \pi j } { N } ) \mathrm { e } ^ { 2 \kappa _ { c } } \right) - 2 \kappa _ { c } \right] u } ,
+$$  
+
+其中，$j=0,1,...N-1$。这里我们已经插入了$\mathbf{A_d}$的特征值，并使用了类似于$\kappa_c$的符号$\kappa_s=\kappa\sin(\Delta\phi)\sin(\Omega)$。$\eta_i$扰动的动力学由这些项的线性组合所控制，这意味着如果所有N个指数的实部为负，则对于给定的$\{\Omega,\Delta\phi\}$对，相位锁定状态是线性稳定的。  
+
+[1] D. M. Abrams and S. H. Strogatz. Chimera states for coupled oscillators. Phys. Rev. Lett., 93:174102, Oct 2004.  
+
+[2] F. M. Asl and A. G. Ulsoy. Analysis of a system of linear delay differential equations. J. Dyn. Sys., Meas., Control, 125(2):215–223, 2003.  
+
+[3] M. Bolotov, T. Levanova, L. Smirnov, and A. Pikovsky. Dynamics of disordered heterogeneous chains of phase oscillators. Cybernetics and Physics, pages 215–221, 12 2019.  
+
+[4] M. Bonnin. Waves and patterns in ring lattices with delays. Physica D: Nonlinear Phenomena, 238(1):77–87, 2009.  
+
+[5] B. C. Daniels, S. T. M. Dissanayake, and B. R. Trees. Synchronization of coupled rotators: Josephson junction ladders and the locally coupled kuramoto model. Phys. Rev. E, 67:026216, Feb 2003.  
+
+[6] P. Davis. Circulant matrices. Pure and applied mathematics. Wiley, 1979.  
+
+[7] R. Delabays, T. Coletta, and P. Jacquod. Multistability of phase-locking and topological winding numbers in locally coupled kuramoto models on single-loop networks. Journal of Mathematical Physics, 57(3):032701, 2016.  
+
+$$
+\mathbf { A _ { d } } = \kappa \cdot \left( \begin{array} { c c c c c c } { 0 } & { \cos ( \Delta \phi - \Omega ) } & { 0 } & { \ldots } & { 0 } & { \cos ( \Delta \phi + \Omega ) } \\ { \cos ( \Delta \phi + \Omega ) } & { 0 } & { \cos ( \Delta \phi - \Omega ) } & { \ldots } & { 0 } & { 0 } \\ { 0 } & { \cos ( \Delta \phi + \Omega ) } & { 0 } & { \ldots } & { 0 } & { 0 } \\ { \vdots } & { \vdots } & { \vdots } & { \ddots } & { \vdots } & { \vdots } \\ { 0 } & { 0 } & { 0 } & { \ldots } & { 0 } & { \cos ( \Delta \phi - \Omega ) } \\ { \cos ( \Delta \phi - \Omega ) } & { 0 } & { 0 } & { \ldots } & { \cos ( \Delta \phi + \Omega ) } & { 0 } \end{array} \right) ,
+$$  
+
+where $\mathbf{1}_{N}$ is the $N \times N$ identity matrix. Eq. (A.1) is a system of linear DDEs. For systems where the matrices of the delayed and non-delayed terms commute the solution is known [2]. In our case the commutation of $\mathbf{A}$ and $\mathbf{A}_{\mathrm{d}}$ is fulfilled since $\mathbf{A}$ is proportional to the identity matrix. The solution hence writes as:  
+
+$$
+\eta ( u ) = \sum _ { k = - \infty } ^ { + \infty } \mathrm { e } ^ { \left[ \mathbf { W } _ { k } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) + \mathbf { A } \right] u } \mathbf { c } _ { k } ^ { I } .
+$$  
+
+The matrix $\mathbf{W}_{k}$ is $k$-th branch of the matrix Lambert W function [23], while the vector $\mathbf{c}_{k}^{I}$ depends on the coefficient matrices, the initial conditions, and the history of the delayed system. Generally, in order to determine the stability we have to calculate the greatest eigenvalue of the exponent in square brackets over all $k$ values. Since the Lambert W function has infinite branches the whole eigenspectrum of the linear solution is infinite. For a scalar system, as opposed to Eq. (2), the principal branch of $k=0$ gives the rightmost eigenvalue. Fortunately for us the above statement holds for systems of DDEs as well if the coefficient matrices commute [2]. The term that contains the principal branch is the following:  
+
+$$
+\eta _ { 0 } ( u ) = \mathrm { e } ^ { [ \mathbf { W } _ { 0 } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) + \mathbf { A } ] u } \mathbf { c } _ { 0 } ^ { I } \, .
+$$  
+
+In order to easily calculate matrix exponentials we need to diagonalize the exponent. First, we have a matrix exponential in the argument of the Lambert W function, which is easy to calculate since $\mathbf{A}$ is diagonal:  
+
+$$
+\mathrm { e } ^ { - \mathbf { A } } = \mathrm { e } ^ { 2 \kappa \cos ( \Delta \phi ) \cos ( \Omega ) } \cdot \mathbf { 1 } _ { N } .
+$$  
+
+Thus the argument of the matrix Lambert W function is simplified, having only one matrix multiplied by a scalar  
+
+$$
+\mathbf { W } _ { 0 } ( \mathbf { A } _ { \mathrm { d } } \mathrm { e } ^ { - \mathbf { A } } ) = \mathbf { W } _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \mathbf { A } _ { \mathrm { d } } ) ,
+$$  
+
+where we introduced the shorthand notation $\kappa_{c}=\kappa\cos(\Delta\phi)\cos(\Omega)$. The $\mathbf{A}_{\mathrm{d}}$ matrix is circulant, thus diagonalizable using the unitary discrete Fourier transform matrix [6]: $\mathbf{A}_{\mathrm{d}}=\mathbf{U}\cdot\mathbf{D}\cdot\mathbf{U}^{-1}$. This property helps in evaluating the matrix Lambert W function, which is simply the scalar function acting on the diagonal elements  
+
+$$
+\begin{array} { r l r } & { } & { \mathbf { W } _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \mathbf { A _ { d } } ) = } \\ & { } & { \mathbf { U } \cdot \left( \begin{array} { c c c } { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { 1 } ) } & { 0 } & { 0 } \\ { 0 } & { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { 2 } ) } & { 0 } \\ { \vdots } & { \vdots } & { \vdots } \\ { 0 } & { 0 } & { W _ { 0 } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ^ { N } ) } \end{array} \right) \cdot \mathbf { U } ^ { - 1 } , } \end{array}
+$$  
+
+[8] K. Dénes, B. Sándor, and Z. Néda. On the predictability of the final state in a ring of kuramoto rotators. Romanian Reports in Physics, 71:108, 2019.  
+
+[9] O. D'Huys, T. Jüngling, and W. Kinzel. Stochastic switching in delay-coupled oscillators. Physical Review E, 90(3):032918, 2014.  
+
+[10] A. Diaz-Guilera and A. Arenas. Phase Patterns of Coupled Oscillators with Application to Wireless Communication. In Lio, P and Yoneki, E and Verma, DC, editor, Bio-inspired Computing and Communications, volume 5151 of Lecture Notes in Computer Science, pages 184+, 2008.  
+
+[11] R. Dodla, A. Sen, and G. L. Johnston. Phase-locked patterns and amplitude death in a ring of delay-coupled limit cycle oscillators. Phys. Rev. E, 69:056217, May 2004.  
+
+[12] K. Dénes, B. Sándor, and Z. Néda. Pattern selection in a ring of kuramoto oscillators. Communications in Nonlinear Science and Numerical Simulation, 78:104868, 2019.  
+
+[13] F. Dörfler and F. Bullo. Synchronization in complex networks of phase oscillators: A survey. Automatica, 50(6):1539 - 1564, 2014.  
+
+[14] O. D' Huys, R. Vicente, T. Erneux, J. Danckaert, and I. Fischer. Synchronization properties of network motifs: Influence of coupling delay and symmetry. Chaos: An Interdisciplinary Journal of Nonlinear Science, 18(3):037116, 2008.  
+
+[15] M. G. Earl and S. H. Strogatz. Synchronization in oscillator networks with delayed coupling: A stability criterion. Phys. Rev. E, 67:036204, Mar 2003.  
+
+[16] X. Huang, M. Zhan, F. Li, and Z. Zheng. Single-clustering synchronization in a ring of kuramoto oscillators. Journal of Physics A: Mathematical and Theoretical, 47:125101, 03 2014.  
+
+[17] A.Kouda and S. Mori. Analysis of a ring of mutually coupled van der pol oscillators with coupling delay. IEEE Transactions on Circuits and Systems, 28(3):247–253, March 1981.  
+
+[18] Y. Kuramoto. Self-entrainment of a population of coupled non-linear oscillators. In H. Araki, editor, International Symposium on Mathematical Problems in Theoretical Physics, volume 39 of Lecture Notes in Physics, pages 420–422. Springer Berlin Heidelberg, 1975.  
+
+[19] Y. Kuramoto and D. Battogtokh. Coexistence of coherence and incoherence in nonlocally coupled phase oscillators. 2002.  
+
+[20] M. A. Matías, V. Pérez-Muñuzuri, M. N. Lorenzo, I. P. Mariño, and V. Pérez-Villar. Observation of a fast rotating wave in rings of coupled chaotic oscillators. Phys. Rev. Lett., 78:219–222, Jan 1997.  
+
+[21] E. Niebur, H. G. Schuster, and D. M. Kammen. Collective frequencies and metastability in networks of limit-cycle oscillators with time delay. Phys. Rev. Lett., 67:2753–2756, Nov 1991.  
+
+[22] J. Ochab and P. F. Gora. Synchronisation of coupled oscillators in a local one-dimensional Kumamoto model. In Lawniczak, AT and Makowiec, D and Di Stefano, BN, editor, Summer Solstice 2009, International Conference on Discrete Models of Complex Systems, volume 3 of Acta Physica Polonica B Proceedings Supplement, pages 453–462, 2010.  
+
+[23] M. Pease. Methods of matrix algebra. Academic Press, New York, 1965.  
+
+[24] P. Perlikowski, S. Yanchuk, O. Popovych, and P. Tass. Periodic patterns in a ring of delay-coupled oscillators. Physical Review E, 82(3):036208, 2010.  
+
+[25] W.-X. Qin and P.-L. Zhang. Discrete rotating waves in a ring of coupled mechanical oscillators with strong damping. Journal of Mathematical Physics, 50(5):052701, 2009.  
+
+[26] J. P. Ramírez and J. Alvarez. Rotating waves in oscillators with huygens' coupling**this work was partly supported by the conacyt under grant cb2012-180011-y. IFAC-PapersOnLine, 48(18):71 – 76, 2015. 4th IFAC Conference on Analysis and Control of Chaotic Systems CHAOS 2015.  
+
+[27] T. K. Roy and A. Lahiri. Synchronized oscillations on a Kuramoto ring and their entrainment under periodic driving. Chaos, Solitons & Fractals, 45(6):888 – 898, 2012.  
+
+[28] S. Strogatz. Sync: The emerging science of spontaneous order. Penguin UK, 2004.  
+
+[29] P. F. Tilles, F. F. Ferreira, and H. A. Cerdeira. Multistable behavior above synchronization in a locally coupled kuramoto model. Physical Review E, 83(6):066206, 2011.  
+
+[30] K. Y. Tsang, R. E. Mirollo, S. H. Strogatz, and K. Wiesenfeld. Dynamics of a globally coupled oscillator array. Physica D: Nonlinear Phenomena, 48(1):102 – 112, 1991.  
+
+where $\lambda^{i}$ is the $i$th eigenvalue of $\mathbf{A}_{\mathrm{d}}$. For compactness we denote the diagonal matrix from above as $\mathbf{D}_{W}\left(\mathrm{e}^{2 \kappa_{c}} \lambda\right)$. In Eq. (A.5) we have a sum in the exponent which can be decomposed to product of exponentials, since $\mathbf{A}$ commutes with the triple product in Eq. (A.8):  
+
+$$
+\mathrm { e } ^ { \left( \mathbf { U } \cdot \mathbf { D } _ { W } ( e ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } + \mathbf { A } \right) u } = \mathrm { e } ^ { \mathbf { U } \cdot \mathbf { D } _ { W } ( e ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } u } \cdot \mathrm { e } ^ { \mathbf { A } u } .
+$$  
+
+We can easily rearrange the terms by evaluating the first exponential using expansion in power series:  
+
+$$
+\mathrm { e } ^ { \mathbf { U } \cdot \mathbf { D } _ { W } \cdot \mathbf { U } ^ { - 1 } u } = \mathbf { U } \sum _ { k = 0 } ^ { \infty } \frac { 1 } { k ! } \left( \mathbf { D } _ { W } u \right) ^ { k } \mathbf { U } ^ { - 1 } = \mathbf { U } \mathrm { e } ^ { \mathbf { D } _ { W } u } \mathbf { U } ^ { - 1 } .
+$$  
+
+Since $\mathbf{U}^{-1}$ commutes with the second exponential in Eq. (A.9) we arrive to the following:  
+
+$$
+\mathrm { e } ^ { \left( \mathbf { U } \cdot \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) \cdot \mathbf { U } ^ { - 1 } + \mathbf { A } \right) u } = \mathbf { U } \cdot \mathrm { e } ^ { \mathbf { D } _ { W } ( \mathrm { e } ^ { 2 \kappa _ { c } } \lambda ) u } \cdot \mathrm { e } ^ { - 2 \kappa _ { c } \mathbf { 1 } _ { N } u } \cdot \mathbf { U } ^ { - 1 } .
+$$  
+
+The exponents of the exponential functions commute again and their sum is a diagonal matrix, thus we can finally rewrite Eq. (A.5) as follows  
+
+$$
+\eta _ { 0 } ( u ) = \mathbf { U } \cdot \mathbf { M } ( u ) \cdot \mathbf { U } ^ { - 1 } \mathbf { c } _ { 0 } ^ { I } ,
+$$  
+
+where $\mathbf{M}(u)$ is a diagonal matrix with entries  
+
+$$
+\mathbf { M } _ { j j } ( u ) = \mathrm { e } ^ { \left[ W _ { 0 } \left( 2 ( \kappa _ { c } \cos \frac { 2 \pi j } { N } + \mathrm { i } \kappa _ { s } \sin \frac { 2 \pi j } { N } ) \mathrm { e } ^ { 2 \kappa _ { c } } \right) - 2 \kappa _ { c } \right] u } ,
+$$  
+
+where $j=0,1,...N-1$. Here we already inserted the eigenvalues of $\mathbf{A_d}$ and used the notation $\kappa_s=\kappa\sin(\Delta\phi)\sin(\Omega)$ similar to $\kappa_c$. The dynamics of the $\eta_i$ perturbations is governed by the linear combination of such terms, meaning that if the real part of all $N$ exponents is negative then the phase locked state for a given $\{\Omega,\Delta\phi\}$ pair is linearly stable.  
+
+[1] D. M. Abrams and S. H. Strogatz. Chimera states for coupled oscillators. Phys. Rev. Lett., 93:174102, Oct 2004.  
+
+[2] F. M. Asl and A. G. Ulsoy. Analysis of a system of linear delay differential equations. J. Dyn. Sys., Meas., Control, 125(2):215–223, 2003.  
+
+[3] M. Bolotov, T. Levanova, L. Smirnov, and A. Pikovsky. Dynamics of disordered heterogeneous chains of phase oscillators. Cybernetics and Physics, pages 215–221, 12 2019.  
+
+[4] M. Bonnin. Waves and patterns in ring lattices with delays. Physica D: Nonlinear Phenomena, 238(1):77–87, 2009.  
+
+[5] B. C. Daniels, S. T. M. Dissanayake, and B. R. Trees. Synchronization of coupled rotators: Josephson junction ladders and the locally coupled kuramoto model. Phys. Rev. E, 67:026216, Feb 2003.  
+
+[6] P. Davis. Circulant matrices. Pure and applied mathematics. Wiley, 1979.  
+
+[7] R. Delabays, T. Coletta, and P. Jacquod. Multistability of phase-locking and topological winding numbers in locally coupled kuramoto models on single-loop networks. Journal of Mathematical Physics, 57(3):032701, 2016.  
+
+[8] K. Dénes, B. Sándor, and Z. Néda. On the predictability of the final state in a ring of kuramoto rotators. Romanian Reports in Physics, 71:108, 2019.  
+
+[9] O. D'Huys, T. Jüngling, and W. Kinzel. Stochastic switching in delay-coupled oscillators. Physical Review E, 90(3):032918, 2014.  
+
+[10] A. Diaz-Guilera and A. Arenas. Phase Patterns of Coupled Oscillators with Application to Wireless Communication. In Lio, P and Yoneki, E and Verma, DC, editor, Bio-inspired Computing and Communications, volume 5151 of Lecture Notes in Computer Science, pages 184+, 2008.  
+
+[31] S. Watanabe, H. S. van der Zant, S. H. Strogatz, and T. P. Orlando. Dynamics of circular arrays of josephson junctions and the discrete sine-gordon equation. Physica D: Nonlinear Phenomena, 97(4):429 – 470, 1996.  
+
+[32] H. Wernecke, B. Sándor, and C. Gros. Chaos in time delay systems, an educational review. Physics Reports, 824:1 – 40, 2019.  
+
+[33] D. A. Wiley, S. H. Strogatz, and M. Girvan. The size of the sync basin. Chaos: An Interdisciplinary Journal of Nonlinear Science, 16(1):015103, 2006.  
+
+[34] A. T. Winfree. Biological rhythms and the behavior of populations of coupled oscillators. Journal of Theoretical Biology, 16(1):15 – 42, 1967.  
+
+[35] J. Wood, T. Edwards, and S. Lipa. Rotary traveling-wave oscillator arrays: A new clock technology. IEEE Journal of Solid-State Circuits, 36(11):11654–1665, 2001.  
+
+[36] M. K. S. Yeung and S. H. Strogatz. Time delay in the kuramoto model of coupled oscillators. Phys. Rev. Lett., 82:648–651, Jan 1999.  
+
+[11] R. Dodla, A. Sen, and G. L. Johnston. Phase-locked patterns and amplitude death in a ring of delay-coupled limit cycle oscillators. Phys. Rev. E, 69:056217, May 2004.  
+
+[12] K. Dénes, B. Sándor, and Z. Néda. Pattern selection in a ring of kuramoto oscillators. Communications in Nonlinear Science and Numerical Simulation, 78:104868, 2019.  
+
+[13] F. Dörfler and F. Bullo. Synchronization in complex networks of phase oscillators: A survey. Automatica, 50(6):1539-1564, 2014.  
+
+[14] O. D' Huys, R. Vicente, T. Erneux, J. Danckaert, and I. Fischer. Synchronization properties of network motifs: Influence of coupling delay and symmetry. Chaos: An Interdisciplinary Journal of Nonlinear Science, 18(3):037116, 2008.  
+
+[15] M. G. Earl and S. H. Strogatz. Synchronization in oscillator networks with delayed coupling: A stability criterion. Phys. Rev. E, 67:036204, Mar 2003.  
+
+[16] X. Huang, M. Zhan, F. Li, and Z. Zheng. Single-clustering synchronization in a ring of kuramoto oscillators. Journal of Physics A: Mathematical and Theoretical, 47:125101, 03 2014.  
+
+[17] A. Kouda and S. Mori. Analysis of a ring of mutually coupled van der pol oscillators with coupling delay. IEEE Transactions on Circuits and Systems, 28(3):247–253, March 1981.  
+
+[18] Y. Kuramoto. Self-entrainment of a population of coupled non-linear oscillators. In H. Araki, editor, International Symposium on Mathematical Problems in Theoretical Physics, volume 39 of Lecture Notes in Physics, pages 420–422. Springer Berlin Heidelberg, 1975.  
+
+[19] Y. Kuramoto and D. Battogtokh. Coexistence of coherence and incoherence in nonlocally coupled phase oscillators. 2002.  
+
+[20] M. A. Matías, V. Pérez-Muñuzuri, M. N. Lorenzo, I. P. Mariño, and V. Pérez-Villar. Observation of a fast rotating wave in rings of coupled chaotic oscillators. Phys. Rev. Lett., 78:219–222, Jan 1997.  
+
+[21] E. Niebur, H. G. Schuster, and D. M. Kammen. Collective frequencies and metastability in networks of limit-cycle oscillators with time delay. Phys. Rev. Lett., 67:2753–2756, Nov 1991.  
+
+[22] J. Ochab and P. F. Gora. Synchronisation of coupled oscillators in a local one-dimensional Kumamoto model. In Lawniczak, AT and Makowiec, D and Di Stefano, BN, editor, Summer Solstice 2009, International Conference on Discrete Models of Complex Systems, volume 3 of Acta Physica Polonica B Proceedings Supplement, pages 453–462, 2010.  
+
+[23] M. Pease. Methods of matrix algebra. Academic Press, New York, 1965.  
+
+[24] P. Perlikowski, S. Yanchuk, O. Popovych, and P. Tass. Periodic patterns in a ring of delay-coupled oscillators. Physical Review E, 82(3):036208, 2010.  
+
+[25] W.-X. Qin and P.-L. Zhang. Discrete rotating waves in a ring of coupled mechanical oscillators with strong damping. Journal of Mathematical Physics, 50(5):052701, 2009.  
+
+[26] J. P. Ramírez and J. Alvarez. Rotating waves in oscillators with huygens' coupling**this work was partly supported by the conacyt under grant cb2012-180011-y. IFAC-PapersOnLine, 48(18):71 – 76, 2015. 4th IFAC Conference on Analysis and Control of Chaotic Systems CHAOS 2015.  
+
+[27] T. K. Roy and A. Lahiri. Synchronized oscillations on a Kuramoto ring and their entrainment under periodic driving. Chaos, Solitons & Fractals, 45(6):888 – 898, 2012.  
+
+[28] S. Strogatz. Sync: The emerging science of spontaneous order. Penguin UK, 2004.  
+
+[29] P. F. Tilles, F. F. Ferreira, and H. A. Cerdeira. Multistable behavior above synchronization in a locally coupled kuramoto model. Physical Review E, 83(6):066206, 2011.  
+
+[30] K. Y. Tsang, R. E. Mirollo, S. H. Strogatz, and K. Wiesenfeld. Dynamics of a globally coupled oscillator array. Physica D: Nonlinear Phenomena, 48(1):102 – 112, 1991.  
+
+[31] S. Watanabe, H. S. van der Zant, S. H. Strogatz, and T. P. Orlando. Dynamics of circular arrays of josephson junctions and the discrete sine-gordon equation. Physica D: Nonlinear Phenomena, 97(4):429 – 470, 1996.  
+
+[32] H. Wernecke, B. Sándor, and C. Gros. Chaos in time delay systems, an educational review. Physics Reports, 824:1 – 40, 2019.  
+
+[33] D. A. Wiley, S. H. Strogatz, and M. Girvan. The size of the sync basin. Chaos: An Interdisciplinary Journal of Nonlinear Science, 16(1):015103, 2006.  
+
+[34] A. T. Winfree. Biological rhythms and the behavior of populations of coupled oscillators. Journal of Theoretical Biology,  
+
+16(1):15 - 42, 1967.  
+
+[35] J. Wood, T. Edwards, and S. Lipa. Rotary traveling-wave oscillator arrays: A new clock technology. IEEE Journal of Solid-State Circuits, 36(11):11654–1665, 2001.  
+
+[36] M. K. S. Yeung and S. H. Strogatz. Time delay in the kuramoto model of coupled oscillators. Phys. Rev. Lett., 82:648–651, Jan 1999.  
