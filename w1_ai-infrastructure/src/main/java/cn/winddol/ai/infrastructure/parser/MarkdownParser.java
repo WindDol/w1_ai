@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 @Slf4j
 public class MarkdownParser {
 
+    private final OutlineRepairer outlineRepairer = new OutlineRepairer();
+
     /**
      * 核心方法：解析 Markdown 文本
      *
@@ -21,6 +23,7 @@ public class MarkdownParser {
      * @return 解析好的章节列表
      */
     public List<SectionPO> parse(String markdown) {
+        markdown = outlineRepairer.recoverMissingParentHeadings(markdown);
         List<SectionPO> sections = new ArrayList<>();
         String mainTitle = null;
         // 用于匹配标题行：# Title, ## Header
@@ -88,7 +91,7 @@ public class MarkdownParser {
             e.printStackTrace();
         }
 
-        return sections;
+        return outlineRepairer.repair(sections);
     }
 
     /**

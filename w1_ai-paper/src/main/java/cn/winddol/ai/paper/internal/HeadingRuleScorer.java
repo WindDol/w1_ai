@@ -85,7 +85,7 @@ class HeadingRuleScorer {
             return heading(candidate, CandidateKind.TITLE, 1, HeadingCandidateExtractor.cleanTitle(candidate.text()),
                     0.98, "first plausible markdown heading is paper title");
         }
-        if (!candidate.markdownHeading() && isPlausibleTitle(candidate.text())) {
+        if (!candidate.markdownHeading() && isPlausibleBareTitle(candidate.text())) {
             return heading(candidate, CandidateKind.TITLE, 1, HeadingCandidateExtractor.cleanTitle(candidate.text()),
                     0.82, "first plausible bare line is paper title");
         }
@@ -329,6 +329,20 @@ class HeadingRuleScorer {
                 && !HeadingCandidateExtractor.ROMAN_SECTION.matcher(cleaned).matches()
                 && !HeadingCandidateExtractor.LETTER_SECTION.matcher(cleaned).matches()
                 && !key.equals("index");
+    }
+
+    private boolean isPlausibleBareTitle(String text) {
+        if (!isPlausibleTitle(text)) {
+            return false;
+        }
+        String cleaned = HeadingCandidateExtractor.cleanTitle(text);
+        int latinWords = 0;
+        for (String word : cleaned.split("\\s+")) {
+            if (word.matches(".*[A-Za-z]{2,}.*")) {
+                latinWords++;
+            }
+        }
+        return latinWords >= 3;
     }
 
     private boolean isConfidentBareSection(String text) {
