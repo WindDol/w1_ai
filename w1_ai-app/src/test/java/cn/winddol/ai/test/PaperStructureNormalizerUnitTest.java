@@ -9,14 +9,15 @@ import cn.winddol.ai.paper.domain.SectionPO;
 import cn.winddol.ai.infrastructure.parser.PaperCleaner;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PaperStructureNormalizerTest {
+public class PaperStructureNormalizerUnitTest {
 
     private final PaperStructureNormalizer normalizer = new PaperStructureNormalizer();
     private final MarkdownParser markdownParser = new MarkdownParser();
@@ -27,7 +28,7 @@ public class PaperStructureNormalizerTest {
                 "Mobius1", "Mobius2", "Mobius33", "1-s2.0-S2405896322006656-main",
                 "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"
         )) {
-            PaperStructureNormalizationResult report = normalizer.normalizeWithReport(Files.readString(resolveSample(sample)));
+            PaperStructureNormalizationResult report = normalizer.normalizeWithReport(readSample(sample));
             String normalized = report.normalizedMarkdown();
             List<SectionPO> sections = markdownParser.parse(normalized);
 
@@ -70,7 +71,7 @@ public class PaperStructureNormalizerTest {
 
     @Test
     public void keepsNumberedAlgorithmStepsOutOfOutline() throws Exception {
-        PaperStructureNormalizationResult report = normalizer.normalizeWithReport(Files.readString(resolveSample("Mobius2")));
+        PaperStructureNormalizationResult report = normalizer.normalizeWithReport(readSample("Mobius2"));
         String normalized = report.normalizedMarkdown();
         List<SectionPO> sections = markdownParser.parse(normalized);
 
@@ -109,7 +110,7 @@ public class PaperStructureNormalizerTest {
 
     @Test
     public void nestsArabicSubsectionsUnderLetterSections() throws Exception {
-        PaperStructureNormalizationResult report = normalizer.normalizeWithReport(Files.readString(resolveSample("Mobius33")));
+        PaperStructureNormalizationResult report = normalizer.normalizeWithReport(readSample("Mobius33"));
         String normalized = report.normalizedMarkdown();
         List<SectionPO> sections = markdownParser.parse(normalized);
 
@@ -158,16 +159,14 @@ public class PaperStructureNormalizerTest {
         assertHeaderLevel(sample16, "references", 2);
     }
 
-    private Path resolveSample(String sample) {
-        Path rootPath = Path.of("docs", sample, sample + ".md");
-        if (Files.exists(rootPath)) {
-            return rootPath;
+    private String readSample(String sample) throws IOException {
+        String resource = "/outline-samples/" + sample + ".md";
+        try (InputStream input = PaperStructureNormalizerUnitTest.class.getResourceAsStream(resource)) {
+            if (input == null) {
+                throw new IllegalStateException("Sample markdown resource not found: " + resource);
+            }
+            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }
-        Path appModulePath = Path.of("..", "docs", sample, sample + ".md");
-        if (Files.exists(appModulePath)) {
-            return appModulePath;
-        }
-        throw new IllegalStateException("Sample markdown not found for " + sample);
     }
 
     private boolean hasHeader(List<SectionPO> sections, String expected) {
@@ -183,7 +182,7 @@ public class PaperStructureNormalizerTest {
     }
 
     private List<SectionPO> parseSample(String sample) throws Exception {
-        String normalized = normalizer.normalize(Files.readString(resolveSample(sample)));
+        String normalized = normalizer.normalize(readSample(sample));
         return markdownParser.parse(normalized);
     }
 

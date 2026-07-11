@@ -38,8 +38,11 @@ build/
 .DS_Store
 /docs/
 /.idea/
-/.idea/
 /data/
 /config/application-local.yml
 
-data/log/log_info.log
+# Runtime artifacts
+*.log
+*.log.*
+**/data/log/
+**/*-debug.bin

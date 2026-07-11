@@ -1,6 +1,8 @@
 # ScholarBrain — Agent 驱动的论文深度阅读与写作系统
 
-针对传统 RAG 处理长篇科研论文时存在的"切片逻辑断裂"、"数学符号语义丢失"及"引用溯源困难"的问题，构建了一款基于 Agent-First 思想的深度阅读系统。模拟人类研究员的"检索→目录定位→深度阅读→引用溯源"思维链。经 RAGAS 框架实测，系统实现了 97% 的忠实度(Faithfulness)、86% 的精确度(Answer Relevancy) 和 95% 的上下文召回率(Context Recall)。
+针对传统 RAG 处理长篇科研论文时存在的"切片逻辑断裂"、"数学符号语义丢失"及"引用溯源困难"的问题，构建了一款基于 Agent-First 思想的深度阅读系统。系统模拟人类研究员的"检索→目录定位→深度阅读→引用溯源"过程，并通过远程 MonkeyOCR、可审计 Outline 恢复、符号提取和引用关系增强构建论文知识库。
+
+> 当前 RAGAS 数据仅包含 10 条探索性样本，不足以作为稳定基准。仓库保留历史报告用于回归分析，但不再引用单次最高结果作为项目最终性能；正式指标将在检索链路升级和评测集扩充后重新发布。
 
 ## 架构总览
 
@@ -39,7 +41,7 @@ flowchart TB
 | `w1_ai-agent-research` | **新** | 研究 Agent：ReAct 循环执行 思考→行动→观察，负责论文问答 |
 | `w1_ai-agent-librarian` | **新** | 馆员 Agent：知识审核、论文间关系检测、新颖性评估 |
 | `w1_ai-agent-writer` | **新** | 写作 Agent（骨架）：论文大纲生成、章节撰写、引用管理 |
-| `w1_ai-paper` | **新** | 论文管线：PDF 上传→LlamaParse 解析→符号提取→向量存储→检索 |
+| `w1_ai-paper` | **新** | 论文管线：PDF 上传→MonkeyOCR 解析→Outline 恢复→符号/引用增强→向量检索 |
 | `w1_ai-infrastructure` | 旧 | 所有适配器实现：数据库、Redis、LLM、PDF 解析、嵌入向量 |
 | `w1_ai-api` | 旧 | REST 接口定义 + DTO |
 | `w1_ai-trigger` | 旧 | HTTP 控制器实现 |
@@ -62,7 +64,7 @@ flowchart TB
 | 数据库     | PostgreSQL + pgvector (向量相似度搜索)                  |
 | 缓存       | Redis (会话记忆 + 分布式锁)                             |
 | ORM       | MyBatis-Plus 3.5.5                                    |
-| PDF 解析   | Python + LlamaParse (LLM 驱动的 PDF→Markdown)          |
+| PDF 解析   | 远程 MonkeyOCR HTTP 服务（LlamaParse 作为可选回退）       |
 | 外部 API   | Semantic Scholar API (引文元数据)                       |
 | 前端       | Streamlit (Python)                                     |
 | 评估       | RAGAS (Faithfulness, AnswerRelevancy, ContextRecall)   |
@@ -118,7 +120,7 @@ mvn clean compile
 
 ```bash
 # 确保 PostgreSQL 和 Redis 已启动
-# 配置 application.properties 中的数据库连接
+# 在 config/application-local.yml 中配置本地密钥和解析器地址
 
 mvn spring-boot:run -pl w1_ai-app
 # 应用启动在 http://localhost:8091
@@ -156,6 +158,24 @@ pip install ragas datasets langchain-openai langchain-google-genai
 python eval.py
 ```
 
+当前目录中有两次 10 条样本的探索性报告，结果波动较大。评测脚本依赖外部裁判模型，运行前需要通过环境变量配置 `GOOGLE_API_KEY` 和 `DEEPSEEK_API_KEY`。后续将把评测集扩充到 30～50 条，并分别报告检索 Recall@K、Context Precision、Faithfulness 和 Answer Relevancy。
+
+### 测试分层
+
+默认 Maven 测试只运行不依赖数据库、外部 API 和远程 GPU 的 `*UnitTest`：
+
+```bash
+mvn test -pl w1_ai-app -am
+```
+
+MonkeyOCR 和公网连通性测试使用 `*ExternalIT` 命名，默认不会执行。手动运行 MonkeyOCR 外部测试前需保持 SSH 隧道并设置：
+
+```bash
+export MONKEYOCR_TEST_PDF=/absolute/path/to/paper.pdf
+```
+
+Outline 回归样本位于 `w1_ai-app/src/test/resources/outline-samples`，可在全新 clone 和 CI 环境中复现。
+
 ## 添加新 Agent 指南
 
 得益于 Agent 框架化设计，添加一个新的 Agent 只需 3 步：
@@ -176,8 +196,11 @@ python eval.py
 ## 路线图
 
 - [x] Agent 框架化重构（模块拆分、接口隔离、事件解耦）
-- [ ] `IEmbeddingService`、`IFileStorageService`、`AgentMemoryFactory` 的 infrastructure 适配器
-- [ ] Spring Bean 配置迁移到新接口
-- [ ] 实现 `w1_ai-agent-writer`：论文大纲生成 + 章节撰写 + 引用管理
+- [x] 远程 MonkeyOCR HTTP 接入与可审计 Outline 归一化
+- [x] `IEmbeddingService`、`IFileStorageService`、`AgentMemoryFactory` 基础适配
+- [ ] 完成论文摄取状态机、失败审计和阶段重跑
+- [ ] 升级混合检索、重排与可复现 RAG 评测
+- [ ] 完成 Agent 章节证据引用和 Librarian 置信度机制
 - [ ] 废弃并删除 `w1_ai-domain` 和 `w1_ai-types` 旧模块
-- [ ] Docker 容器化部署
+- [ ] PostgreSQL/pgvector/Redis Docker Compose 与数据库迁移
+- [ ] WriterAgent（非当前主线，保留骨架）
