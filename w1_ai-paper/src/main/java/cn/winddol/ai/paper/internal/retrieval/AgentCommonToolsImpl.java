@@ -1,4 +1,4 @@
-package cn.winddol.ai.paper.internal;
+package cn.winddol.ai.paper.internal.retrieval;
 
 import cn.winddol.ai.paper.domain.GlobalReferenceEntity;
 import cn.winddol.ai.paper.domain.PaperEntity;

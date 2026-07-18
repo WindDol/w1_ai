@@ -10,6 +10,13 @@ public interface IPaperRepository {
 
     Long saveFullPaper(String title, List<SectionPO> sectionPOs, String fingerprint, String abstractText, Integer year);
 
+    void replaceFullPaper(Long paperId, String title, List<SectionPO> sectionPOs,
+                          String fingerprint, String abstractText, Integer year);
+
+    void updatePaperEmbedding(Long paperId, float[] embedding);
+
+    void resetDerivedDataFrom(Long paperId, cn.winddol.ai.paper.domain.ingest.PaperIngestStage stage);
+
     void updateStatus(Long paperId, String status);
 
     void updateStatusWithError(Long paperId, String status, String errorMessage);

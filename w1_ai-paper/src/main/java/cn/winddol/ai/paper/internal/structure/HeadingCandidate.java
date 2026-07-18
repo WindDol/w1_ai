@@ -1,4 +1,4 @@
-package cn.winddol.ai.paper.internal;
+package cn.winddol.ai.paper.internal.structure;
 
 public record HeadingCandidate(
         int lineNumber,

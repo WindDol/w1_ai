@@ -71,7 +71,7 @@ flowchart TB
 
 ## API 接口
 
-所有接口保持不变，基础路径 `http://localhost:8091`。
+基础路径为 `http://localhost:8091`。论文上传已经升级为异步摄取任务，接口返回 `jobId`，再通过任务接口查询 `paperId` 和处理状态。
 
 ### Agent 流式问答
 
@@ -83,9 +83,12 @@ GET /api/v1/agent/ask-stream?sessionId={id}&question={问题}
 ### 论文管理
 
 ```bash
-POST   /api/v1/paper/upload              # 上传 PDF，返回 paperId
-GET    /api/v1/paper/list                # 论文列表
-GET    /api/v1/paper/{paperId}/details   # 论文详情 + Librarian 审计报告
+POST   /api/v1/paper/upload                         # 上传 PDF，返回 202 + jobId
+GET    /api/v1/paper/ingestions/{jobId}             # 查询摄取状态与失败原因
+POST   /api/v1/paper/ingestions/{jobId}/retry       # 从失败阶段继续
+POST   /api/v1/paper/ingestions/{jobId}/rerun       # 从指定 stage 重跑
+GET    /api/v1/paper/list                           # 论文列表
+GET    /api/v1/paper/{paperId}/details              # 论文详情 + Librarian 审计报告
 ```
 
 ### 科研工具
@@ -198,7 +201,7 @@ Outline 回归样本位于 `w1_ai-app/src/test/resources/outline-samples`，可�
 - [x] Agent 框架化重构（模块拆分、接口隔离、事件解耦）
 - [x] 远程 MonkeyOCR HTTP 接入与可审计 Outline 归一化
 - [x] `IEmbeddingService`、`IFileStorageService`、`AgentMemoryFactory` 基础适配
-- [ ] 完成论文摄取状态机、失败审计和阶段重跑
+- [x] 完成论文摄取状态机、失败审计和阶段重跑（见 `PHASE1_INGESTION.md`）
 - [ ] 升级混合检索、重排与可复现 RAG 评测
 - [ ] 完成 Agent 章节证据引用和 Librarian 置信度机制
 - [ ] 废弃并删除 `w1_ai-domain` 和 `w1_ai-types` 旧模块

@@ -78,17 +78,25 @@ public class PythonParserAdapter {
     @Value("${python.monkeyocr.http-timeout-seconds:1800}")
     private long monkeyOcrHttpTimeoutSeconds;
 
+    public String parserType() {
+        return normalizeParserType(parserType);
+    }
+
     public String parsePdfToMarkdown(String absolutePath) {
+        return parsePdfWithArtifacts(absolutePath).markdown();
+    }
+
+    public ParserOutput parsePdfWithArtifacts(String absolutePath) {
         String type = normalizeParserType(parserType);
         log.info("Calling PDF parser [{}] for: {}", type, absolutePath);
 
         if (PARSER_MONKEYOCR.equals(type)) {
-            return parseWithMonkeyOcr(absolutePath);
+            return new ParserOutput(parseWithMonkeyOcr(absolutePath), null);
         }
         if (PARSER_MONKEYOCR_HTTP.equals(type)) {
             return parseWithMonkeyOcrHttp(absolutePath);
         }
-        return parseWithJsonScript(absolutePath);
+        return new ParserOutput(parseWithJsonScript(absolutePath), null);
     }
 
     private String parseWithJsonScript(String absolutePath) {
@@ -153,7 +161,7 @@ public class PythonParserAdapter {
         }
     }
 
-    private String parseWithMonkeyOcrHttp(String absolutePath) {
+    private ParserOutput parseWithMonkeyOcrHttp(String absolutePath) {
         Path pdfPath = Path.of(absolutePath).toAbsolutePath().normalize();
         if (!Files.exists(pdfPath)) {
             throw new RuntimeException("PDF file not found: " + pdfPath);
@@ -175,13 +183,21 @@ public class PythonParserAdapter {
 
             byte[] zipBytes = downloadMonkeyOcrZip(client, downloadUrl);
             Path outputDir = extractMonkeyOcrZip(zipBytes, pdfPath);
+            Path zipArtifact = outputDir.resolve("monkeyocr-result.zip");
+            Files.write(zipArtifact, zipBytes);
             Path markdown = findMarkdownInDirectory(outputDir, pdfPath);
             log.info("MonkeyOCR HTTP markdown output: {}", markdown);
-            return Files.readString(markdown, StandardCharsets.UTF_8);
+            return new ParserOutput(
+                    Files.readString(markdown, StandardCharsets.UTF_8),
+                    zipArtifact.toString()
+            );
         } catch (Exception e) {
             log.error("Failed to execute MonkeyOCR HTTP parser", e);
             throw new RuntimeException("MonkeyOCR HTTP PDF parsing system error", e);
         }
+    }
+
+    public record ParserOutput(String markdown, String parserArtifactPath) {
     }
 
     private JSONObject uploadPdfToMonkeyOcr(HttpClient client, Path pdfPath) throws IOException, InterruptedException {

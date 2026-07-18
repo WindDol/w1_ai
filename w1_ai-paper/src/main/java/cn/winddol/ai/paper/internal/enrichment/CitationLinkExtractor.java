@@ -1,4 +1,4 @@
-package cn.winddol.ai.paper.internal;
+package cn.winddol.ai.paper.internal.enrichment;
 
 import org.springframework.stereotype.Component;
 

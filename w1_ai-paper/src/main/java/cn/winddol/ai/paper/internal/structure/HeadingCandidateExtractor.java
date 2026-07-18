@@ -1,4 +1,4 @@
-package cn.winddol.ai.paper.internal;
+package cn.winddol.ai.paper.internal.structure;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,12 +5,10 @@ import cn.winddol.ai.infrastructure.embedding.EmbeddingProcessor;
 import cn.winddol.ai.shared.api.ICitationEnrichmentService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-@EnableScheduling
 @Slf4j
 public class GlobalScheduler {
     @Resource

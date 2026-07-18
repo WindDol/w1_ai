@@ -3,15 +3,19 @@ package cn.winddol.ai.trigger.http;
 import cn.winddol.ai.api.IPaperController;
 import cn.winddol.ai.api.dto.PaperDTO;
 import cn.winddol.ai.api.dto.PaperDetailDTO;
+import cn.winddol.ai.api.dto.PaperIngestJobDTO;
 import cn.winddol.ai.api.dto.SymbolDTO;
 import cn.winddol.ai.api.response.Response;
 import cn.winddol.ai.paper.domain.SymbolEntity;
 import cn.winddol.ai.paper.domain.PaperDetailVO;
 import cn.winddol.ai.paper.domain.PaperVO;
 import cn.winddol.ai.paper.api.IPaperApplication;
+import cn.winddol.ai.paper.domain.ingest.PaperIngestJob;
+import cn.winddol.ai.paper.domain.ingest.PaperIngestStage;
 import cn.winddol.ai.shared.enums.ResponseCode;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,24 +26,63 @@ import java.util.List;
 @RequestMapping("/api/v1/paper")
 @RestController
 public class PaperController implements IPaperController {
-    @Resource
-    private IPaperApplication paperApplicationService;
+    private final IPaperApplication paperApplicationService;
+
+    public PaperController(IPaperApplication paperApplicationService) {
+        this.paperApplicationService = paperApplicationService;
+    }
+
     @Override
     @PostMapping("/upload")
-    public Response<String> upload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Response<PaperIngestJobDTO>> upload(@RequestParam("file") MultipartFile file) {
         try {
-            Long paperId =  paperApplicationService.uploadAndParse(file);
-            return Response.<String>builder()
+            PaperIngestJob job = paperApplicationService.submit(file);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(Response.<PaperIngestJobDTO>builder()
                     .code(ResponseCode.SUCCESS.getCode())
                     .info(ResponseCode.SUCCESS.getInfo())
-                    .data("文件已接收，Librarian 正在后台处理...,paperId为: %d".formatted(paperId))
-                    .build();
+                    .data(toDto(job))
+                    .build());
         } catch (Exception e) {
             log.error("上传文件失败", e);
-            return Response.<String>builder()
+            return ResponseEntity.badRequest().body(Response.<PaperIngestJobDTO>builder()
                     .code(ResponseCode.UN_ERROR.getCode())
-                    .info(ResponseCode.UN_ERROR.getInfo())
-                    .build();
+                    .info(e.getMessage())
+                    .build());
+        }
+    }
+
+    @Override
+    @GetMapping("/ingestions/{jobId}")
+    public ResponseEntity<Response<PaperIngestJobDTO>> getIngestJob(@PathVariable String jobId) {
+        try {
+            return ResponseEntity.ok(success(paperApplicationService.getIngestJob(jobId)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(failure(e));
+        }
+    }
+
+    @Override
+    @PostMapping("/ingestions/{jobId}/retry")
+    public ResponseEntity<Response<PaperIngestJobDTO>> retryIngestJob(@PathVariable String jobId) {
+        try {
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(success(paperApplicationService.retry(jobId)));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(failure(e));
+        }
+    }
+
+    @Override
+    @PostMapping("/ingestions/{jobId}/rerun")
+    public ResponseEntity<Response<PaperIngestJobDTO>> rerunIngestJob(
+            @PathVariable String jobId,
+            @RequestParam("stage") String stage) {
+        try {
+            PaperIngestStage requestedStage = PaperIngestStage.valueOf(stage.trim().toUpperCase());
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(success(paperApplicationService.rerunFrom(jobId, requestedStage)));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(failure(e));
         }
     }
     @Override
@@ -94,5 +137,40 @@ public class PaperController implements IPaperController {
         }
     }
 
+    private Response<PaperIngestJobDTO> success(PaperIngestJob job) {
+        return Response.<PaperIngestJobDTO>builder()
+                .code(ResponseCode.SUCCESS.getCode())
+                .info(ResponseCode.SUCCESS.getInfo())
+                .data(toDto(job))
+                .build();
+    }
+
+    private Response<PaperIngestJobDTO> failure(Exception error) {
+        return Response.<PaperIngestJobDTO>builder()
+                .code(ResponseCode.UN_ERROR.getCode())
+                .info(error.getMessage())
+                .build();
+    }
+
+    private PaperIngestJobDTO toDto(PaperIngestJob job) {
+        return PaperIngestJobDTO.builder()
+                .jobId(job.getId())
+                .paperId(job.getPaperId())
+                .originalFilename(job.getOriginalFilename())
+                .fileSha256(job.getFileSha256())
+                .status(job.getStatus() == null ? null : job.getStatus().name())
+                .currentStage(job.getCurrentStage() == null ? null : job.getCurrentStage().name())
+                .failedStage(job.getFailedStage() == null ? null : job.getFailedStage().name())
+                .errorCode(job.getErrorCode())
+                .errorMessage(job.getErrorMessage())
+                .attemptCount(job.getAttemptCount())
+                .parserType(job.getParserType())
+                .parserVersion(job.getParserVersion())
+                .normalizerVersion(job.getNormalizerVersion())
+                .createdAt(job.getCreatedAt())
+                .updatedAt(job.getUpdatedAt())
+                .completedAt(job.getCompletedAt())
+                .build();
+    }
 
 }

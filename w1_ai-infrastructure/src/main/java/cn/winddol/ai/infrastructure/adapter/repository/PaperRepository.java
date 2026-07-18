@@ -7,6 +7,7 @@ import cn.winddol.ai.paper.domain.PaperVO;
 import cn.winddol.ai.paper.domain.ReferenceEnum;
 import cn.winddol.ai.paper.domain.ReferenceItem;
 import cn.winddol.ai.paper.domain.SymbolDefinition;
+import cn.winddol.ai.paper.domain.ingest.PaperIngestStage;
 import cn.winddol.ai.infrastructure.dao.*;
 import cn.winddol.ai.infrastructure.dao.impl.ReferenceSeriveceImpl;
 import cn.winddol.ai.infrastructure.dao.impl.SectionReferenceLinkService;
@@ -78,28 +79,15 @@ public class PaperRepository implements IPaperRepository {
         Paper paper = getPaper(title, sectionPOs);
         paper.setAbstractText(abstractText);
         paper.setYears(year);
-        String textToEmbed = title + "\n" + abstractText;
-        float[] vector = embeddingModel.embed(textToEmbed).content().vector();
-        paper.setEmbedding(vector);
         paper.setFingerprint(fingerprint);
+        paper.setStatus("PARSING");
         // 插入数据库，插入后 paper.id 会自动被回填
         paperMapper.insert(paper);
         Long newPaperId = paper.getId();
 
         // 2. 批量构建并保存 Section 内容表
         Long paperId = paper.getId();
-        int index = 0;
-        for (SectionPO po : sectionPOs) {
-            Section section = new Section();
-            section.setId(po.uuid); // 使用解析时生成的 UUID
-            section.setPaperId(paperId);
-            section.setHeader(po.header);
-            section.setContent(po.getContent());
-            section.setIdx(index++);
-            section.setTokenCount(po.getContent().length()); // 简单估算，后面用分词器精修
-            section.setParentId(po.getParentId());
-            sectionMapper.insert(section);
-        }
+        insertSections(paperId, sectionPOs);
         List<GlobalReference> danglingNodes = globalReferenceMapper.selectList(
                 new LambdaQueryWrapper<GlobalReference>()
                         .eq(GlobalReference::getFingerprint, fingerprint)
@@ -114,6 +102,77 @@ public class PaperRepository implements IPaperRepository {
                     node.getId(), newPaperId);
         }
         return paperId;
+    }
+
+    @Override
+    @Transactional
+    public void replaceFullPaper(Long paperId, String title, List<SectionPO> sectionPOs,
+                                 String fingerprint, String abstractText, Integer year) {
+        if (paperMapper.selectById(paperId) == null) {
+            throw new AppException("PAPER_NOT_FOUND", "Paper not found: " + paperId);
+        }
+        resetDerivedDataFrom(paperId, PaperIngestStage.SYMBOL_ENRICHMENT);
+        sectionMapper.delete(new LambdaQueryWrapper<Section>().eq(Section::getPaperId, paperId));
+
+        Paper paper = getPaper(title, sectionPOs);
+        paper.setId(paperId);
+        paper.setAbstractText(abstractText);
+        paper.setYears(year);
+        paper.setFingerprint(fingerprint);
+        paper.setEmbedding(null);
+        paper.setStatus("PARSING");
+        paper.setStatusMessage(null);
+        paperMapper.updateById(paper);
+        paperMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Paper>()
+                .eq(Paper::getId, paperId)
+                .set(Paper::getEmbedding, null)
+                .set(Paper::getStatusMessage, null));
+        insertSections(paperId, sectionPOs);
+    }
+
+    @Override
+    public void updatePaperEmbedding(Long paperId, float[] embedding) {
+        Paper paper = new Paper();
+        paper.setId(paperId);
+        paper.setEmbedding(embedding);
+        paperMapper.updateById(paper);
+    }
+
+    @Override
+    @Transactional
+    public void resetDerivedDataFrom(Long paperId, PaperIngestStage stage) {
+        if (stage.isBeforeOrEqual(PaperIngestStage.SYMBOL_ENRICHMENT)) {
+            sectionReferenceLinkMapper.delete(new LambdaQueryWrapper<SectionReferenceLink>()
+                    .eq(SectionReferenceLink::getPaperId, paperId));
+            referenceMapper.delete(new LambdaQueryWrapper<Reference>()
+                    .eq(Reference::getPaperId, paperId));
+            symbolMapper.delete(new LambdaQueryWrapper<Symbol>()
+                    .eq(Symbol::getPaperId, paperId));
+        } else if (stage == PaperIngestStage.CITATION_ENRICHMENT) {
+            referenceMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Reference>()
+                    .eq(Reference::getPaperId, paperId)
+                    .set(Reference::getTitle, null)
+                    .set(Reference::getPaperAbstract, null)
+                    .set(Reference::getSourceType, null)
+                    .set(Reference::getGlobalRefId, null));
+        }
+
+        if (stage.isBeforeOrEqual(PaperIngestStage.EMBEDDING)) {
+            paperMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Paper>()
+                    .eq(Paper::getId, paperId)
+                    .set(Paper::getEmbedding, null));
+            sectionMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Section>()
+                    .eq(Section::getPaperId, paperId)
+                    .set(Section::getEmbedding, null));
+            symbolMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Symbol>()
+                    .eq(Symbol::getPaperId, paperId)
+                    .set(Symbol::getEmbedding, null));
+        }
+
+        if (stage.isBeforeOrEqual(PaperIngestStage.LIBRARIAN_AUDIT)) {
+            relationMapper.delete(new LambdaQueryWrapper<PaperKnowledgeRelation>()
+                    .eq(PaperKnowledgeRelation::getSourcePaperId, paperId));
+        }
     }
 
     @Override
@@ -607,5 +666,20 @@ public class PaperRepository implements IPaperRepository {
         List<OutlineNode> treeOutline = TreeBuilderUtil.buildTree(sectionPOs);
         paper.setOutline(treeOutline);
         return paper;
+    }
+
+    private void insertSections(Long paperId, List<SectionPO> sectionPOs) {
+        int index = 0;
+        for (SectionPO po : sectionPOs) {
+            Section section = new Section();
+            section.setId(po.uuid);
+            section.setPaperId(paperId);
+            section.setHeader(po.header);
+            section.setContent(po.getContent());
+            section.setIdx(index++);
+            section.setTokenCount(po.getContent() == null ? 0 : po.getContent().length());
+            section.setParentId(po.getParentId());
+            sectionMapper.insert(section);
+        }
     }
 }

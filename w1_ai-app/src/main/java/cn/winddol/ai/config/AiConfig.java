@@ -35,7 +35,7 @@ public class AiConfig {
         return  OpenAiChatModel.builder()
                 .apiKey(limApiKey)
                 .baseUrl("https://api.deepseek.com") 
-                .modelName("deepseek-chat")          
+                .modelName("deepseek-v4-flash")
                 .temperature(0.0)                   
                 .timeout(java.time.Duration.ofSeconds(500))
                 .maxRetries(1)

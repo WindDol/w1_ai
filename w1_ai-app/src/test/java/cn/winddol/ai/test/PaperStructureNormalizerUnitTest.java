@@ -1,10 +1,10 @@
 package cn.winddol.ai.test;
 
 import cn.winddol.ai.infrastructure.parser.MarkdownParser;
-import cn.winddol.ai.paper.internal.CandidateKind;
-import cn.winddol.ai.paper.internal.DecisionAction;
-import cn.winddol.ai.paper.internal.PaperStructureNormalizationResult;
-import cn.winddol.ai.paper.internal.PaperStructureNormalizer;
+import cn.winddol.ai.paper.internal.structure.CandidateKind;
+import cn.winddol.ai.paper.internal.structure.DecisionAction;
+import cn.winddol.ai.paper.internal.structure.PaperStructureNormalizationResult;
+import cn.winddol.ai.paper.internal.structure.PaperStructureNormalizer;
 import cn.winddol.ai.paper.domain.SectionPO;
 import cn.winddol.ai.infrastructure.parser.PaperCleaner;
 import org.junit.jupiter.api.Test;

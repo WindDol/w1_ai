@@ -1,4 +1,4 @@
-package cn.winddol.ai.paper.internal;
+package cn.winddol.ai.paper.internal.structure;
 
 import org.springframework.stereotype.Component;
 
@@ -7,6 +7,12 @@ import java.util.List;
 
 @Component
 public class PaperStructureNormalizer {
+
+    public static final String RULE_VERSION = "2026-07-18";
+
+    public String ruleVersion() {
+        return RULE_VERSION;
+    }
 
     private final HeadingCandidateExtractor candidateExtractor;
     private final HeadingRuleScorer ruleScorer;

@@ -184,22 +184,34 @@ if st.session_state.page == "📤 Upload & Management":
             key=st.session_state.uploader_key  # <--- 关键点：绑定 Key
         )
         if uploaded_file:
-            # 复用你之前的上传逻辑
-            with st.status("🔄 Librarian 正在入库...", expanded=True) as status:
+            with st.status("🔄 正在创建摄取任务...", expanded=True) as status:
                 try:
                     files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "application/pdf")}
                     response = requests.post(f"{BASE_URL}/api/v1/paper/upload", files=files)
-                    if response.status_code == 200:
-                        status.update(label="✅ 上传并解析成功", state="complete")
-                        st.balloons()
+                    if response.status_code in (200, 202):
+                        job = response.json().get("data", {})
+                        st.session_state.last_ingest_job = job
+                        status.update(label="✅ 文件已接收，后台任务已创建", state="complete")
+                        st.caption(f"任务 ID: {job.get('jobId', '-')}")
                         st.session_state.uploader_key = str(uuid.uuid4())
                         import time
                         time.sleep(1)
                         st.rerun()
                     else:
-                        status.update(label="❌ 失败", state="error")
+                        message = response.json().get("info", "上传失败")
+                        status.update(label=f"❌ {message}", state="error")
                 except Exception as e:
                     st.error(f"连接失败: {e}")
+
+        last_job = st.session_state.get("last_ingest_job")
+        if last_job:
+            job_id = last_job.get("jobId")
+            if st.button("🔄 刷新最近任务", disabled=not job_id):
+                job_response = requests.get(f"{BASE_URL}/api/v1/paper/ingestions/{job_id}")
+                if job_response.status_code == 200:
+                    st.session_state.last_ingest_job = job_response.json().get("data", last_job)
+                    st.rerun()
+            st.json(st.session_state.last_ingest_job, expanded=False)
 
     with tab2:
         st.subheader("📑 知识库全景")
@@ -219,9 +231,12 @@ if st.session_state.page == "📤 Upload & Management":
 
                     # 使用 streamlit 的 dataframe 展示，支持搜索和排序
                     status_colors = {
-                        "COMPLETED": "✅",
+                        "READY": "✅",
+                        "COMPLETED": "✅",  # Legacy records created before the ingestion state machine.
                         "AUDITING": "⏳",
                         "PARSED": "📄",
+                        "PARSING": "🔄",
+                        "FAILED": "❌",
                         "ERROR": "❌",
                     }
 
