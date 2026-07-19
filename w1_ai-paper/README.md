@@ -12,7 +12,8 @@
 cn.winddol.ai.paper
 ├─ api/                  对外应用接口及基础设施端口
 ├─ domain/               论文领域模型
-│  └─ ingest/            摄取任务、阶段和状态机
+│  ├─ ingest/            摄取任务、阶段和状态机
+│  └─ retrieval/         Chunk、证据、召回通道和检索请求模型
 └─ internal/
    ├─ *.java             跨能力应用编排
    ├─ structure/         OCR Markdown 与 Outline 结构恢复
@@ -34,6 +35,10 @@ cn.winddol.ai.paper
 | `ISymbolExtractor.java` | 元数据与符号抽取端口。 |
 | `ISemanticScholar.java` | Semantic Scholar 外部查询端口。 |
 | `IScientificResearchTools.java` | 向 Agent 暴露的论文搜索和阅读工具集合。 |
+| `IPaperRetrievalService.java` | 对外提供统一的结构化证据检索用例。 |
+| `IRetrievalRepository.java` | Chunk 索引与向量/全文候选召回端口。 |
+| `IRetrievalIndexService.java` | 从现有章节重建结构化 Chunk 索引。 |
+| `IParserArtifactReader.java` | 从 MonkeyOCR 产物读取带页码的文本块。 |
 | `PaperIngestedEvent.java` | 核心入库完成后发布给 Librarian 的事件。 |
 
 ## `domain` 文件说明
@@ -51,6 +56,16 @@ cn.winddol.ai.paper
 | `SearchResultDTO` | 混合检索结果。 |
 | `RefMetadata` | 指纹生成所需作者、年份等元数据。 |
 | `S2Author`, `S2PaperData`, `S2PaperResponse` | Semantic Scholar 响应模型。 |
+
+### `domain/retrieval`
+
+| 文件组 | 作用 |
+| --- | --- |
+| `SectionChunk` | 隶属于章节的最小检索和引用单元，不替代原有 Section。 |
+| `PaperRetrievalQuery`, `PaperRetrievalResult` | 统一检索输入和带版本、耗时的结果。 |
+| `RetrievalCandidate`, `PaperEvidence` | 召回阶段候选与最终结构化证据。 |
+| `EvidenceType`, `RetrievalChannel` | 区分章节/符号/引用及向量/全文来源。 |
+| `SourceTextBlock` | MonkeyOCR 文本块及原始页码。 |
 
 ### `domain/ingest`
 
@@ -103,6 +118,11 @@ cn.winddol.ai.paper
 | 文件 | 作用 |
 | --- | --- |
 | `HybridRetrieverServiceImpl.java` | 组合文本向量与 Repository 过滤执行论文库检索。 |
+| `StructuredSectionChunker.java` | 在章节边界内按段落/句子构建有重叠的 Chunk。 |
+| `RetrievalIndexServiceImpl.java` | 生成 Chunk、补充 Outline 路径/页码并向量化。 |
+| `ReciprocalRankFusion.java` | 使用 RRF 融合不同检索通道并去重。 |
+| `HeadingPathResolver.java` | 根据 Section 父子关系生成稳定 Outline 路径。 |
+| `EvidenceQuoteExtractor.java` | 从命中 Chunk 生成长度受控的证据片段。 |
 | `AgentReaderServiceImpl.java` | 获取 Outline、带上下文读取章节、查引用和论文关系。 |
 | `AgentCommonToolsImpl.java` | 查找论文和高被引参考文献等公共 Agent 工具。 |
 
@@ -117,7 +137,8 @@ submit PDF
   -> STRUCTURE_NORMALIZATION
   -> METADATA_EXTRACTION
   -> PAPER_PERSISTENCE
-  -> REFERENCE/SYMBOL/EMBEDDING
+  -> REFERENCE/SYMBOL
+  -> EMBEDDING (Paper/Symbol + Section Chunk retrieval index)
   -> PaperIngestedEvent
   -> Librarian audit
   -> READY

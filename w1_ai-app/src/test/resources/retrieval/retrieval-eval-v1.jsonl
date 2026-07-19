@@ -1,0 +1,8 @@
+{"id":"ret-v1-001","type":"CROSS_SECTION","question":"How does the Mobius group formulation relate to the Watanabe-Strogatz transformation?","paperId":7,"expectedHeading":"A. Relation to the Watanabe–Strogatz transformation"}
+{"id":"ret-v1-002","type":"FACTUAL","question":"How are Mobius transformations defined in higher dimensions?","paperId":14,"expectedHeading":"transformations in higher dimensions"}
+{"id":"ret-v1-003","type":"FACTUAL","question":"What insight does the reduced system provide into traveling waves on spheres?","paperId":9,"expectedHeading":"6. An insight into traveling waves on spheres"}
+{"id":"ret-v1-004","type":"FACTUAL","question":"How are the dynamics linearized for local stability analysis?","paperId":11,"expectedHeading":"4.1 Linearization of the Dynamics"}
+{"id":"ret-v1-005","type":"FACTUAL","question":"Which a-priori estimate supports global-in-time solvability?","paperId":15,"expectedHeading":"7.1. A-priori estimate"}
+{"id":"ret-v1-006","type":"CROSS_SECTION","question":"How does coupling delay affect the collective dynamics?","paperId":16,"expectedHeading":"4. Studying the Role of the Coupling Delay"}
+{"id":"ret-v1-007","type":"FACTUAL","question":"How is the low-dimensional model derived for higher-order interactions?","paperId":17,"expectedHeading":"III. A LOW-DIMENSIONAL MODEL"}
+{"id":"ret-v1-008","type":"FACTUAL","question":"How is the center-unstable manifold used in bifurcation analysis?","paperId":21,"expectedHeading":"7.1. Bifurcation analysis"}

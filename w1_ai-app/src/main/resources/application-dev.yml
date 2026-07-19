@@ -39,6 +39,8 @@ ai:
   embedding:
     api-key: ${AI_EMBEDDING_API_KEY:}
     base-url: ${AI_EMBEDDING_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+    model: ${AI_EMBEDDING_MODEL:text-embedding-v4}
+    dimensions: ${AI_EMBEDDING_DIMENSIONS:1536}
 logging:
   level:
     root: info
@@ -76,6 +78,13 @@ upload:
   path: ${UPLOAD_PATH:${user.dir}/data/upload}
 
 paper:
+  retrieval:
+    mode: ${PAPER_RETRIEVAL_MODE:hybrid}
+    candidate-limit: ${PAPER_RETRIEVAL_CANDIDATE_LIMIT:30}
+    top-k: ${PAPER_RETRIEVAL_TOP_K:8}
+    chunk:
+      max-chars: ${PAPER_CHUNK_MAX_CHARS:3200}
+      overlap-chars: ${PAPER_CHUNK_OVERLAP_CHARS:400}
   ingestion:
     lease-minutes: ${PAPER_INGEST_LEASE_MINUTES:120}
     heartbeat-seconds: ${PAPER_INGEST_HEARTBEAT_SECONDS:30}

@@ -1,10 +1,10 @@
 package cn.winddol.ai.paper.internal;
 
-import cn.winddol.ai.paper.api.IEmbeddingService;
-import cn.winddol.ai.paper.api.IPaperRepository;
 import cn.winddol.ai.paper.api.IScientificResearchTools;
-import cn.winddol.ai.paper.domain.SearchResultDTO;
 import cn.winddol.ai.paper.domain.OutlineNode;
+import cn.winddol.ai.paper.domain.retrieval.PaperEvidence;
+import cn.winddol.ai.paper.domain.retrieval.PaperRetrievalQuery;
+import cn.winddol.ai.paper.domain.retrieval.PaperRetrievalResult;
 import cn.winddol.ai.paper.internal.retrieval.AgentCommonToolsImpl;
 import cn.winddol.ai.paper.internal.retrieval.AgentReaderServiceImpl;
 import cn.winddol.ai.paper.internal.retrieval.HybridRetrieverServiceImpl;
@@ -29,10 +29,14 @@ public class ScientificResearchToolsImpl implements IScientificResearchTools {
         this.agentCommonTools = agentCommonTools;
     }
 
+    /**
+     * 执行论文库混合检索，并将结构化证据格式化为 ResearchAgent 可直接阅读的文本。
+     */
     @Override
-    @Tool("Search the paper library. 'query' is the keyword/sentence. 'paperId' is optional: set specific ID to search within one paper, or set NULL to search the entire library. 'threshold' is optional (0.35-0.7), or set NULL. Returns candidate sections, symbols, and references.")
+    @Tool("Search the paper library with vector and full-text retrieval. 'paperId' is optional. 'threshold' is the minimum vector similarity (0.2-0.95). Returns ranked evidence with paper, outline path, page, quote, score, and retrieval channels.")
     public String searchLibrary(String query, Long paperId, Double threshold) {
-        SearchResultDTO result = retrieverService.searchLibrary(query, paperId, threshold);
+        PaperRetrievalResult result = retrieverService.retrieve(
+                new PaperRetrievalQuery(query, paperId, threshold, null));
         return formatSearchResult(result);
     }
 
@@ -92,65 +96,48 @@ public class ScientificResearchToolsImpl implements IScientificResearchTools {
         return agentCommonTools.getTopCitedReferences(limit);
     }
 
-    private String formatSearchResult(SearchResultDTO result) {
+    /**
+     * 输出证据类型、论文、Outline 路径、页码、分数、召回通道和原文片段。
+     */
+    private String formatSearchResult(PaperRetrievalResult result) {
         StringBuilder sb = new StringBuilder();
-        boolean hasContent = false;
-
-        if (result.getSymbols() != null && !result.getSymbols().isEmpty()) {
-            sb.append("### Related Symbols (Terminology):\n");
-            for (SearchResultDTO.SymbolDTO s : result.getSymbols()) {
-                sb.append(String.format("- **%s**: %s", s.getSymbol(), s.getDescription()));
-
-                if (s.getSourcePaperTitle() != null) {
-                    sb.append(String.format(" (Source: \"%s\")", s.getSourcePaperTitle()));
-                }
-                if (s.getDefinitionFormula() != null) {
-                    sb.append(String.format(" [Def: $%s$]", s.getDefinitionFormula()));
-                }
-                sb.append("\n");
+        if (result.evidence() == null || result.evidence().isEmpty()) {
+            return "No relevant evidence found in the library for query: " + result.query();
+        }
+        sb.append("### Ranked Evidence\n");
+        for (int i = 0; i < result.evidence().size(); i++) {
+            PaperEvidence evidence = result.evidence().get(i);
+            sb.append(String.format("%d. **[%s] %s**\n", i + 1,
+                    evidence.getEvidenceType(), safe(evidence.getHeading())));
+            sb.append(String.format("   Paper: \"%s\" (paperId=%s)\n",
+                    safe(evidence.getPaperTitle()), evidence.getPaperId()));
+            if (evidence.getHeadingPath() != null) {
+                sb.append(String.format("   Outline: %s\n", evidence.getHeadingPath()));
             }
-            sb.append("\n");
-            hasContent = true;
-        }
-
-        if (result.getSections() != null && !result.getSections().isEmpty()) {
-            sb.append("### Found Sections (Candidate Locations):\n");
-            for (SearchResultDTO.SectionDTO s : result.getSections()) {
-                sb.append(String.format("- **Header**: %s\n", s.getHeader()));
-                sb.append(String.format("  **Source**: \"%s\"\n", s.getSourcePaperTitle()));
-                sb.append(String.format("  **ID**: %s\n", s.getId()));
-                sb.append(String.format("  **Preview**: %s\n\n", truncate(s.getContent(), 300)));
+            if (evidence.getSectionId() != null) {
+                sb.append(String.format("   Section ID: %s; Chunk ID: %s\n",
+                        evidence.getSectionId(), evidence.getChunkId()));
             }
-            hasContent = true;
-        }
-
-        if (result.getReferences() != null && !result.getReferences().isEmpty()) {
-            sb.append("### Found References (External Context):\n");
-            for (SearchResultDTO.ReferenceDTO r : result.getReferences()) {
-                sb.append(String.format("- **[%s] %s**\n", r.getRefId(), r.getTitle()));
-
-                if (r.getLinkedPaperId() != null) {
-                    sb.append(String.format("  [FULL TEXT AVAILABLE] This paper is in your library. ID: %d\n", r.getLinkedPaperId()));
-                    sb.append(String.format("  Action Hint: You can use `getPaperOutline(%d)` to explore it deeper.\n", r.getLinkedPaperId()));
-                }
-
-                sb.append(String.format("  **Cited By**: \"%s\" (Paper ID: %d)\n", r.getSourcePaperTitle(), r.getPaperId()));
-                String abstractPreview = r.getAbstractText() != null ? truncate(r.getAbstractText(), 200) : "No abstract available.";
-                sb.append(String.format("  **Abstract**: %s\n\n", abstractPreview));
+            if (evidence.getReferenceIndex() != null) {
+                sb.append(String.format("   Reference index: %s\n", evidence.getReferenceIndex()));
             }
+            if (evidence.getPageStart() != null) {
+                String page = evidence.getPageEnd() != null
+                        && !evidence.getPageStart().equals(evidence.getPageEnd())
+                        ? evidence.getPageStart() + "-" + evidence.getPageEnd()
+                        : evidence.getPageStart().toString();
+                sb.append(String.format("   Page: %s\n", page));
+            }
+            sb.append(String.format("   Score: %.6f; Channels: %s\n",
+                    evidence.getFusionScore(), evidence.getMatchedChannels()));
+            sb.append(String.format("   Quote: %s\n\n", evidence.getQuote()));
         }
-
-        if (!hasContent) {
-            return "No relevant information found in the library for query: " + result;
-        }
-
+        sb.append(String.format("Retrieval version: %s; elapsed: %d ms\n",
+                result.retrievalVersion(), result.elapsedMillis()));
         return sb.toString();
     }
 
-    private String truncate(String input, int limit) {
-        if (input == null) return "";
-        String clean = input.replaceAll("\\s+", " ").trim();
-        if (clean.length() <= limit) return clean;
-        return clean.substring(0, limit) + "...";
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 }

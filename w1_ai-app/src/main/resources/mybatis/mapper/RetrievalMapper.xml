@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.winddol.ai.infrastructure.dao.RetrievalMapper">
+
+    <!-- 向量相似度阈值在排序前生效，确保调用方传入的过滤条件真正参与查询。 -->
+    <select id="searchSectionChunksByVector"
+            resultType="cn.winddol.ai.paper.domain.retrieval.RetrievalCandidate">
+        SELECT
+            'SECTION:' || sc.id AS evidenceKey,
+            'SECTION' AS evidenceType,
+            sc.paper_id AS paperId,
+            p.title AS paperTitle,
+            sc.section_id AS sectionId,
+            sc.id AS chunkId,
+            sc.heading,
+            sc.heading_path AS headingPath,
+            sc.content,
+            sc.page_start AS pageStart,
+            sc.page_end AS pageEnd,
+            1 - (sc.embedding &lt;=&gt; cast(#{vectorStr} AS vector)) AS semanticScore
+        FROM section_chunks sc
+        JOIN papers p ON p.id = sc.paper_id
+        WHERE sc.embedding IS NOT NULL
+          AND 1 - (sc.embedding &lt;=&gt; cast(#{vectorStr} AS vector)) &gt;= #{minScore}
+        <if test="paperId != null">
+            AND sc.paper_id = #{paperId}
+        </if>
+        ORDER BY sc.embedding &lt;=&gt; cast(#{vectorStr} AS vector)
+        LIMIT #{limit}
+    </select>
+
+    <!-- 生成的 tsvector 中 heading_path 权重高于正文，使章节标题命中更容易靠前。 -->
+    <select id="searchSectionChunksByFullText"
+            resultType="cn.winddol.ai.paper.domain.retrieval.RetrievalCandidate">
+        SELECT
+            'SECTION:' || sc.id AS evidenceKey,
+            'SECTION' AS evidenceType,
+            sc.paper_id AS paperId,
+            p.title AS paperTitle,
+            sc.section_id AS sectionId,
+            sc.id AS chunkId,
+            sc.heading,
+            sc.heading_path AS headingPath,
+            sc.content,
+            sc.page_start AS pageStart,
+            sc.page_end AS pageEnd,
+            ts_rank_cd(sc.search_vector, websearch_to_tsquery('english', #{query})) AS lexicalScore
+        FROM section_chunks sc
+        JOIN papers p ON p.id = sc.paper_id
+        WHERE sc.search_vector @@ websearch_to_tsquery('english', #{query})
+        <if test="paperId != null">
+            AND sc.paper_id = #{paperId}
+        </if>
+        ORDER BY lexicalScore DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="searchSymbolsByVector"
+            resultType="cn.winddol.ai.paper.domain.retrieval.RetrievalCandidate">
+        SELECT
+            'SYMBOL:' || sym.id AS evidenceKey,
+            'SYMBOL' AS evidenceType,
+            sym.paper_id AS paperId,
+            p.title AS paperTitle,
+            sym.symbol AS heading,
+            concat_ws(' ', sym.symbol, sym.description, sym.definition_formula) AS content,
+            1 - (sym.embedding &lt;=&gt; cast(#{vectorStr} AS vector)) AS semanticScore
+        FROM paper_symbols sym
+        JOIN papers p ON p.id = sym.paper_id
+        WHERE sym.embedding IS NOT NULL
+          AND 1 - (sym.embedding &lt;=&gt; cast(#{vectorStr} AS vector)) &gt;= #{minScore}
+        <if test="paperId != null">
+            AND sym.paper_id = #{paperId}
+        </if>
+        ORDER BY sym.embedding &lt;=&gt; cast(#{vectorStr} AS vector)
+        LIMIT #{limit}
+    </select>
+
+    <select id="searchSymbolsByFullText"
+            resultType="cn.winddol.ai.paper.domain.retrieval.RetrievalCandidate">
+        SELECT
+            'SYMBOL:' || sym.id AS evidenceKey,
+            'SYMBOL' AS evidenceType,
+            sym.paper_id AS paperId,
+            p.title AS paperTitle,
+            sym.symbol AS heading,
+            concat_ws(' ', sym.symbol, sym.description, sym.definition_formula) AS content,
+            ts_rank_cd(
+                to_tsvector('simple', concat_ws(' ', sym.symbol, sym.description, sym.definition_formula)),
+                websearch_to_tsquery('simple', #{query})
+            ) AS lexicalScore
+        FROM paper_symbols sym
+        JOIN papers p ON p.id = sym.paper_id
+        WHERE to_tsvector('simple', concat_ws(' ', sym.symbol, sym.description, sym.definition_formula))
+              @@ websearch_to_tsquery('simple', #{query})
+        <if test="paperId != null">
+            AND sym.paper_id = #{paperId}
+        </if>
+        ORDER BY lexicalScore DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 短 LaTeX 符号难以稳定分词，因此单独提供大小写无关的精确匹配。 -->
+    <select id="searchSymbolsByExact"
+            resultType="cn.winddol.ai.paper.domain.retrieval.RetrievalCandidate">
+        SELECT
+            'SYMBOL:' || sym.id AS evidenceKey,
+            'SYMBOL' AS evidenceType,
+            sym.paper_id AS paperId,
+            p.title AS paperTitle,
+            sym.symbol AS heading,
+            concat_ws(' ', sym.symbol, sym.description, sym.definition_formula) AS content,
+            1.0 AS lexicalScore
+        FROM paper_symbols sym
+        JOIN papers p ON p.id = sym.paper_id
+        WHERE (lower(sym.symbol) = lower(#{query}) OR lower(sym.latex) = lower(#{query}))
+        <if test="paperId != null">
+            AND sym.paper_id = #{paperId}
+        </if>
+        ORDER BY sym.id
+        LIMIT #{limit}
+    </select>
+
+    <!-- 引用证据归属于当前论文，但复用全局标准引用记录中的 embedding。 -->
+    <select id="searchReferencesByVector"
+            resultType="cn.winddol.ai.paper.domain.retrieval.RetrievalCandidate">
+        SELECT
+            'REFERENCE:' || pr.id AS evidenceKey,
+            'REFERENCE' AS evidenceType,
+            pr.paper_id AS paperId,
+            p.title AS paperTitle,
+            gr.title AS heading,
+            concat_ws(' ', gr.title, gr.abstract, pr.raw_text) AS content,
+            pr.ref_index AS referenceIndex,
+            1 - (gr.embedding &lt;=&gt; cast(#{vectorStr} AS vector)) AS semanticScore
+        FROM paper_references pr
+        JOIN global_references gr ON gr.id = pr.global_ref_id
+        JOIN papers p ON p.id = pr.paper_id
+        WHERE gr.embedding IS NOT NULL
+          AND 1 - (gr.embedding &lt;=&gt; cast(#{vectorStr} AS vector)) &gt;= #{minScore}
+        <if test="paperId != null">
+            AND pr.paper_id = #{paperId}
+        </if>
+        ORDER BY gr.embedding &lt;=&gt; cast(#{vectorStr} AS vector)
+        LIMIT #{limit}
+    </select>
+
+    <select id="searchReferencesByFullText"
+            resultType="cn.winddol.ai.paper.domain.retrieval.RetrievalCandidate">
+        SELECT
+            'REFERENCE:' || pr.id AS evidenceKey,
+            'REFERENCE' AS evidenceType,
+            pr.paper_id AS paperId,
+            p.title AS paperTitle,
+            gr.title AS heading,
+            concat_ws(' ', gr.title, gr.abstract, pr.raw_text) AS content,
+            pr.ref_index AS referenceIndex,
+            ts_rank_cd(
+                to_tsvector('english', concat_ws(' ', gr.title, gr.abstract, pr.raw_text)),
+                websearch_to_tsquery('english', #{query})
+            ) AS lexicalScore
+        FROM paper_references pr
+        JOIN global_references gr ON gr.id = pr.global_ref_id
+        JOIN papers p ON p.id = pr.paper_id
+        WHERE to_tsvector('english', concat_ws(' ', gr.title, gr.abstract, pr.raw_text))
+              @@ websearch_to_tsquery('english', #{query})
+        <if test="paperId != null">
+            AND pr.paper_id = #{paperId}
+        </if>
+        ORDER BY lexicalScore DESC
+        LIMIT #{limit}
+    </select>
+</mapper>

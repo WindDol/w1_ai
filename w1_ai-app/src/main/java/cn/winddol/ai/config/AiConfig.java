@@ -15,6 +15,10 @@ public class AiConfig {
 
     @Value("${ai.embedding.base-url}")
     private String embeddingBaseUrl;
+    @Value("${ai.embedding.model:text-embedding-v4}")
+    private String embeddingModelName;
+    @Value("${ai.embedding.dimensions:1536}")
+    private int embeddingDimensions;
     @Value("${ai.llm.api-key}")
     private String limApiKey;
 
@@ -23,8 +27,8 @@ public class AiConfig {
         return OpenAiEmbeddingModel.builder()
                 .apiKey(embeddingApiKey)
                 .baseUrl(embeddingBaseUrl)
-                .modelName("text-embedding-v4")
-                .dimensions(1536)
+                .modelName(embeddingModelName)
+                .dimensions(embeddingDimensions)
                 .logRequests(true)
                 .logResponses(true)
                 .build();

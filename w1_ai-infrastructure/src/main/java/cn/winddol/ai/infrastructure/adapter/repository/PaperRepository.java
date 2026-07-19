@@ -63,6 +63,8 @@ public class PaperRepository implements IPaperRepository {
     private GlobalReferenceMapper globalReferenceMapper;
     @Resource
     private PaperKnowledgeRelationMapper relationMapper;
+    @Resource
+    private SectionChunkMapper sectionChunkMapper;
 
 
     @Override
@@ -138,6 +140,9 @@ public class PaperRepository implements IPaperRepository {
         paperMapper.updateById(paper);
     }
 
+    /**
+     * 按重跑起始阶段清理派生数据；从 EMBEDDING 重跑时同时删除旧 Chunk 索引。
+     */
     @Override
     @Transactional
     public void resetDerivedDataFrom(Long paperId, PaperIngestStage stage) {
@@ -158,6 +163,8 @@ public class PaperRepository implements IPaperRepository {
         }
 
         if (stage.isBeforeOrEqual(PaperIngestStage.EMBEDDING)) {
+            sectionChunkMapper.delete(new LambdaQueryWrapper<SectionChunkPO>()
+                    .eq(SectionChunkPO::getPaperId, paperId));
             paperMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<Paper>()
                     .eq(Paper::getId, paperId)
                     .set(Paper::getEmbedding, null));
@@ -528,9 +535,17 @@ public class PaperRepository implements IPaperRepository {
                 .content(section.getContent()).idx(section.getIdx()).build();
     }
 
+    /**
+     * 查询当前章节的局部符号及其所属论文的全局符号，禁止混入其他论文的全局符号。
+     */
     @Override
     public List<SymbolEntity> selectSymbolsByUuids(String sectionUuid) {
+        Section section = sectionMapper.selectById(sectionUuid);
+        if (section == null || section.getPaperId() == null) {
+            return List.of();
+        }
         List<Symbol> symbols = symbolMapper.selectList(new QueryWrapper<Symbol>()
+                .eq("paper_id", section.getPaperId())
                 .and(wrapper -> wrapper
                         .apply("source_ids @> ARRAY[{0}]::text[]", sectionUuid)
                         .or()
@@ -546,14 +561,13 @@ public class PaperRepository implements IPaperRepository {
         return List.of();
     }
 
+    /**
+     * 查询指定论文的完整符号表，包括该论文的全局符号和各章节局部符号。
+     */
     @Override
     public List<SymbolEntity> findByPaperId(Long paperId) {
         List<Symbol> symbols = symbolMapper.selectList(new QueryWrapper<Symbol>()
-                .and(wrapper -> wrapper
-                        .eq("paper_id", paperId)
-                        .or()
-                        .eq("is_global", true)
-                ));
+                .eq("paper_id", paperId));
         if(symbols != null && !symbols.isEmpty()) {
             return symbols.stream().map(s -> SymbolEntity.builder()
                     .id(s.getId()).paperId(s.getPaperId()).symbol(s.getSymbol())

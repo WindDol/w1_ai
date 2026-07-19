@@ -28,9 +28,4 @@ public class GlobalScheduler {
         log.info("⏰ Starting nightly symbols cleanup...");
         embeddingProcessor.embedSymbols();
     }
-    @Scheduled(cron = "0 20 * * * ?")
-    public void runSectionsCleanup() {
-        log.info("⏰ Starting nightly sections cleanup...");
-        embeddingProcessor.embedSections();
-    }
 }

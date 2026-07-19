@@ -30,7 +30,9 @@ cn.winddol.ai.infrastructure
 | `adapter/paper/FileStorageServiceImpl.java` | 持久保存上传 PDF、Markdown、报告和解析产物。 |
 | `adapter/paper/LibrarianRepositoryImpl.java` | 实现 Librarian 的论文候选和知识关系访问。 |
 | `adapter/parser/PaperParser.java` | 聚合 Python Parser、MarkdownParser、ReferenceParser 等，适配 `IPaperParser`。 |
+| `adapter/parser/MonkeyOcrArtifactReader.java` | 从 MonkeyOCR ZIP 的 content list 读取文本块和页码。 |
 | `adapter/repository/PaperRepository.java` | 实现论文、章节、引用、符号和检索仓储端口。 |
+| `adapter/repository/RetrievalRepository.java` | 实现 Chunk 索引替换及混合检索候选召回端口。 |
 | `adapter/repository/PaperIngestJobRepository.java` | 实现摄取任务、乐观锁和阶段审计仓储端口。 |
 | `adapter/repository/AgentRepository.java` | 兼容旧 Agent 数据访问接口。 |
 
@@ -38,11 +40,11 @@ cn.winddol.ai.infrastructure
 
 ### Mapper
 
-`PaperMapper`、`SectionMapper`、`ReferenceMapper`、`SymbolMapper` 分别访问论文核心表；`GlobalReferenceMapper` 和 `SectionReferenceLinkMapper` 处理引用图谱；`PaperKnowledgeRelationMapper` 保存论文关系；`PaperIngestJobMapper` 和 `PaperIngestStageRunMapper` 保存摄取状态及阶段记录；`AgentThoughtTraceMapper` 保存 Agent 轨迹。
+`PaperMapper`、`SectionMapper`、`ReferenceMapper`、`SymbolMapper` 分别访问论文核心表；`SectionChunkMapper` 保存检索 Chunk，`RetrievalMapper` 执行向量和全文候选查询；`GlobalReferenceMapper` 和 `SectionReferenceLinkMapper` 处理引用图谱；`PaperKnowledgeRelationMapper` 保存论文关系；`PaperIngestJobMapper` 和 `PaperIngestStageRunMapper` 保存摄取状态及阶段记录；`AgentThoughtTraceMapper` 保存 Agent 轨迹。
 
 ### `dao/po`
 
-PO 与数据库表一一对应：`Paper`、`Section`、`Reference`、`Symbol`、`GlobalReference`、`SectionReferenceLink`、`PaperKnowledgeRelation`、`PaperIngestJobPO`、`PaperIngestStageRunPO` 和 `AgentThoughtTrace`。PO 不能直接暴露到 API 层。
+PO 与数据库表一一对应：`Paper`、`Section`、`SectionChunkPO`、`Reference`、`Symbol`、`GlobalReference`、`SectionReferenceLink`、`PaperKnowledgeRelation`、`PaperIngestJobPO`、`PaperIngestStageRunPO` 和 `AgentThoughtTrace`。PO 不能直接暴露到 API 层。
 
 ### `dao/handler`
 
@@ -82,7 +84,7 @@ PO 与数据库表一一对应：`Paper`、`Section`、`Reference`、`Symbol`、
 
 ## 配置与资源
 
-- MyBatis XML 位于 `src/main/resources/mapper`，其 namespace 和 resultType 必须与 Java 包名保持一致。
+- MyBatis XML 位于 `w1_ai-app/src/main/resources/mybatis/mapper`，其 namespace 和 resultType 必须与 Java 包名保持一致。
 - MonkeyOCR 地址、超时、解析器类型和产物目录由 Spring 配置或环境变量注入。
 - 数据库迁移脚本当前由 `w1_ai-app/src/main/resources/db/manual` 管理。
 
@@ -91,4 +93,3 @@ PO 与数据库表一一对应：`Paper`、`Section`、`Reference`、`Symbol`、
 - Adapter 负责“把技术实现翻译为领域端口”，Controller 不应直接调用 DAO。
 - DAO 返回 PO 后，应在 Repository Adapter 中转换为领域模型。
 - 业务状态机、Outline 决策规则和 Agent 策略不能放进本模块。
-

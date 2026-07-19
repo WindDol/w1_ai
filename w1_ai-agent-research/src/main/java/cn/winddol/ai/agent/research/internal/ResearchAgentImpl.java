@@ -53,8 +53,8 @@ public class ResearchAgentImpl implements IResearchAgent {
                 - Search for relevant sections, symbols, and references.
                 - 'query': The search keyword (Required).
                 - 'paperId': Specific paper ID (Optional, Long). Use null to search everywhere.
-                - 'threshold': Similarity threshold (Optional, Double). Range [0.35, 0.7]. Default is 0.5.
-                   Hint: Increase to 0.6 if results are irrelevant; decrease to 0.35 if no results found.
+                - 'threshold': Minimum vector similarity (Optional, Double). Range [0.2, 0.95]. Default is 0.4.
+                   Full-text evidence can still be returned when vector similarity is below this threshold.
                 - Usage Example: {"query": "soliton", "paperId": 123, "threshold": 0.5} OR just "soliton" for global search.
             2. getPaperOutline(paperId):
                 - Get the hierarchical table of contents for a paper.

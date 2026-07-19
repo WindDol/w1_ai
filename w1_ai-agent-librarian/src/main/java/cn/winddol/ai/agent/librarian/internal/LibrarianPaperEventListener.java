@@ -1,11 +1,11 @@
 package cn.winddol.ai.agent.librarian.internal;
 
 import cn.winddol.ai.agent.librarian.api.ILibrarianAgent;
-import cn.winddol.ai.agent.librarian.api.ILibrarianRepository;
 import cn.winddol.ai.domain.agent.adapter.embedding.IEmbeddingProcessor;
 import cn.winddol.ai.paper.api.IEmbeddingService;
 import cn.winddol.ai.paper.api.IPaperIngestJobRepository;
 import cn.winddol.ai.paper.api.IPaperRepository;
+import cn.winddol.ai.paper.api.IRetrievalIndexService;
 import cn.winddol.ai.paper.api.PaperIngestedEvent;
 import cn.winddol.ai.paper.domain.PaperEntity;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStage;
@@ -26,6 +26,7 @@ public class LibrarianPaperEventListener {
     private final ICitationEnrichmentService citationService;
     private final IEmbeddingProcessor embeddingProcessor;
     private final IEmbeddingService embeddingService;
+    private final IRetrievalIndexService retrievalIndexService;
     private final IPaperRepository paperRepository;
     private final IPaperIngestJobRepository jobRepository;
     private final ILibrarianAgent librarianAgent;
@@ -34,6 +35,7 @@ public class LibrarianPaperEventListener {
                                        ICitationEnrichmentService citationService,
                                        IEmbeddingProcessor embeddingProcessor,
                                        IEmbeddingService embeddingService,
+                                       IRetrievalIndexService retrievalIndexService,
                                        IPaperRepository paperRepository,
                                        IPaperIngestJobRepository jobRepository,
                                        ILibrarianAgent librarianAgent) {
@@ -41,11 +43,15 @@ public class LibrarianPaperEventListener {
         this.citationService = citationService;
         this.embeddingProcessor = embeddingProcessor;
         this.embeddingService = embeddingService;
+        this.retrievalIndexService = retrievalIndexService;
         this.paperRepository = paperRepository;
         this.jobRepository = jobRepository;
         this.librarianAgent = librarianAgent;
     }
 
+    /**
+     * 从事件指定阶段继续执行符号、引用、检索索引和论文关系审计，并记录阶段状态。
+     */
     @EventListener
     public void onPaperIngested(PaperIngestedEvent event) {
         long start = System.currentTimeMillis();
@@ -79,7 +85,12 @@ public class LibrarianPaperEventListener {
                             + (paper.getAbstractText() == null ? "" : paper.getAbstractText());
                     paperRepository.updatePaperEmbedding(paperId, embeddingService.embed(embeddingText));
                     embeddingProcessor.embedReferences(paperId);
-                    embeddingProcessor.embedSections(paperId);
+                    // 复用已保存的 OCR 产物定位页码，重试 EMBEDDING 阶段时不重新调用 OCR。
+                    String parserArtifactPath = jobRepository.findById(jobId)
+                            .map(job -> job.getParserArtifactPath())
+                            .orElse(null);
+                    int chunkCount = retrievalIndexService.rebuild(paperId, parserArtifactPath);
+                    log.info("Rebuilt retrieval index for Paper [{}] with {} chunks", paperId, chunkCount);
                 });
             }
 
