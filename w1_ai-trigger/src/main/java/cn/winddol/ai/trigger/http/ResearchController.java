@@ -3,6 +3,7 @@ package cn.winddol.ai.trigger.http;
 import cn.winddol.ai.api.IResearchController;
 import cn.winddol.ai.domain.agent.adapter.event.NotificationService;
 import cn.winddol.ai.agent.research.api.IResearchOrchestrator;
+import cn.winddol.ai.agent.research.domain.ResearchContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +25,14 @@ public class ResearchController implements IResearchController {
 
     @Override
     @GetMapping(value = "/ask-stream", produces = "text/event-stream;charset=UTF-8")
-    public SseEmitter askStream(@RequestParam String sessionId, @RequestParam String question) {
+    public SseEmitter askStream(@RequestParam String sessionId,
+                                @RequestParam String question,
+                                @RequestParam(required = false) Long paperId,
+                                @RequestParam(required = false) String sectionId,
+                                @RequestParam(required = false) String headingPath,
+                                @RequestParam(required = false) String selectedText) {
         SseEmitter emitter = new SseEmitter(600_000L);
+        ResearchContext context = new ResearchContext(paperId, sectionId, headingPath, selectedText);
 
         // 1. 在基础设施层注册这个连接
         notificationService.register(sessionId, emitter);
@@ -33,9 +40,11 @@ public class ResearchController implements IResearchController {
         // 2. 异步启动领域逻辑，不需要在 Controller 里写 Lambda 推送逻辑
         CompletableFuture.runAsync(() -> {
             try {
-                orchestrator.startResearch(sessionId, question);
+                orchestrator.startResearch(sessionId, question, context);
+                notificationService.complete(sessionId);
             } catch (Exception e) {
-                notificationService.send(sessionId, "Error: " + e.getMessage());
+                log.error("Research session failed: {}", sessionId, e);
+                notificationService.error(sessionId, e);
             }
         });
 

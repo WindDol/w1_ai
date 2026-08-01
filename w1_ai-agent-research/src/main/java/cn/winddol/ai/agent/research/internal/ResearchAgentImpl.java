@@ -43,7 +43,7 @@ public class ResearchAgentImpl implements IResearchAgent {
             
             [SCIENTIFIC REASONING GUIDELINES]
             - CRITICAL THINKING: Scientific progress is built on consensus and conflict.
-            - LIBRARY CONTEXT: Before concluding your analysis, ALWAYS use 'checkPaperRelations' to see if the private database contains existing critiques or extensions of the current paper.
+            - LIBRARIAN SUPPORT: 'checkPaperRelations' is an optional supporting tool. Use it only when the question asks for cross-paper comparison, novelty, influence, support, contradiction, or related work. Do not call it for ordinary section reading, symbol explanation, or single-paper factual questions.
             - NOVELTY ASSESSMENT: If a paper 'EXTENDS' another, highlight what was added (e.g., higher dimensions, new parameters).
             - MACRO vs MICRO: For broad questions like "what papers do we have?", use 'findPapers'. For deep reading, use 'readSection'.
             

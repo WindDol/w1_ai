@@ -38,11 +38,28 @@ public class SseNotificationServiceImpl implements NotificationService {
 
     @Override
     public void complete(String sessionId) {
-
+        SseEmitter emitter = emitters.remove(sessionId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event().name("done").data("{}", MediaType.APPLICATION_JSON));
+                emitter.complete();
+            } catch (IOException error) {
+                emitter.completeWithError(error);
+            }
+        }
     }
 
     @Override
     public void error(String sessionId, Throwable t) {
-
+        SseEmitter emitter = emitters.remove(sessionId);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event().name("agent-error")
+                        .data(t.getMessage() == null ? "Research failed" : t.getMessage()));
+            } catch (IOException ignored) {
+                // 连接已断开时直接结束 emitter。
+            }
+            emitter.completeWithError(t);
+        }
     }
 }

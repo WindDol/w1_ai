@@ -4,11 +4,14 @@ import cn.winddol.ai.paper.api.IFileStorageService;
 import cn.winddol.ai.paper.api.IPaperIngestJobRepository;
 import cn.winddol.ai.paper.api.IPaperParser;
 import cn.winddol.ai.paper.api.IPaperRepository;
+import cn.winddol.ai.paper.domain.PaperEntity;
+import cn.winddol.ai.paper.domain.SectionEntity;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestJob;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStage;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStateMachine;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStatus;
 import cn.winddol.ai.paper.domain.ingest.StoredPaperFile;
+import cn.winddol.ai.paper.domain.workspace.ArtifactType;
 import cn.winddol.ai.paper.internal.PaperApplicationServiceImpl;
 import cn.winddol.ai.paper.internal.PaperIngestionDispatcher;
 import cn.winddol.ai.paper.internal.structure.PaperStructureNormalizer;
@@ -17,6 +20,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.io.File;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -122,6 +126,63 @@ class PaperIngestionApplicationUnitTest {
 
         assertEquals(1, recovered);
         verify(fixture.dispatcher).dispatch(interrupted.getId());
+    }
+
+    @Test
+    void paperReadingAggregatesExistingPaperData() throws Exception {
+        Fixture fixture = new Fixture();
+        PaperEntity paper = PaperEntity.builder().id(7L).title("Mobius action").status("COMPLETED").build();
+        PaperIngestJob job = PaperIngestJob.builder().id("job-7").paperId(7L).status(PaperIngestStatus.READY).build();
+        when(fixture.paperRepository.selectPaperById(7L)).thenReturn(paper);
+        when(fixture.jobRepository.findLatestByPaperId(7L)).thenReturn(Optional.of(job));
+        when(fixture.paperRepository.findByPaperId(7L)).thenReturn(List.of());
+        when(fixture.paperRepository.selectReferencesByPaperId(7L)).thenReturn(List.of());
+        when(fixture.paperRepository.findRelationsByPaperId(7L)).thenReturn(List.of());
+
+        var reading = fixture.service.getPaperReading(7L);
+
+        assertEquals(7L, reading.getPaper().getId());
+        assertEquals("job-7", reading.getLatestJobId());
+    }
+
+    @Test
+    void sectionReadingUsesRealParentPath() throws Exception {
+        Fixture fixture = new Fixture();
+        SectionEntity parent = SectionEntity.builder().id("parent").paperId(7L).header("II. BACKGROUND").build();
+        SectionEntity child = SectionEntity.builder().id("child").paperId(7L)
+                .parentId("parent").header("C. Mobius group").build();
+        when(fixture.paperRepository.selectSectionById("child")).thenReturn(child);
+        when(fixture.paperRepository.selectSectionById("parent")).thenReturn(parent);
+        when(fixture.paperRepository.selectPaperById(7L))
+                .thenReturn(PaperEntity.builder().id(7L).title("Paper").build());
+        when(fixture.paperRepository.selectLinksBySectionId("child")).thenReturn(List.of());
+        when(fixture.paperRepository.selectReferencesByPaperId(7L)).thenReturn(List.of());
+        when(fixture.paperRepository.selectSymbolsByUuids("child")).thenReturn(List.of());
+
+        assertEquals("II. BACKGROUND > C. Mobius group",
+                fixture.service.getSectionReading("child").getHeadingPath());
+    }
+
+    @Test
+    void ingestionDetailsExposeOnlyExistingArtifacts() throws Exception {
+        Fixture fixture = new Fixture();
+        PaperIngestJob job = PaperIngestJob.builder().id("job-7")
+                .rawMarkdownPath("raw.md").normalizedMarkdownPath("normalized.md").build();
+        File raw = mock(File.class);
+        File normalized = mock(File.class);
+        when(fixture.jobRepository.findById("job-7")).thenReturn(Optional.of(job));
+        when(fixture.jobRepository.findStageRuns("job-7")).thenReturn(List.of());
+        when(fixture.fileStorageService.resolveFile("raw.md")).thenReturn(raw);
+        when(fixture.fileStorageService.resolveFile("normalized.md")).thenReturn(normalized);
+        when(raw.isFile()).thenReturn(true);
+        when(normalized.isFile()).thenReturn(false);
+
+        var details = fixture.service.getIngestionDetails("job-7");
+
+        assertTrue(details.getArtifacts().stream()
+                .anyMatch(item -> item.type() == ArtifactType.RAW_MARKDOWN && item.available()));
+        assertFalse(details.getArtifacts().stream()
+                .anyMatch(item -> item.type() == ArtifactType.NORMALIZED_MARKDOWN && item.available()));
     }
 
     private MockMultipartFile pdf() {

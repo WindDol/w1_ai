@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor  // 必须有这个
@@ -21,5 +22,8 @@ public class PaperEntity {
 
     private Map<String, Object> metadata;
     private String abstractText;
+    private String status;
+    private Integer year;
+    private LocalDateTime createdAt;
     private Double score;
 }

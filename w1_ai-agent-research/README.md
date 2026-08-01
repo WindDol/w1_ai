@@ -4,6 +4,8 @@
 
 `w1_ai-agent-research` 负责面向用户问题的研究型问答编排。它处理问题改写、会话并发控制、工具调用、研究步骤记录和最终回答生成，不直接实现论文数据库检索。
 
+ResearchAgent 是面向用户的主能力；LibrarianAgent 维护的论文关系只作为可选研究工具。普通章节阅读和符号解释不强制查询论文关系，跨论文比较、创新性、支持或冲突分析才使用 Librarian 结果。
+
 论文检索与章节阅读工具由 `w1_ai-paper` 提供，并在应用层通过 `ToolProvider` 注入。
 
 ## 目录结构
@@ -34,6 +36,7 @@ cn.winddol.ai.agent.research
 | --- | --- |
 | `AgentStep.java` | 通用 Agent 步骤数据。 |
 | `ResearchAgentStep.java` | Research Agent 的思考、工具和结果步骤。 |
+| `ResearchContext.java` | 当前论文、章节路径和用户选中文本等结构化研究范围。 |
 
 ### `internal`
 
@@ -47,6 +50,7 @@ cn.winddol.ai.agent.research
 
 ```text
 ResearchController
+  -> ResearchContext（论文/章节/选中文本）
   -> IResearchOrchestrator
   -> ISessionLockService
   -> ISupervisor
@@ -61,4 +65,3 @@ ResearchController
 - Agent 提示词、步骤控制和研究策略放在本模块。
 - 论文实体、向量检索和引用查询不要复制到本模块。
 - 新增工具优先在能力所有者模块实现，再通过 `ToolProvider` 暴露。
-

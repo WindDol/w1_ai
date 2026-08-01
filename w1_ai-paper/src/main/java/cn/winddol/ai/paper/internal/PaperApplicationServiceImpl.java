@@ -13,6 +13,12 @@ import cn.winddol.ai.paper.domain.ingest.PaperIngestJob;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStage;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStatus;
 import cn.winddol.ai.paper.domain.ingest.StoredPaperFile;
+import cn.winddol.ai.paper.domain.workspace.ArtifactContent;
+import cn.winddol.ai.paper.domain.workspace.ArtifactSummary;
+import cn.winddol.ai.paper.domain.workspace.ArtifactType;
+import cn.winddol.ai.paper.domain.workspace.IngestionWorkspaceView;
+import cn.winddol.ai.paper.domain.workspace.PaperWorkspaceView;
+import cn.winddol.ai.paper.domain.workspace.SectionWorkspaceView;
 import cn.winddol.ai.paper.internal.structure.PaperStructureNormalizer;
 import cn.winddol.ai.shared.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +28,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class PaperApplicationServiceImpl implements IPaperApplication {
+
+    private static final int MAX_ARTIFACT_CHARS = 2_000_000;
 
     private final IFileStorageService fileStorageService;
     private final IPaperParser parser;
@@ -202,6 +216,136 @@ public class PaperApplicationServiceImpl implements IPaperApplication {
                 .build();
 
         return vo;
+    }
+
+    /** 聚合论文阅读所需的 Outline、符号、引用、关系和最近摄取任务。 */
+    @Override
+    public PaperWorkspaceView getPaperReading(Long paperId) {
+        PaperEntity paper = paperRepository.selectPaperById(paperId);
+        if (paper == null) {
+            throw new AppException("PAPER_NOT_FOUND", "Paper not found: " + paperId);
+        }
+        String latestJobId = jobRepository.findLatestByPaperId(paperId)
+                .map(PaperIngestJob::getId)
+                .orElse(null);
+        return PaperWorkspaceView.builder()
+                .paper(paper)
+                .status(paper.getStatus())
+                .latestJobId(latestJobId)
+                .symbols(safe(paperRepository.findByPaperId(paperId)))
+                .references(safe(paperRepository.selectReferencesByPaperId(paperId)))
+                .relations(safe(paperRepository.findRelationsByPaperId(paperId)))
+                .build();
+    }
+
+    /** 读取章节正文，并解析其真实父级路径、局部符号和引用。 */
+    @Override
+    public SectionWorkspaceView getSectionReading(String sectionId) {
+        SectionEntity section = paperRepository.selectSectionById(sectionId);
+        if (section == null) {
+            throw new AppException("SECTION_NOT_FOUND", "Section not found: " + sectionId);
+        }
+        PaperEntity paper = paperRepository.selectPaperById(section.getPaperId());
+        return SectionWorkspaceView.builder()
+                .section(section)
+                .paperTitle(paper == null ? null : paper.getTitle())
+                .headingPath(resolveHeadingPath(section))
+                .symbols(safe(paperRepository.selectSymbolsByUuids(sectionId)))
+                .references(resolveSectionReferences(section))
+                .build();
+    }
+
+    /** 返回摄取任务的阶段执行记录和可供复查的产物列表。 */
+    @Override
+    public IngestionWorkspaceView getIngestionDetails(String jobId) {
+        PaperIngestJob job = getIngestJob(jobId);
+        List<ArtifactSummary> artifacts = new ArrayList<>();
+        for (ArtifactType type : ArtifactType.values()) {
+            artifacts.add(new ArtifactSummary(type, type.label(), artifactExists(pathFor(job, type))));
+        }
+        return IngestionWorkspaceView.builder()
+                .job(job)
+                .stageRuns(jobRepository.findStageRuns(jobId))
+                .artifacts(artifacts)
+                .build();
+    }
+
+    /** 只读取摄取任务自身登记的文本产物，避免暴露任意文件读取能力。 */
+    @Override
+    public ArtifactContent readIngestionArtifact(String jobId, ArtifactType type) {
+        PaperIngestJob job = getIngestJob(jobId);
+        String path = pathFor(job, type);
+        if (!artifactExists(path)) {
+            throw new AppException("ARTIFACT_NOT_FOUND", "Artifact is not available: " + type.name());
+        }
+        try {
+            String content = fileStorageService.readTextArtifact(path);
+            boolean truncated = content.length() > MAX_ARTIFACT_CHARS;
+            if (truncated) {
+                content = content.substring(0, MAX_ARTIFACT_CHARS);
+            }
+            return new ArtifactContent(type, type.label(), content, truncated);
+        } catch (IOException error) {
+            throw new AppException("ARTIFACT_READ_FAILED", "Unable to read artifact: " + error.getMessage());
+        }
+    }
+
+    private List<ReferenceItem> resolveSectionReferences(SectionEntity section) {
+        List<SectionReferenceLinkEntity> links = safe(paperRepository.selectLinksBySectionId(section.getId()));
+        Map<String, ReferenceItem> references = new LinkedHashMap<>();
+        Map<String, ReferenceItem> fallback = new LinkedHashMap<>();
+        for (ReferenceItem item : safe(paperRepository.selectReferencesByPaperId(section.getPaperId()))) {
+            fallback.put(item.getRefId(), item);
+        }
+        for (SectionReferenceLinkEntity link : links) {
+            ReferenceItem item = paperRepository.selectReferenceByIndex(section.getPaperId(), link.getRefIndex());
+            if (item == null) {
+                item = fallback.get(link.getRefIndex());
+            }
+            if (item != null) {
+                references.putIfAbsent(item.getRefId(), item);
+            }
+        }
+        return List.copyOf(references.values());
+    }
+
+    private String resolveHeadingPath(SectionEntity section) {
+        LinkedList<String> headings = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        SectionEntity current = section;
+        while (current != null && current.getId() != null && visited.add(current.getId())) {
+            if (current.getHeader() != null && !current.getHeader().isBlank()) {
+                headings.addFirst(current.getHeader());
+            }
+            current = current.getParentId() == null || current.getParentId().isBlank()
+                    ? null
+                    : paperRepository.selectSectionById(current.getParentId());
+        }
+        return String.join(" > ", headings);
+    }
+
+    private String pathFor(PaperIngestJob job, ArtifactType type) {
+        return switch (type) {
+            case RAW_MARKDOWN -> job.getRawMarkdownPath();
+            case NORMALIZED_MARKDOWN -> job.getNormalizedMarkdownPath();
+            case NORMALIZATION_REPORT -> job.getNormalizationReportPath();
+            case METADATA -> job.getMetadataPath();
+        };
+    }
+
+    private boolean artifactExists(String path) {
+        if (path == null || path.isBlank()) {
+            return false;
+        }
+        try {
+            return fileStorageService.resolveFile(path).isFile();
+        } catch (RuntimeException ignored) {
+            return false;
+        }
+    }
+
+    private <T> List<T> safe(List<T> values) {
+        return values == null ? List.of() : values;
     }
 
     /**

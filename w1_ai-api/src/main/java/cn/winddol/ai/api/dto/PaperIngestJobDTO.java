@@ -16,6 +16,7 @@ public class PaperIngestJobDTO {
     private Long paperId;
     private String originalFilename;
     private String fileSha256;
+    private Long fileSize;
     private String status;
     private String currentStage;
     private String failedStage;
@@ -27,5 +28,6 @@ public class PaperIngestJobDTO {
     private String normalizerVersion;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime startedAt;
     private LocalDateTime completedAt;
 }

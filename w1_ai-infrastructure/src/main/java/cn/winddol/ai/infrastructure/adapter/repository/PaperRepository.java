@@ -212,11 +212,18 @@ public class PaperRepository implements IPaperRepository {
             return null;
         }
         Paper paper = paperMapper.selectById(id);
+        if (paper == null) {
+            return null;
+        }
 
         return PaperEntity.builder()
                 .id(id)
                 .outline(paper.getOutline())
                 .title(paper.getTitle())
+                .abstractText(paper.getAbstractText())
+                .status(paper.getStatus())
+                .year(paper.getYears())
+                .createdAt(paper.getCreatedAt())
                 .build();
     }
     @Override
@@ -225,11 +232,19 @@ public class PaperRepository implements IPaperRepository {
             return null;
         }
         Paper paper = paperMapper.selectById(paperId);
+        if (paper == null) {
+            return null;
+        }
 
         return PaperEntity.builder()
                 .id(paperId)
                 .title(paper.getTitle())
                 .abstractText(paper.getAbstractText())
+                .outline(paper.getOutline())
+                .metadata(paper.getMetadata())
+                .status(paper.getStatus())
+                .year(paper.getYears())
+                .createdAt(paper.getCreatedAt())
                 .build();
     }
 
@@ -403,6 +418,9 @@ public class PaperRepository implements IPaperRepository {
                 .paperId(s.getPaperId())
                 .refId(s.getRefIndex())
                 .rawText(s.getRawText())
+                .title(s.getTitle())
+                .paperAbstract(s.getPaperAbstract())
+                .globalRefId(s.getGlobalRefId())
                 .build()).toList();
     }
 
@@ -533,14 +551,22 @@ public class PaperRepository implements IPaperRepository {
     @Override
     public PaperEntity selectPaperById(Long paperId) {
         Paper paper = paperMapper.selectById(paperId);
+        if (paper == null) {
+            return null;
+        }
 
         return PaperEntity.builder().id(paperId).title(paper.getTitle())
-                .outline(paper.getOutline()).build() ;
+                .outline(paper.getOutline()).abstractText(paper.getAbstractText())
+                .metadata(paper.getMetadata()).status(paper.getStatus())
+                .year(paper.getYears()).createdAt(paper.getCreatedAt()).build();
     }
 
     @Override
     public SectionEntity selectSectionById(String sectionUuid) {
         Section section = sectionMapper.selectById(sectionUuid);
+        if (section == null) {
+            return null;
+        }
         return SectionEntity.builder()
                 .id(sectionUuid).paperId(section.getPaperId())
                 .header(section.getHeader()).parentId(section.getParentId())

@@ -4,6 +4,11 @@ import cn.winddol.ai.paper.domain.PaperDetailVO;
 import cn.winddol.ai.paper.domain.PaperVO;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestJob;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStage;
+import cn.winddol.ai.paper.domain.workspace.ArtifactContent;
+import cn.winddol.ai.paper.domain.workspace.ArtifactType;
+import cn.winddol.ai.paper.domain.workspace.IngestionWorkspaceView;
+import cn.winddol.ai.paper.domain.workspace.PaperWorkspaceView;
+import cn.winddol.ai.paper.domain.workspace.SectionWorkspaceView;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,4 +29,12 @@ public interface IPaperApplication {
     List<PaperVO> listAllPapers();
 
     PaperDetailVO getPaperDetails(Long paperId);
+
+    PaperWorkspaceView getPaperReading(Long paperId);
+
+    SectionWorkspaceView getSectionReading(String sectionId);
+
+    IngestionWorkspaceView getIngestionDetails(String jobId);
+
+    ArtifactContent readIngestionArtifact(String jobId, ArtifactType type);
 }

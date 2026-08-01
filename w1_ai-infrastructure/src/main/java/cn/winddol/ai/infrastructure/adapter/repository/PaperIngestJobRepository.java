@@ -8,6 +8,7 @@ import cn.winddol.ai.paper.api.IPaperIngestJobRepository;
 import cn.winddol.ai.paper.domain.ingest.IngestStageRunStatus;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestJob;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStage;
+import cn.winddol.ai.paper.domain.ingest.PaperIngestStageRun;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStateMachine;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStatus;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -53,6 +54,30 @@ public class PaperIngestJobRepository implements IPaperIngestJobRepository {
     @Override
     public Optional<PaperIngestJob> findById(String jobId) {
         return Optional.ofNullable(jobMapper.selectById(jobId)).map(this::toDomain);
+    }
+
+    @Override
+    public Optional<PaperIngestJob> findLatestByPaperId(Long paperId) {
+        if (paperId == null) {
+            return Optional.empty();
+        }
+        PaperIngestJobPO job = jobMapper.selectOne(new LambdaQueryWrapper<PaperIngestJobPO>()
+                .eq(PaperIngestJobPO::getPaperId, paperId)
+                .orderByDesc(PaperIngestJobPO::getCreatedAt)
+                .last("LIMIT 1"));
+        return Optional.ofNullable(job).map(this::toDomain);
+    }
+
+    @Override
+    public List<PaperIngestStageRun> findStageRuns(String jobId) {
+        if (jobId == null || jobId.isBlank()) {
+            return List.of();
+        }
+        return stageRunMapper.selectList(new LambdaQueryWrapper<PaperIngestStageRunPO>()
+                        .eq(PaperIngestStageRunPO::getJobId, jobId)
+                        .orderByAsc(PaperIngestStageRunPO::getStartedAt)
+                        .orderByAsc(PaperIngestStageRunPO::getId))
+                .stream().map(this::toStageRun).toList();
     }
 
     @Override
@@ -385,6 +410,21 @@ public class PaperIngestJobRepository implements IPaperIngestJobRepository {
                 .leaseUntil(po.getLeaseUntil()).version(po.getVersion())
                 .createdAt(po.getCreatedAt()).updatedAt(po.getUpdatedAt())
                 .startedAt(po.getStartedAt()).completedAt(po.getCompletedAt()).build();
+    }
+
+    private PaperIngestStageRun toStageRun(PaperIngestStageRunPO po) {
+        return PaperIngestStageRun.builder()
+                .id(po.getId())
+                .jobId(po.getJobId())
+                .stage(enumValue(PaperIngestStage.class, po.getStage()))
+                .attempt(po.getAttempt())
+                .status(enumValue(IngestStageRunStatus.class, po.getStatus()))
+                .artifactPath(po.getArtifactPath())
+                .errorCode(po.getErrorCode())
+                .errorMessage(po.getErrorMessage())
+                .startedAt(po.getStartedAt())
+                .finishedAt(po.getFinishedAt())
+                .build();
     }
 
     private String name(Enum<?> value) {

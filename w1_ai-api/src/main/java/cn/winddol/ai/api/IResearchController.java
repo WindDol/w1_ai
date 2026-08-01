@@ -4,5 +4,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface IResearchController {
-    SseEmitter askStream(String sessionId, String question);
+    SseEmitter askStream(String sessionId,
+                         String question,
+                         Long paperId,
+                         String sectionId,
+                         String headingPath,
+                         String selectedText);
 }

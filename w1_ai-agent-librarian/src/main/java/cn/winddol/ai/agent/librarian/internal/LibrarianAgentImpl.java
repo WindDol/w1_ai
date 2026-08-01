@@ -41,7 +41,7 @@ public class LibrarianAgentImpl implements ILibrarianAgent {
                               ILibrarianEvidenceProvider evidenceProvider,
                               @Value("${paper.librarian.audit.neighbor-limit:3}") int neighborLimit,
                               @Value("${paper.librarian.audit.evidence-limit:4}") int evidenceLimit,
-                              @Value("${paper.librarian.audit.review-threshold:0.65}") double reviewThreshold,
+                              @Value("${paper.librarian.audit.review-threshold:0.5}") double reviewThreshold,
                               @Value("${paper.librarian.audit.version:librarian-evidence-v1}") String auditVersion,
                               @Value("${paper.librarian.audit.prompt-version:librarian-relation-v1}") String promptVersion,
                               @Value("${ai.llm.model:configured-chat-model}") String modelName) {

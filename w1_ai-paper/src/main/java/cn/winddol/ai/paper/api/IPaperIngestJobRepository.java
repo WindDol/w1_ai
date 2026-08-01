@@ -2,6 +2,7 @@ package cn.winddol.ai.paper.api;
 
 import cn.winddol.ai.paper.domain.ingest.PaperIngestJob;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStage;
+import cn.winddol.ai.paper.domain.ingest.PaperIngestStageRun;
 import cn.winddol.ai.paper.domain.ingest.PaperIngestStatus;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,10 @@ public interface IPaperIngestJobRepository {
     PaperIngestJob createOrGetReusable(PaperIngestJob job);
 
     Optional<PaperIngestJob> findById(String jobId);
+
+    Optional<PaperIngestJob> findLatestByPaperId(Long paperId);
+
+    List<PaperIngestStageRun> findStageRuns(String jobId);
 
     List<PaperIngestJob> findRecoverable(LocalDateTime staleBefore, int limit);
 

@@ -1,5 +1,6 @@
 package cn.winddol.ai.test;
 
+import cn.winddol.ai.agent.research.domain.ResearchContext;
 import cn.winddol.ai.paper.api.IPaperRepository;
 import cn.winddol.ai.paper.domain.PaperEntity;
 import cn.winddol.ai.paper.domain.ReferenceItem;
@@ -16,6 +17,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class AgentEvidenceUnitTest {
+
+    @Test
+    void researchContextKeepsQuestionSeparateFromReadingScope() {
+        ResearchContext context = new ResearchContext(
+                7L, "section-1", "II. BACKGROUND > C. Mobius group",
+                "M(z) maps the unit disk onto itself.");
+
+        String mission = context.scopeTask("Explain the group action");
+
+        assertTrue(mission.startsWith("Explain the group action"));
+        assertTrue(mission.contains("Current paper ID: 7"));
+        assertTrue(mission.contains("Current section ID: section-1"));
+        assertTrue(mission.contains("<BEGIN_SELECTED_SOURCE>"));
+    }
 
     @Test
     void readingSectionReturnsTraceableSectionAndSymbolEvidence() {
