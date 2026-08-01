@@ -8,6 +8,8 @@ import cn.winddol.ai.paper.domain.retrieval.PaperRetrievalResult;
 import cn.winddol.ai.paper.internal.retrieval.AgentCommonToolsImpl;
 import cn.winddol.ai.paper.internal.retrieval.AgentReaderServiceImpl;
 import cn.winddol.ai.paper.internal.retrieval.HybridRetrieverServiceImpl;
+import cn.winddol.ai.shared.model.tool.ToolEvidence;
+import cn.winddol.ai.shared.model.tool.ToolResult;
 import com.alibaba.fastjson.JSON;
 import dev.langchain4j.agent.tool.Tool;
 import org.springframework.stereotype.Component;
@@ -35,9 +37,20 @@ public class ScientificResearchToolsImpl implements IScientificResearchTools {
     @Override
     @Tool("Search the paper library with vector and full-text retrieval. 'paperId' is optional. 'threshold' is the minimum vector similarity (0.2-0.95). Returns ranked evidence with paper, outline path, page, quote, score, and retrieval channels.")
     public String searchLibrary(String query, Long paperId, Double threshold) {
+        return searchLibraryWithEvidence(query, paperId, threshold).getContent();
+    }
+
+    /**
+     * 执行混合检索，并把真实召回结果同时作为工具正文和结构化证据返回。
+     */
+    @Override
+    public ToolResult searchLibraryWithEvidence(String query, Long paperId, Double threshold) {
         PaperRetrievalResult result = retrieverService.retrieve(
                 new PaperRetrievalQuery(query, paperId, threshold, null));
-        return formatSearchResult(result);
+        List<ToolEvidence> evidence = result.evidence().stream()
+                .map(this::toToolEvidence)
+                .toList();
+        return ToolResult.ok(formatSearchResult(result), evidence);
     }
 
     @Override
@@ -48,9 +61,17 @@ public class ScientificResearchToolsImpl implements IScientificResearchTools {
     }
 
     @Override
-    @Tool("Read the full content of a specific section. Input is the section UUID. This tool also provides context from parent sections and local symbol definitions.")
+    @Tool("Read the full content of a specific section. Input is the section UUID. This tool also provides available symbol definitions and the evidence trail retains the outline path for review.")
     public String readSection(String sectionUuid) {
-        return readerService.readSectionWithContext(sectionUuid);
+        return readSectionWithEvidence(sectionUuid).getContent();
+    }
+
+    /**
+     * 读取章节及其符号，并保留此次读取所对应的章节级证据。
+     */
+    @Override
+    public ToolResult readSectionWithEvidence(String sectionUuid) {
+        return readerService.readSectionWithEvidence(sectionUuid);
     }
 
     @Override
@@ -61,7 +82,15 @@ public class ScientificResearchToolsImpl implements IScientificResearchTools {
     Input: paperId (Long), refIndex (String, e.g., '24').
     """)
     public String lookupReference(Long paperId, String refIndex) {
-        return readerService.lookupReference(paperId, refIndex);
+        return lookupReferenceWithEvidence(paperId, refIndex).getContent();
+    }
+
+    /**
+     * 查询参考文献并返回该参考文献的可复查证据项。
+     */
+    @Override
+    public ToolResult lookupReferenceWithEvidence(Long paperId, String refIndex) {
+        return readerService.lookupReferenceWithEvidence(paperId, refIndex);
     }
 
     @Override
@@ -135,6 +164,27 @@ public class ScientificResearchToolsImpl implements IScientificResearchTools {
         sb.append(String.format("Retrieval version: %s; elapsed: %d ms\n",
                 result.retrievalVersion(), result.elapsedMillis()));
         return sb.toString();
+    }
+
+    /**
+     * 将论文检索领域对象转换为跨模块通用的工具证据，供 ResearchAgent 汇总并通过 SSE 输出。
+     */
+    private ToolEvidence toToolEvidence(PaperEvidence evidence) {
+        return ToolEvidence.builder()
+                .evidenceKey(evidence.getEvidenceKey())
+                .evidenceType(evidence.getEvidenceType() == null ? null : evidence.getEvidenceType().name())
+                .paperId(evidence.getPaperId())
+                .paperTitle(evidence.getPaperTitle())
+                .sectionId(evidence.getSectionId())
+                .chunkId(evidence.getChunkId())
+                .heading(evidence.getHeading())
+                .headingPath(evidence.getHeadingPath())
+                .pageStart(evidence.getPageStart())
+                .pageEnd(evidence.getPageEnd())
+                .referenceIndex(evidence.getReferenceIndex())
+                .quote(evidence.getQuote())
+                .accessedVia("searchLibrary")
+                .build();
     }
 
     private String safe(String value) {

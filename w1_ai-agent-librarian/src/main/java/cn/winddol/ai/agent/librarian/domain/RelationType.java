@@ -5,5 +5,6 @@ public enum RelationType {
     EXTENDS,
     CONTRADICTS,
     SUPPORT,
-    ALTERNATIVE
+    ALTERNATIVE,
+    UNRELATED
 }

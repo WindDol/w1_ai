@@ -446,7 +446,19 @@ public class PaperRepository implements IPaperRepository {
                 .type((String) map.get("relation_type"))
                 .description((String) map.get("description"))
                 .direction((String) map.get("direction"))
+                .confidence(numberToDouble(map.get("confidence")))
+                .auditStatus((String) map.get("audit_status"))
+                .supportingEvidence((String) map.get("supporting_evidence"))
+                .conflictingEvidence((String) map.get("conflicting_evidence"))
+                .auditVersion((String) map.get("audit_version"))
+                .modelName((String) map.get("model_name"))
+                .promptVersion((String) map.get("prompt_version"))
+                .retrievalVersion((String) map.get("retrieval_version"))
                 .build()).toList();
+    }
+
+    private Double numberToDouble(Object value) {
+        return value instanceof Number number ? number.doubleValue() : null;
     }
 
     @Override

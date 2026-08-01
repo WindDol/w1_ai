@@ -22,6 +22,12 @@ public class AiConfig {
     @Value("${ai.llm.api-key}")
     private String limApiKey;
 
+    @Value("${ai.llm.base-url:https://api.deepseek.com}")
+    private String llmBaseUrl;
+
+    @Value("${ai.llm.model:deepseek-v4-flash}")
+    private String llmModelName;
+
     @Bean
     public EmbeddingModel embeddingModel() {
         return OpenAiEmbeddingModel.builder()
@@ -38,8 +44,8 @@ public class AiConfig {
     public ChatLanguageModel chatLanguageModel(){
         return  OpenAiChatModel.builder()
                 .apiKey(limApiKey)
-                .baseUrl("https://api.deepseek.com") 
-                .modelName("deepseek-v4-flash")
+                .baseUrl(llmBaseUrl)
+                .modelName(llmModelName)
                 .temperature(0.0)                   
                 .timeout(java.time.Duration.ofSeconds(500))
                 .maxRetries(1)

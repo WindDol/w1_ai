@@ -26,9 +26,11 @@ cn.winddol.ai.infrastructure
 | 文件 | 作用 |
 | --- | --- |
 | `adapter/ai/DeepSeekAdapter.java` | 调用大模型并适配 Agent 所需 AI 接口。 |
+| `adapter/ai/LibrarianRelationAiAdapter.java` | 调用大模型生成带证据键、置信度的论文关系审计结论。 |
 | `adapter/paper/EmbeddingServiceImpl.java` | 实现论文模块的向量化端口。 |
 | `adapter/paper/FileStorageServiceImpl.java` | 持久保存上传 PDF、Markdown、报告和解析产物。 |
 | `adapter/paper/LibrarianRepositoryImpl.java` | 实现 Librarian 的论文候选和知识关系访问。 |
+| `adapter/paper/LibrarianEvidenceProviderImpl.java` | 将论文模块混合检索结果适配为 Librarian 审计证据。 |
 | `adapter/parser/PaperParser.java` | 聚合 Python Parser、MarkdownParser、ReferenceParser 等，适配 `IPaperParser`。 |
 | `adapter/parser/MonkeyOcrArtifactReader.java` | 从 MonkeyOCR ZIP 的 content list 读取文本块和页码。 |
 | `adapter/repository/PaperRepository.java` | 实现论文、章节、引用、符号和检索仓储端口。 |
@@ -40,7 +42,7 @@ cn.winddol.ai.infrastructure
 
 ### Mapper
 
-`PaperMapper`、`SectionMapper`、`ReferenceMapper`、`SymbolMapper` 分别访问论文核心表；`SectionChunkMapper` 保存检索 Chunk，`RetrievalMapper` 执行向量和全文候选查询；`GlobalReferenceMapper` 和 `SectionReferenceLinkMapper` 处理引用图谱；`PaperKnowledgeRelationMapper` 保存论文关系；`PaperIngestJobMapper` 和 `PaperIngestStageRunMapper` 保存摄取状态及阶段记录；`AgentThoughtTraceMapper` 保存 Agent 轨迹。
+`PaperMapper`、`SectionMapper`、`ReferenceMapper`、`SymbolMapper` 分别访问论文核心表；`SectionChunkMapper` 保存检索 Chunk，`RetrievalMapper` 执行向量和全文候选查询；`GlobalReferenceMapper` 和 `SectionReferenceLinkMapper` 处理引用图谱；`PaperKnowledgeRelationMapper` 保存带置信度、证据 JSON、审计版本的论文关系；`PaperIngestJobMapper` 和 `PaperIngestStageRunMapper` 保存摄取状态及阶段记录；`AgentThoughtTraceMapper` 保存 Agent 轨迹。
 
 ### `dao/po`
 

@@ -159,15 +159,32 @@ public class PaperApplicationServiceImpl implements IPaperApplication {
             for (KnowledgeRelationEntity rel : relations) {
                 String type = rel.getType();
                 String otherPaperInfo = String.format("Paper [%d] (%s)", rel.getRelatedId(), rel.getRelatedTitle());
+                String auditInfo = formatRelationAuditInfo(rel);
+
+                if (!"CONFIRMED".equals(rel.getAuditStatus())) {
+                    novelty.append(String.format("- **Relation audit requires review**: %s is classified as **%s** relative to %s.\n"
+                                    + "  *Reason: %s; %s*\n",
+                            "OUTGOING".equals(rel.getDirection()) ? "This paper" : otherPaperInfo,
+                            type, "OUTGOING".equals(rel.getDirection()) ? otherPaperInfo : "this paper",
+                            rel.getDescription(), auditInfo));
+                    continue;
+                }
+
+                if ("UNRELATED".equals(type)) {
+                    novelty.append(String.format("- **No direct relation identified** between this paper and %s.\n"
+                                    + "  *Reason: %s; %s*\n",
+                            otherPaperInfo, rel.getDescription(), auditInfo));
+                    continue;
+                }
 
                 if ("OUTGOING".equals(rel.getDirection())) {
                     String actionPhrase = getActivePhrasing(type);
-                    novelty.append(String.format("- This paper **%s** %s.\n  *Reason: %s*\n",
-                            actionPhrase, otherPaperInfo, rel.getDescription()));
+                    novelty.append(String.format("- This paper **%s** %s.\n  *Reason: %s; %s*\n",
+                            actionPhrase, otherPaperInfo, rel.getDescription(), auditInfo));
                 } else {
                     String passivePhrase = getPassivePhrasing(type);
-                    novelty.append(String.format("- This paper **%s** %s.\n  *Note: %s*\n",
-                            passivePhrase, otherPaperInfo, rel.getDescription()));
+                    novelty.append(String.format("- This paper **%s** %s.\n  *Note: %s; %s*\n",
+                            passivePhrase, otherPaperInfo, rel.getDescription(), auditInfo));
                 }
             }
         } else {
@@ -185,6 +202,15 @@ public class PaperApplicationServiceImpl implements IPaperApplication {
                 .build();
 
         return vo;
+    }
+
+    /**
+     * 关系详情页必须显式说明审计状态与置信度，避免把模型建议误展示为确定事实。
+     */
+    private String formatRelationAuditInfo(KnowledgeRelationEntity relation) {
+        String status = relation.getAuditStatus() == null ? "LEGACY" : relation.getAuditStatus();
+        String confidence = relation.getConfidence() == null ? "legacy" : String.format("%.2f", relation.getConfidence());
+        return "audit status=" + status + ", confidence=" + confidence;
     }
 
     private String getActivePhrasing(String type) {

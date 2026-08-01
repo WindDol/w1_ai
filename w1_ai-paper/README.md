@@ -52,7 +52,7 @@ cn.winddol.ai.paper
 | `ReferenceItem`, `ReferenceEnum`, `GlobalReferenceEntity` | 局部引用、引用类型和全局引用实体。 |
 | `SectionReferenceLinkEntity` | 章节正文与引用条目的关联。 |
 | `SymbolEntity`, `SymbolDefinition` | 论文中的数学符号及解释。 |
-| `KnowledgeRelationEntity` | 论文之间的可读知识关系。 |
+| `KnowledgeRelationEntity` | 论文之间的只读知识关系，包含置信度、审计状态、版本和证据 JSON。 |
 | `SearchResultDTO` | 混合检索结果。 |
 | `RefMetadata` | 指纹生成所需作者、年份等元数据。 |
 | `S2Author`, `S2PaperData`, `S2PaperResponse` | Semantic Scholar 响应模型。 |
@@ -123,7 +123,7 @@ cn.winddol.ai.paper
 | `ReciprocalRankFusion.java` | 使用 RRF 融合不同检索通道并去重。 |
 | `HeadingPathResolver.java` | 根据 Section 父子关系生成稳定 Outline 路径。 |
 | `EvidenceQuoteExtractor.java` | 从命中 Chunk 生成长度受控的证据片段。 |
-| `AgentReaderServiceImpl.java` | 获取 Outline、带上下文读取章节、查引用和论文关系。 |
+| `AgentReaderServiceImpl.java` | 获取 Outline、带上下文读取章节、查引用和展示可回查的论文关系证据。 |
 | `AgentCommonToolsImpl.java` | 查找论文和高被引参考文献等公共 Agent 工具。 |
 
 ## 摄取主链路

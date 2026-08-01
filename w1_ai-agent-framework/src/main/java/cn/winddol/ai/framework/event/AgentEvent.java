@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class AgentEvent {
 
-    public enum Type { THOUGHT, ACTION, OBSERVATION, ANSWER, ERROR }
+    public enum Type { THOUGHT, ACTION, OBSERVATION, ANSWER, EVIDENCE, ERROR }
 
     private final String sessionId;
     private final Type type;

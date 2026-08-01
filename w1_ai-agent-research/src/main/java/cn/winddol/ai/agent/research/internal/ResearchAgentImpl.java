@@ -5,6 +5,8 @@ import cn.winddol.ai.agent.research.api.ResearchEventListener;
 import cn.winddol.ai.agent.research.domain.AgentStep;
 import cn.winddol.ai.framework.event.AgentEvent;
 import cn.winddol.ai.framework.tool.ToolProvider;
+import cn.winddol.ai.shared.model.tool.ToolEvidence;
+import cn.winddol.ai.shared.model.tool.ToolResult;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import dev.langchain4j.data.message.AiMessage;
@@ -17,7 +19,9 @@ import dev.langchain4j.model.output.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -60,7 +64,7 @@ public class ResearchAgentImpl implements IResearchAgent {
                 - Get the hierarchical table of contents for a paper.
                 - Usage: {"paperId": 7}
             3. readSection(sectionUuid):
-                - Read full content of a section with context and symbols.
+                - Read the full content of a section with available symbol definitions.
                 - Usage: {"sectionUuid": "uuid-string"}
             4. lookupReference(paperId, refIndex):
                 - Get specific title and abstract for a citation index found in text (e.g., "[12]", "Ref 24").
@@ -135,6 +139,7 @@ public class ResearchAgentImpl implements IResearchAgent {
     private String executeReActLoop(String sessionId, List<ChatMessage> history, ResearchEventListener listener) {
         int maxSteps = 20;
         int maxSafeMessages = 30;
+        Map<String, ToolEvidence> evidenceByKey = new LinkedHashMap<>();
         for (int i = 0; i < maxSteps; i++) {
             if (history.size() > maxSafeMessages) {
                 history.remove(3);
@@ -166,12 +171,7 @@ public class ResearchAgentImpl implements IResearchAgent {
 
             if (step.getFinalAnswer() != null && !StringUtils.isBlank(step.getFinalAnswer())) {
                 log.info("🛑 Step {}: [Final Answer Ready] {}", i + 1, step.getThought());
-                listener.onStep(AgentEvent.builder()
-                        .sessionId(sessionId)
-                        .type(AgentEvent.Type.ANSWER)
-                        .content(step.getFinalAnswer())
-                        .step(i)
-                        .build());
+                publishAnswerAndEvidence(sessionId, step.getFinalAnswer(), i, evidenceByKey, listener);
                 return step.getFinalAnswer();
             }
 
@@ -204,10 +204,14 @@ public class ResearchAgentImpl implements IResearchAgent {
                     i + 1, step.getThought(), step.getAction(), step.getActionInput());
             if (i == maxSteps - 1) {
                 log.warn("⚠️ Agent failed to provide finalAnswer in last step. Fallback to thought summary.");
-                return "【自动汇总】由于搜索步数达到上限，根据已有资料整理如下：" + step.getThought();
+                String fallback = "【自动汇总】由于搜索步数达到上限，根据已有资料整理如下：" + step.getThought();
+                publishAnswerAndEvidence(sessionId, fallback, i, evidenceByKey, listener);
+                return fallback;
             }
 
-            String observation = toolProvider.executeTool(step.getAction(), step.getActionInput()).getContent();
+            ToolResult toolResult = toolProvider.executeTool(step.getAction(), step.getActionInput());
+            collectEvidence(evidenceByKey, toolResult.getEvidence());
+            String observation = toolResult.getContent();
             String preview = observation;
             if (observation.length() > 5000) {
                 preview = observation.substring(0, 5000) + "\n\n...(Total " + observation.length() + " chars, truncated for display)";
@@ -221,6 +225,63 @@ public class ResearchAgentImpl implements IResearchAgent {
             history.add(UserMessage.from("Observation: " + observation));
         }
         return "❌ Failed to answer within step limit.";
+    }
+
+    /**
+     * 输出最终答案后追加本轮工具调用实际得到的证据链，供读者自行回查原始论文内容。
+     */
+    private void publishAnswerAndEvidence(String sessionId,
+                                          String answer,
+                                          int step,
+                                          Map<String, ToolEvidence> evidenceByKey,
+                                          ResearchEventListener listener) {
+        listener.onStep(AgentEvent.builder()
+                .sessionId(sessionId)
+                .type(AgentEvent.Type.ANSWER)
+                .content(answer)
+                .step(step)
+                .build());
+        List<ToolEvidence> evidence = List.copyOf(evidenceByKey.values());
+        listener.onStep(AgentEvent.builder()
+                .sessionId(sessionId)
+                .type(AgentEvent.Type.EVIDENCE)
+                .content(evidence.isEmpty()
+                        ? "本次回答没有调用到可复查的论文证据。"
+                        : "本次回答的可复查证据链，共 " + evidence.size() + " 条。")
+                .data(JSON.toJSONString(evidence))
+                .step(step)
+                .build());
+    }
+
+    /**
+     * 按稳定证据键去重，保留工具调用真实返回的来源信息，不从 LLM 最终文本中推断证据。
+     */
+    private void collectEvidence(Map<String, ToolEvidence> evidenceByKey, List<ToolEvidence> evidence) {
+        if (evidence == null) {
+            return;
+        }
+        for (ToolEvidence item : evidence) {
+            if (item == null) {
+                continue;
+            }
+            String key = item.getEvidenceKey();
+            if (StringUtils.isBlank(key)) {
+                key = fallbackEvidenceKey(item);
+            }
+            evidenceByKey.putIfAbsent(key, item);
+        }
+    }
+
+    /**
+     * 为极少数没有数据库主键的证据生成回退去重键，避免同一条证据重复出现在 SSE 中。
+     */
+    private String fallbackEvidenceKey(ToolEvidence evidence) {
+        return String.join(":",
+                StringUtils.defaultString(evidence.getEvidenceType(), "UNKNOWN"),
+                String.valueOf(evidence.getPaperId()),
+                StringUtils.defaultString(evidence.getSectionId()),
+                StringUtils.defaultString(evidence.getReferenceIndex()),
+                StringUtils.defaultString(evidence.getHeading()));
     }
 
     private AgentStep parseOutput(String llmOutput) {

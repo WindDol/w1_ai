@@ -16,4 +16,12 @@ public class KnowledgeRelationEntity {
     private String type;
     private String description;
     private String direction;
+    private Double confidence;
+    private String auditStatus;
+    private String supportingEvidence;
+    private String conflictingEvidence;
+    private String auditVersion;
+    private String modelName;
+    private String promptVersion;
+    private String retrievalVersion;
 }

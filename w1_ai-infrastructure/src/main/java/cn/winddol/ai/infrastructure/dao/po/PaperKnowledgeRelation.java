@@ -40,9 +40,27 @@ public class PaperKnowledgeRelation {
      */
     private String description;
 
+    /** 模型对关系结论给出的置信度，范围为 0 到 1。 */
+    private Double confidence;
+
+    /** CONFIRMED、PENDING_REVIEW 或 LEGACY，避免低置信结果被当作论文事实展示。 */
+    private String auditStatus;
+
+    /** 支撑和反驳关系结论的真实检索证据，JSON 数组文本。 */
+    private String supportingEvidence;
+    private String conflictingEvidence;
+
+    /** 使同一论文对在同一审计策略下可以幂等重跑。 */
+    private String auditVersion;
+    private String modelName;
+    private String promptVersion;
+    private String retrievalVersion;
+
     /**
      * 记录创建时间
      */
     private Date createdAt;
+
+    private Date updatedAt;
 
 }

@@ -46,3 +46,4 @@ build/
 *.log.*
 **/data/log/
 **/*-debug.bin
+/config/application-local.example.yml
