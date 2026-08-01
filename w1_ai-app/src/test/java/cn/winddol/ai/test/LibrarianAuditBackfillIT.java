@@ -35,8 +35,7 @@ class LibrarianAuditBackfillIT {
     @Autowired
     private IPaperRepository paperRepository;
 
-    @Value("${paper.librarian.audit.backfill.paper-ids:}")
-    private String paperIds;
+    private String paperIds = "7,9,11,14,15,16,17,18,19,20,21,22,23";
 
     @Value("${paper.librarian.audit.version:librarian-evidence-v1}")
     private String auditVersion;
