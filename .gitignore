@@ -47,3 +47,4 @@ build/
 **/data/log/
 **/*-debug.bin
 /config/application-local.example.yml
+/learing/
