@@ -55,6 +55,7 @@ public class ResearchAgentImpl implements IResearchAgent {
             [AVAILABLE TOOLS]
             1. searchLibrary(query, paperId, threshold):
                 - Search for relevant sections, symbols, and references.
+                - Section chunks are retrieval anchors only. The tool automatically runs Smart Read for the top one or two unique section candidates, based on their fused-score gap, and returns complete sections together with parent background, mathematical dictionaries, cited-reference summaries, and nearby-section navigation. Other ranked chunks remain candidate anchors. Treat expanded sections as semantic context units; call readSection only when you need to follow an unexpanded candidate or nearby-section link.
                 - 'query': The search keyword (Required).
                 - 'paperId': Specific paper ID (Optional, Long). Use null to search everywhere.
                 - 'threshold': Minimum vector similarity (Optional, Double). Range [0.2, 0.95]. Default is 0.4.

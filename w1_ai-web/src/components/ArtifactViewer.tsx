@@ -1,9 +1,8 @@
 import { Check, Copy, FileCode2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import { api } from '../api'
 import type { ArtifactContent, ArtifactSummary, ArtifactType } from '../types'
+import { AcademicMarkdown } from './AcademicMarkdown'
 
 type Props = {
   jobId: string
@@ -58,7 +57,7 @@ export function ArtifactViewer({ jobId, artifacts, initialType, onClose }: Props
         <div className="artifact-content">
           {loading && <div className="compact-empty">正在读取产物...</div>}
           {error && <div className="inline-error">{error}</div>}
-          {!loading && artifact && markdown && <div className="markdown-body artifact-markdown"><ReactMarkdown remarkPlugins={[remarkGfm]}>{artifact.content}</ReactMarkdown></div>}
+          {!loading && artifact && markdown && <div className="markdown-body artifact-markdown"><AcademicMarkdown>{artifact.content}</AcademicMarkdown></div>}
           {!loading && artifact && !markdown && <pre><FileCode2 size={16} />{artifact.content}</pre>}
         </div>
         {artifact?.truncated && <div className="truncated-notice">内容过大，当前只展示前 2,000,000 个字符。</div>}

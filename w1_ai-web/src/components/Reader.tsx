@@ -1,7 +1,6 @@
 import { BookOpen, Braces, ExternalLink } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import type { PaperWorkspace, SectionWorkspace } from '../types'
+import { AcademicMarkdown } from './AcademicMarkdown'
 
 type Props = {
   paper?: PaperWorkspace
@@ -33,8 +32,8 @@ export function Reader({ paper, section, loading, highlightedQuote, onSelectText
   return (
     <main className="reader-pane">
       <header className="reader-header">
-        <div className="reader-breadcrumb">{section?.headingPath || '论文概览'}</div>
-        <h1>{title}</h1>
+        <div className="reader-breadcrumb"><AcademicMarkdown inline>{section?.headingPath || '论文概览'}</AcademicMarkdown></div>
+        <h1><AcademicMarkdown inline>{title}</AcademicMarkdown></h1>
         <div className="reader-meta">
           <span>Paper #{paper.id}</span>
           {paper.year && <span>{paper.year}</span>}
@@ -51,7 +50,7 @@ export function Reader({ paper, section, loading, highlightedQuote, onSelectText
         const selected = window.getSelection()?.toString().trim()
         if (selected) onSelectText?.(selected.slice(0, 4000))
       }}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+        <AcademicMarkdown>{content}</AcademicMarkdown>
       </article>
       {(symbols.length > 0 || references.length > 0) && (
         <footer className="section-context">
@@ -61,8 +60,8 @@ export function Reader({ paper, section, loading, highlightedQuote, onSelectText
               <div className="context-grid">
                 {symbols.map((symbol) => (
                   <div key={symbol.id} className="context-item">
-                    <strong>{symbol.latex || symbol.symbol}</strong>
-                    <span>{symbol.description || '暂无定义说明'}</span>
+                    <strong><AcademicMarkdown inline assumeMath>{symbol.latex || symbol.symbol}</AcademicMarkdown></strong>
+                    <span><AcademicMarkdown inline>{symbol.description || '暂无定义说明'}</AcademicMarkdown></span>
                   </div>
                 ))}
               </div>
@@ -75,7 +74,7 @@ export function Reader({ paper, section, loading, highlightedQuote, onSelectText
                 {references.map((reference) => (
                   <div key={reference.refId} className="reference-row">
                     <span>[{reference.refId}]</span>
-                    <strong>{reference.title || reference.rawText || reference.abstractText || '未命名引用'}</strong>
+                    <strong>{reference.title || reference.rawText || reference.abstractText || null}</strong>
                   </div>
                 ))}
               </div>

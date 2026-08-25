@@ -42,15 +42,15 @@ export const api = {
 }
 
 export function streamResearch(
+  sessionId: string,
   question: string,
-  context: { paperId?: number; sectionId?: string; headingPath?: string; selectedText?: string },
+  context: { paperIds?: number[]; sectionId?: string; headingPath?: string; selectedText?: string },
   onEvent: (event: AgentEvent) => void,
   onDone: () => void,
   onError: (message: string) => void
 ) {
-  const sessionId = crypto.randomUUID()
   const query = new URLSearchParams({ sessionId, question })
-  if (context.paperId) query.set('paperId', String(context.paperId))
+  context.paperIds?.forEach((paperId) => query.append('paperIds', String(paperId)))
   if (context.sectionId) query.set('sectionId', context.sectionId)
   if (context.headingPath) query.set('headingPath', context.headingPath)
   if (context.selectedText) query.set('selectedText', context.selectedText.slice(0, 4000))

@@ -84,6 +84,8 @@ paper:
     mode: ${PAPER_RETRIEVAL_MODE:hybrid}
     candidate-limit: ${PAPER_RETRIEVAL_CANDIDATE_LIMIT:30}
     top-k: ${PAPER_RETRIEVAL_TOP_K:8}
+    smart-read-limit: ${PAPER_RETRIEVAL_SMART_READ_LIMIT:2}
+    smart-read-single-section-ratio: ${PAPER_RETRIEVAL_SMART_READ_SINGLE_SECTION_RATIO:1.35}
     chunk:
       max-chars: ${PAPER_CHUNK_MAX_CHARS:3200}
       overlap-chars: ${PAPER_CHUNK_OVERLAP_CHARS:400}

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -27,12 +28,12 @@ public class ResearchController implements IResearchController {
     @GetMapping(value = "/ask-stream", produces = "text/event-stream;charset=UTF-8")
     public SseEmitter askStream(@RequestParam String sessionId,
                                 @RequestParam String question,
-                                @RequestParam(required = false) Long paperId,
+                                @RequestParam(required = false) List<Long> paperIds,
                                 @RequestParam(required = false) String sectionId,
                                 @RequestParam(required = false) String headingPath,
                                 @RequestParam(required = false) String selectedText) {
         SseEmitter emitter = new SseEmitter(600_000L);
-        ResearchContext context = new ResearchContext(paperId, sectionId, headingPath, selectedText);
+        ResearchContext context = new ResearchContext(paperIds, sectionId, headingPath, selectedText);
 
         // 1. 在基础设施层注册这个连接
         notificationService.register(sessionId, emitter);

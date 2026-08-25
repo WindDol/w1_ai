@@ -12,9 +12,12 @@ import cn.winddol.ai.shared.model.tool.ToolEvidence;
 import cn.winddol.ai.shared.model.tool.ToolResult;
 import com.alibaba.fastjson.JSON;
 import dev.langchain4j.agent.tool.Tool;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Component
 public class ScientificResearchToolsImpl implements IScientificResearchTools {
@@ -22,13 +25,19 @@ public class ScientificResearchToolsImpl implements IScientificResearchTools {
     private final HybridRetrieverServiceImpl retrieverService;
     private final AgentReaderServiceImpl readerService;
     private final AgentCommonToolsImpl agentCommonTools;
+    private final int smartReadLimit;
+    private final double smartReadSingleSectionRatio;
 
     public ScientificResearchToolsImpl(HybridRetrieverServiceImpl retrieverService,
                                        AgentReaderServiceImpl readerService,
-                                       AgentCommonToolsImpl agentCommonTools) {
+                                       AgentCommonToolsImpl agentCommonTools,
+                                       @Value("${paper.retrieval.smart-read-limit:2}") int smartReadLimit,
+                                       @Value("${paper.retrieval.smart-read-single-section-ratio:1.35}") double smartReadSingleSectionRatio) {
         this.retrieverService = retrieverService;
         this.readerService = readerService;
         this.agentCommonTools = agentCommonTools;
+        this.smartReadLimit = Math.max(0, smartReadLimit);
+        this.smartReadSingleSectionRatio = Math.max(1.0, smartReadSingleSectionRatio);
     }
 
     /**
@@ -47,10 +56,63 @@ public class ScientificResearchToolsImpl implements IScientificResearchTools {
     public ToolResult searchLibraryWithEvidence(String query, Long paperId, Double threshold) {
         PaperRetrievalResult result = retrieverService.retrieve(
                 new PaperRetrievalQuery(query, paperId, threshold, null));
-        List<ToolEvidence> evidence = result.evidence().stream()
+        Map<String, ToolEvidence> evidence = new LinkedHashMap<>();
+        result.evidence().stream()
                 .map(this::toToolEvidence)
-                .toList();
-        return ToolResult.ok(formatSearchResult(result), evidence);
+                .forEach(item -> evidence.putIfAbsent(item.getEvidenceKey(), item));
+
+        StringBuilder content = new StringBuilder(formatSearchResult(result));
+        Map<String, PaperEvidence> matchedSections = new LinkedHashMap<>();
+        for (PaperEvidence item : result.evidence()) {
+            if (item.getEvidenceType() == cn.winddol.ai.paper.domain.retrieval.EvidenceType.SECTION
+                    && item.getSectionId() != null && !item.getSectionId().isBlank()) {
+                matchedSections.putIfAbsent(item.getSectionId(), item);
+            }
+        }
+        int expansionLimit = determineSmartReadLimit(List.copyOf(matchedSections.values()));
+        if (expansionLimit > 0) {
+            content.append("\n### Structurally Expanded Section Context\n");
+            content.append("The chunks above are retrieval anchors. The complete matched sections below are the context units.\n\n");
+            content.append("Smart Read expanded ").append(expansionLimit)
+                    .append(" of ").append(matchedSections.size()).append(" unique candidate sections.\n\n");
+            int expandedCount = 0;
+            for (String sectionId : matchedSections.keySet()) {
+                if (expandedCount++ >= expansionLimit) {
+                    break;
+                }
+                ToolResult expanded = readerService.readSectionWithEvidence(sectionId);
+                content.append("#### Expanded sectionId=").append(sectionId).append("\n");
+                content.append(expanded.getContent()).append("\n");
+                if (expanded.getEvidence() != null) {
+                    for (ToolEvidence item : expanded.getEvidence()) {
+                        evidence.putIfAbsent(item.getEvidenceKey(), item);
+                    }
+                }
+            }
+        }
+        return ToolResult.ok(content.toString(), List.copyOf(evidence.values()));
+    }
+
+    /**
+     * Expand at most the configured number of sections. When the first section's fused RRF
+     * score clearly dominates the second, one complete Smart Read is enough; otherwise two
+     * nearby candidates are retained for cross-checking.
+     */
+    private int determineSmartReadLimit(List<PaperEvidence> candidates) {
+        int limit = Math.min(smartReadLimit, candidates.size());
+        if (limit <= 1 || candidates.size() < 2) {
+            return limit;
+        }
+        double first = score(candidates.get(0));
+        double second = score(candidates.get(1));
+        if (first > 0.0 && (second <= 0.0 || first / second >= smartReadSingleSectionRatio)) {
+            return 1;
+        }
+        return limit;
+    }
+
+    private double score(PaperEvidence evidence) {
+        return evidence.getFusionScore() == null ? 0.0 : evidence.getFusionScore();
     }
 
     @Override

@@ -1,15 +1,17 @@
-import { FileText, Search } from 'lucide-react'
+import { Check, FileText, Plus, Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { PaperSummary } from '../types'
 
 type Props = {
   papers: PaperSummary[]
   selectedId?: number
+  scopeIds: number[]
   loading: boolean
   onSelect: (paperId: number) => void
+  onToggleScope: (paperId: number) => void
 }
 
-export function PaperLibrary({ papers, selectedId, loading, onSelect }: Props) {
+export function PaperLibrary({ papers, selectedId, scopeIds, loading, onSelect, onToggleScope }: Props) {
   const [query, setQuery] = useState('')
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase()
@@ -31,20 +33,29 @@ export function PaperLibrary({ papers, selectedId, loading, onSelect }: Props) {
       </label>
       <div className="paper-list" aria-busy={loading}>
         {loading && <div className="compact-empty">正在读取论文库...</div>}
-        {!loading && filtered.map((paper) => (
-          <button
-            type="button"
-            key={paper.id}
-            className={`paper-list-item ${selectedId === paper.id ? 'is-selected' : ''}`}
-            onClick={() => onSelect(paper.id)}
-          >
-            <FileText size={16} />
-            <span>
-              <strong>{paper.title}</strong>
-              <small>Paper #{paper.id} · {paper.status || 'COMPLETED'}</small>
-            </span>
-          </button>
-        ))}
+        {!loading && filtered.map((paper) => {
+          const inScope = scopeIds.includes(paper.id)
+          return (
+            <div key={paper.id} className={`paper-list-row ${selectedId === paper.id ? 'is-selected' : ''}`}>
+              <button type="button" className="paper-list-item" onClick={() => onSelect(paper.id)}>
+                <FileText size={16} />
+                <span>
+                  <strong>{paper.title}</strong>
+                  <small>Paper #{paper.id} · {paper.status || 'COMPLETED'}</small>
+                </span>
+              </button>
+              <button
+                type="button"
+                className={`paper-scope-button ${inScope ? 'is-in-scope' : ''}`}
+                onClick={() => onToggleScope(paper.id)}
+                title={inScope ? '移出研究范围' : '加入研究范围'}
+                aria-label={`${inScope ? '移出' : '加入'}研究范围：${paper.title}`}
+              >
+                {inScope ? <Check size={15} /> : <Plus size={15} />}
+              </button>
+            </div>
+          )
+        })}
         {!loading && !filtered.length && <div className="compact-empty">没有匹配的论文</div>}
       </div>
     </aside>

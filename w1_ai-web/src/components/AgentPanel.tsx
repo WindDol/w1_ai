@@ -1,32 +1,76 @@
-import { ArrowUp, BookOpen, Bot, CheckCircle2, FileSearch, Search, Square, Wrench } from 'lucide-react'
-import { FormEvent, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import { ArrowUp, BookOpen, Bot, Eye, Lightbulb, RotateCcw, Search, Square, Wrench } from 'lucide-react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import { streamResearch } from '../api'
-import type { AgentEvent, Evidence } from '../types'
+import type { AgentEvent, Evidence, PaperSummary } from '../types'
+import { AcademicMarkdown } from './AcademicMarkdown'
 
 type Props = {
+  sessionId: string
   paperId?: number
-  paperTitle?: string
   sectionId?: string
   sectionTitle?: string
   headingPath?: string
   selectedText?: string
+  scopePapers?: PaperSummary[]
   variant?: 'sidebar' | 'workspace'
-  onOpenReader?: () => void
+  onClearScope?: () => void
+  onConversationStarted?: (question: string) => void
   onEvidenceSelect: (evidence: Evidence) => void
 }
 
-type Activity = { kind: 'action' | 'observation'; label: string; step?: number }
+type Activity = { kind: 'thought' | 'action' | 'observation'; label: string; step?: number }
+type ChatTurn = {
+  question: string
+  answer: string
+  activities: Activity[]
+  evidence: Evidence[]
+  error: string
+}
 
-export function AgentPanel({ paperId, paperTitle, sectionId, sectionTitle, headingPath, selectedText, variant = 'sidebar', onOpenReader, onEvidenceSelect }: Props) {
+function readStoredTurns(sessionId: string): ChatTurn[] {
+  try {
+    const stored = window.localStorage.getItem(`scholarbrain.chat.${sessionId}`)
+    if (!stored) return []
+    const parsed = JSON.parse(stored) as ChatTurn[]
+    return Array.isArray(parsed) ? parsed.slice(-30) : []
+  } catch {
+    return []
+  }
+}
+
+function storeTurns(sessionId: string, turns: ChatTurn[]) {
+  const key = `scholarbrain.chat.${sessionId}`
+  const recentTurns = turns.slice(-30)
+  try {
+    window.localStorage.setItem(key, JSON.stringify(recentTurns))
+  } catch {
+    const compactTurns = recentTurns.slice(-10).map((turn) => ({
+      ...turn,
+      activities: turn.activities.map((activity) => ({
+        ...activity,
+        label: activity.label.slice(0, 1200)
+      }))
+    }))
+    try { window.localStorage.setItem(key, JSON.stringify(compactTurns)) } catch { /* Storage may be unavailable. */ }
+  }
+}
+
+export function AgentPanel({ sessionId, paperId, sectionId, sectionTitle, headingPath, selectedText, scopePapers = [], variant = 'sidebar', onClearScope, onConversationStarted, onEvidenceSelect }: Props) {
   const [question, setQuestion] = useState('')
+  const [submittedQuestion, setSubmittedQuestion] = useState('')
   const [answer, setAnswer] = useState('')
   const [activities, setActivities] = useState<Activity[]>([])
   const [evidence, setEvidence] = useState<Evidence[]>([])
+  const [history, setHistory] = useState<ChatTurn[]>(() => readStoredTurns(sessionId))
   const [running, setRunning] = useState(false)
   const [error, setError] = useState('')
   const cancelRef = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    const turns = [...history]
+    if (submittedQuestion) turns.push({ question: submittedQuestion, answer, activities, evidence, error })
+    storeTurns(sessionId, turns)
+  }, [sessionId, history, submittedQuestion, answer, activities, evidence, error])
 
   function handleEvent(event: AgentEvent) {
     if (event.type === 'ANSWER') {
@@ -41,12 +85,16 @@ export function AgentPanel({ paperId, paperTitle, sectionId, sectionTitle, headi
       }
       return
     }
+    if ((event.type === 'THOUGHT' || event.type === 'MESSAGE') && event.content?.trim()) {
+      setActivities((items) => [...items, { kind: 'thought', label: event.content!.trim(), step: event.step }])
+      return
+    }
     if (event.type === 'ACTION') {
-      setActivities((items) => [...items, { kind: 'action', label: `调用 ${event.content || '研究工具'}`, step: event.step }])
+      setActivities((items) => [...items, { kind: 'action', label: event.content || '研究工具', step: event.step }])
       return
     }
     if (event.type === 'OBSERVATION') {
-      setActivities((items) => [...items, { kind: 'observation', label: '已读取并整理工具结果', step: event.step }])
+      setActivities((items) => [...items, { kind: 'observation', label: event.content?.trim() || '工具未返回可展示内容', step: event.step }])
     }
   }
 
@@ -54,14 +102,24 @@ export function AgentPanel({ paperId, paperTitle, sectionId, sectionTitle, headi
     event.preventDefault()
     const value = question.trim()
     if (!value || running) return
+    if (submittedQuestion) {
+      setHistory((turns) => [...turns, { question: submittedQuestion, answer, activities, evidence, error }])
+    }
+    setSubmittedQuestion(value)
+    setQuestion('')
     setAnswer('')
     setEvidence([])
     setActivities([])
     setError('')
     setRunning(true)
+    onConversationStarted?.(value)
+    const context = variant === 'workspace'
+      ? { paperIds: scopePapers.map((item) => item.id) }
+      : { paperIds: paperId ? [paperId] : [], sectionId, headingPath, selectedText }
     cancelRef.current = streamResearch(
+      sessionId,
       value,
-      { paperId, sectionId, headingPath, selectedText },
+      context,
       handleEvent,
       () => setRunning(false),
       (message) => { setError(message); setRunning(false) }
@@ -87,12 +145,16 @@ export function AgentPanel({ paperId, paperTitle, sectionId, sectionTitle, headi
           <section className="research-context-bar">
             <div>
               <span className="context-icon"><BookOpen size={16} /></span>
-              <span><small>当前研究范围{selectedText ? ` · 已选择 ${selectedText.length} 字原文` : ''}</small><strong>{paperTitle || '全部论文库'}</strong>{sectionTitle && <em>{sectionTitle}</em>}</span>
+              <span>
+                <small>当前研究范围</small>
+                <strong>{scopePapers.length ? `已选择 ${scopePapers.length} 篇论文` : '全部论文库'}</strong>
+                {scopePapers.length > 0 && <em>{scopePapers.map((item) => item.title).join(' · ')}</em>}
+              </span>
             </div>
-            {paperId && onOpenReader && <button type="button" className="secondary-button" onClick={onOpenReader}><FileSearch size={15} />核查原文</button>}
+            {scopePapers.length > 0 && onClearScope && <button type="button" className="secondary-button" onClick={onClearScope}><RotateCcw size={15} />恢复全库</button>}
           </section>
         )}
-        {!answer && !activities.length && (
+        {!submittedQuestion && history.length === 0 && (
           <div className="agent-empty">
             <Bot size={25} />
             <strong>{variant === 'workspace' ? '提出一个研究问题' : '围绕当前论文提问'}</strong>
@@ -106,44 +168,65 @@ export function AgentPanel({ paperId, paperTitle, sectionId, sectionTitle, headi
             )}
           </div>
         )}
-        {activities.length > 0 && (
-          <section className="agent-activity">
-            <h3>执行记录</h3>
-            {activities.map((item, index) => (
-              <div key={`${item.kind}-${index}`} className="activity-row">
-                {item.kind === 'action' ? <Wrench size={14} /> : <CheckCircle2 size={14} />}
-                <span>{item.label}</span>
-              </div>
-            ))}
-            {running && <div className="activity-row is-active"><Search size={14} /><span>正在核对论文证据</span></div>}
-          </section>
-        )}
-        {answer && (
-          <section className="agent-answer">
-            <h3>回答</h3>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>
-          </section>
-        )}
-        {evidence.length > 0 && (
-          <section className="evidence-list">
-            <div className="evidence-heading"><h3>证据链</h3><span>{evidence.length}</span></div>
-            {evidence.map((item, index) => (
-              <button type="button" key={item.evidenceKey || index} className="evidence-item" onClick={() => onEvidenceSelect(item)}>
-                <span className="evidence-index">{String(index + 1).padStart(2, '0')}</span>
-                <span>
-                  <strong>{item.headingPath || item.heading || item.paperTitle || '论文证据'}</strong>
-                  <small>{item.quote || `来自 ${item.accessedVia || 'ResearchAgent'}`}</small>
-                </span>
-              </button>
-            ))}
-          </section>
-        )}
-        {error && <div className="inline-error">{error}</div>}
+        <div className="chat-thread">
+          {[...history, ...(submittedQuestion ? [{ question: submittedQuestion, answer, activities, evidence, error }] : [])].map((turn, turnIndex) => {
+            const isActiveTurn = turnIndex === history.length && Boolean(submittedQuestion)
+            return (
+              <article className="chat-turn" key={`${turn.question}-${turnIndex}`}>
+                <div className="chat-message chat-message-user">
+                  <div className="chat-bubble chat-bubble-user">{turn.question}</div>
+                </div>
+                <div className="chat-message chat-message-assistant">
+                  <span className="chat-avatar" aria-hidden="true"><Bot size={16} /></span>
+                  <div className="chat-bubble chat-bubble-assistant">
+                    {(turn.activities.length > 0 || (isActiveTurn && running)) && (
+                      <details className="agent-activity" open={isActiveTurn && running}>
+                        <summary>{isActiveTurn && running ? '正在研究' : `研究过程 · ${turn.activities.length} 步`}</summary>
+                        <div className="activity-list">
+                          {turn.activities.map((item, index) => (
+                            <div key={`${item.kind}-${index}`} className={`activity-row activity-${item.kind}`}>
+                              {item.kind === 'thought' ? <Lightbulb size={14} /> : item.kind === 'action' ? <Wrench size={14} /> : <Eye size={14} />}
+                              <div className="activity-content">
+                                <strong>{item.kind === 'thought' ? '思考' : item.kind === 'action' ? '调用工具' : '工具返回'}</strong>
+                                <div className="activity-message"><AcademicMarkdown>{item.label}</AcademicMarkdown></div>
+                              </div>
+                            </div>
+                          ))}
+                          {isActiveTurn && running && <div className="activity-row is-active"><Search size={14} /><span>正在核对论文证据</span></div>}
+                        </div>
+                      </details>
+                    )}
+                    {turn.answer ? (
+                      <div className="agent-answer"><AcademicMarkdown>{turn.answer}</AcademicMarkdown></div>
+                    ) : isActiveTurn && running ? (
+                      <div className="assistant-thinking"><span /><span /><span /></div>
+                    ) : null}
+                    {turn.evidence.length > 0 && (
+                      <section className="evidence-list">
+                        <div className="evidence-heading"><h3>证据链</h3><span>{turn.evidence.length}</span></div>
+                        {turn.evidence.map((item, index) => (
+                          <button type="button" key={item.evidenceKey || index} className="evidence-item" onClick={() => onEvidenceSelect(item)}>
+                            <span className="evidence-index">{String(index + 1).padStart(2, '0')}</span>
+                            <span>
+                              <strong><AcademicMarkdown inline>{item.headingPath || item.heading || item.paperTitle || '论文证据'}</AcademicMarkdown></strong>
+                              <small><AcademicMarkdown inline>{item.quote || `来自 ${item.accessedVia || 'ResearchAgent'}`}</AcademicMarkdown></small>
+                            </span>
+                          </button>
+                        ))}
+                      </section>
+                    )}
+                    {turn.error && <div className="inline-error">{turn.error}</div>}
+                  </div>
+                </div>
+              </article>
+            )
+          })}
+        </div>
       </div>
       <form className="agent-composer" onSubmit={submit}>
-        <textarea value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="这篇论文的核心贡献是什么？" rows={3} />
+        <textarea value={question} onChange={(event) => setQuestion(event.target.value)} placeholder={variant === 'workspace' ? '输入跨论文或单篇研究问题...' : '这篇论文的核心贡献是什么？'} rows={3} />
         <div className="composer-footer">
-          <span>{sectionId ? `当前章节 · ${sectionTitle || sectionId}` : paperId ? `当前论文 · Paper #${paperId}` : '全部论文库'}</span>
+          <span>{variant === 'workspace' ? (scopePapers.length ? `限定 ${scopePapers.length} 篇论文` : '搜索全部论文库') : sectionId ? `当前章节 · ${sectionTitle || sectionId}` : paperId ? `当前论文 · Paper #${paperId}` : '未附加论文上下文'}</span>
           {running ? (
             <button type="button" className="icon-button dark" onClick={stop} title="停止"><Square size={15} /></button>
           ) : (

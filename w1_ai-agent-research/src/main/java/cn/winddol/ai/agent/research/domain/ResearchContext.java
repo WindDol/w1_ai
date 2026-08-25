@@ -1,29 +1,39 @@
 package cn.winddol.ai.agent.research.domain;
 
+import java.util.List;
+
 /**
  * 用户发起研究任务时的结构化阅读上下文。
  *
  * 上下文由 HTTP 层独立传入，避免前端把 paperId、sectionId 等信息拼进自然语言问题。
  */
-public record ResearchContext(Long paperId,
+public record ResearchContext(List<Long> paperIds,
                               String sectionId,
                               String headingPath,
                               String selectedText) {
 
+    public ResearchContext {
+        paperIds = paperIds == null ? List.of() : paperIds.stream()
+                .filter(id -> id != null && id > 0)
+                .distinct()
+                .limit(20)
+                .toList();
+    }
+
     public static ResearchContext empty() {
-        return new ResearchContext(null, null, null, null);
+        return new ResearchContext(List.of(), null, null, null);
     }
 
     /** 将经过校验的页面上下文附加到研究任务，而不修改用户原始问题。 */
     public String scopeTask(String taskDescription) {
-        if (paperId == null && isBlank(sectionId) && isBlank(selectedText)) {
+        if (paperIds.isEmpty() && isBlank(sectionId) && isBlank(selectedText)) {
             return taskDescription;
         }
         StringBuilder scoped = new StringBuilder(taskDescription)
                 .append("\n\n[ACTIVE READING CONTEXT]\n");
-        if (paperId != null) {
-            scoped.append("- Current paper ID: ").append(paperId).append('\n');
-            scoped.append("- Prefer evidence from this paper unless the question explicitly asks for comparison.\n");
+        if (!paperIds.isEmpty()) {
+            scoped.append("- Selected paper IDs: ").append(paperIds).append('\n');
+            scoped.append("- Restrict evidence to these papers. For comparisons, call searchLibrary separately for each selected paper ID.\n");
         }
         if (!isBlank(sectionId)) {
             scoped.append("- Current section ID: ").append(oneLine(sectionId, 200)).append('\n');

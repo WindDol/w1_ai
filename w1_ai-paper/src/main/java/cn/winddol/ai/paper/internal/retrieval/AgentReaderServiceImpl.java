@@ -51,12 +51,17 @@ public class AgentReaderServiceImpl {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("### Current Section Content\n");
-        sb.append(section.getContent()).append("\n\n");
+        PaperEntity paper = repository.selectPaperById(section.getPaperId());
+        String headingPath = resolveHeadingPath(section);
+        sb.append("### Navigation Path\n");
+        if (paper != null && paper.getTitle() != null) {
+            sb.append("Paper: \"").append(paper.getTitle()).append("\" > ");
+        }
+        sb.append(headingPath).append("\n\n");
 
         List<SymbolEntity> symbols = repository.selectSymbolsByUuids(sectionUuid);
         if (symbols != null && !symbols.isEmpty()) {
-            sb.append("### Local Symbols\n");
+            sb.append("### Mathematical Dictionary (Relevant to this section)\n");
             for (SymbolEntity s : symbols) {
                 sb.append(String.format("- **%s**: %s", s.getSymbol(), s.getDescription()));
                 if (s.getDefinitionFormula() != null) {
@@ -64,10 +69,27 @@ public class AgentReaderServiceImpl {
                 }
                 sb.append("\n");
             }
+            sb.append("\n");
         }
 
-        PaperEntity paper = repository.selectPaperById(section.getPaperId());
-        String headingPath = resolveHeadingPath(section);
+        SectionEntity parent = null;
+        if (section.getParentId() != null && !section.getParentId().isBlank()) {
+            parent = repository.selectSectionById(section.getParentId());
+        }
+        if (parent != null) {
+            sb.append("### Parent Section Background\n");
+            sb.append("**").append(valueOrLegacy(parent.getHeader())).append("**\n");
+            if (parent.getContent() != null && !parent.getContent().isBlank()) {
+                sb.append(abbreviate(parent.getContent(), 500)).append("\n");
+            }
+            sb.append("\n");
+        }
+
+        sb.append("### Current Section Content\n");
+        sb.append(section.getContent() == null ? "" : section.getContent()).append("\n\n");
+
+        List<ReferenceItem> references = appendCitationContext(sb, section);
+        appendNearbySections(sb, section);
         List<ToolEvidence> evidence = new ArrayList<>();
         evidence.add(ToolEvidence.builder()
                 .evidenceKey("SECTION:" + section.getId())
@@ -95,7 +117,83 @@ public class AgentReaderServiceImpl {
                         .build());
             }
         }
+        for (ReferenceItem reference : references) {
+            evidence.add(ToolEvidence.builder()
+                    .evidenceKey("REFERENCE:" + section.getPaperId() + ':' + reference.getRefId())
+                    .evidenceType(EvidenceType.REFERENCE.name())
+                    .paperId(section.getPaperId())
+                    .paperTitle(paper == null ? null : paper.getTitle())
+                    .sectionId(section.getId())
+                    .heading(reference.getTitle())
+                    .headingPath(headingPath)
+                    .referenceIndex(reference.getRefId())
+                    .quote(abbreviate(referenceText(reference), 1600))
+                    .accessedVia("readSection")
+                    .build());
+        }
         return ToolResult.ok(sb.toString(), evidence);
+    }
+
+    /**
+     * 插入本节实际引用的参考文献摘要。这恢复了 Smart Read 中与引用相关的功能，同时保持当前章节内容完整不变。
+     */
+    private List<ReferenceItem> appendCitationContext(StringBuilder content, SectionEntity section) {
+        List<SectionReferenceLinkEntity> links = repository.selectLinksBySectionId(section.getId());
+        if (links == null || links.isEmpty()) {
+            return List.of();
+        }
+        List<ReferenceItem> references = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        for (SectionReferenceLinkEntity link : links) {
+            ReferenceItem reference = repository.selectReferenceByIndex(section.getPaperId(), link.getRefIndex());
+            if (reference != null && seen.add(String.valueOf(reference.getRefId()))) {
+                references.add(reference);
+            }
+        }
+        if (references.isEmpty()) {
+            return List.of();
+        }
+
+        content.append("### External References Cited in This Section\n");
+        content.append("Use this context to understand citation markers in the section.\n\n");
+        for (ReferenceItem reference : references) {
+            content.append("- **[").append(valueOrLegacy(reference.getRefId())).append("] ")
+                    .append(valueOrLegacy(reference.getTitle())).append("**\n");
+            if (reference.getLinkedPaperId() != null) {
+                content.append("  Full text is available in the library (paperId=")
+                        .append(reference.getLinkedPaperId()).append(").\n");
+            }
+            content.append("  Abstract/Summary: ")
+                    .append(abbreviate(referenceText(reference), 500)).append("\n\n");
+        }
+        return List.copyOf(references);
+    }
+
+    /**
+     * 将相邻的节段保留为导航链接。它们的内容不会被注入，因为
+     * 匹配的节段仍作为语义上下文单元；代理程序可在需要时通过链接进行跳转。
+     */
+    private void appendNearbySections(StringBuilder content, SectionEntity section) {
+        if (section.getPaperId() == null || section.getIdx() == null) {
+            return;
+        }
+        SectionEntity previous = repository.getSectionSibling(section.getPaperId(), section.getIdx(), -1);
+        SectionEntity next = repository.getSectionSibling(section.getPaperId(), section.getIdx(), 1);
+        if (previous == null && next == null) {
+            return;
+        }
+        content.append("### Nearby Sections\n");
+        if (previous != null) {
+            content.append("- Previous: ").append(sectionLink(previous)).append("\n");
+        }
+        if (next != null) {
+            content.append("- Next: ").append(sectionLink(next)).append("\n");
+        }
+        content.append("\n");
+    }
+
+    private String sectionLink(SectionEntity section) {
+        return "[sectionId=" + valueOrLegacy(section.getId()) + "] " + valueOrLegacy(section.getHeader());
     }
 
     public String lookupReference(Long paperId, String refIndex) {

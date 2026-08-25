@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronRight, FileText } from 'lucide-react'
 import { useState } from 'react'
 import type { OutlineNode } from '../types'
+import { AcademicMarkdown } from './AcademicMarkdown'
 
 type Props = {
   nodes: OutlineNode[]
@@ -25,7 +26,7 @@ function Branch({ node, selectedId, onSelect }: { node: OutlineNode } & Omit<Pro
           {hasChildren ? (expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />) : <FileText size={13} />}
         </button>
         <button type="button" className="outline-title" onClick={() => onSelect(node)} title={node.title}>
-          {node.title}
+          <AcademicMarkdown inline>{node.title}</AcademicMarkdown>
         </button>
       </div>
       {hasChildren && expanded && (

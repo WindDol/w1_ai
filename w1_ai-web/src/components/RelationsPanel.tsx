@@ -1,5 +1,6 @@
 import { AlertTriangle, ArrowRight, CheckCircle2, GitBranch, MinusCircle } from 'lucide-react'
 import type { PaperRelation } from '../types'
+import { AcademicMarkdown } from './AcademicMarkdown'
 
 type Props = {
   relations: PaperRelation[]
@@ -16,8 +17,8 @@ function RelationRow({ relation, onOpenPaper }: { relation: PaperRelation; onOpe
       </span>
       <span className="relation-content">
         <span className="relation-label"><b>{relation.type}</b><small>{Math.round((relation.confidence || 0) * 100)}%</small></span>
-        <strong>{relation.relatedTitle}</strong>
-        <small>{relation.description || relation.auditStatus || '暂无关系说明'}</small>
+        <strong><AcademicMarkdown inline>{relation.relatedTitle}</AcademicMarkdown></strong>
+        <small><AcademicMarkdown inline>{relation.description || relation.auditStatus || '暂无关系说明'}</AcademicMarkdown></small>
       </span>
       <ArrowRight size={15} />
     </button>
